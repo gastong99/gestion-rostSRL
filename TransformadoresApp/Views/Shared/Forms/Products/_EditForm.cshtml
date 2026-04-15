@@ -1,0 +1,113 @@
+﻿<div class="row g-3">
+    <input type="hidden" name="id" id="edit_id_route" />
+    <input type="hidden" name="ProductId" id="edit_ProductId" />
+
+    @* Identificación *@
+    <div class="col-md-4">
+        <label for="edit_Code" class="form-label">Código <span class="text-danger">*</span></label>
+        <input type="text" name="Code" id="edit_Code" class="form-control" maxlength="50"
+               data-val="true"
+               data-val-required="El código es obligatorio."
+               data-val-length="El código no puede tener más de 50 caracteres."
+               data-val-length-max="50" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Code" data-valmsg-replace="true"></span>
+    </div>
+    <div class="col-md-8">
+        <label for="edit_Name" class="form-label">Nombre <span class="text-danger">*</span></label>
+        <input type="text" name="Name" id="edit_Name" class="form-control" maxlength="100"
+               data-val="true"
+               data-val-required="El nombre es obligatorio."
+               data-val-length="El nombre no puede tener más de 100 caracteres."
+               data-val-length-max="100" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+    </div>
+
+    @* Datos eléctricos *@
+    <div class="col-md-4">
+        <label for="edit_PotenciaKVA" class="form-label">Potencia (kVA) <span class="text-danger">*</span></label>
+        <input type="number" name="PotenciaKVA" id="edit_PotenciaKVA" class="form-control"
+               data-val="true"
+               data-val-required="La potencia es obligatoria."
+               data-val-length="La potencia debe estar entre 1 y 5000 kVA."
+               data-val-length-max="5000" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="PotenciaKVA" data-valmsg-replace="true"></span>
+    </div>
+    <div class="col-md-4">
+        <label for="edit_PerdidasPo" class="form-label">Pérdidas Po (W) <span class="text-danger">*</span></label>
+        <input type="number" name="PerdidasPo" id="edit_PerdidasPo" class="form-control"
+               data-val="true"
+               data-val-required="Las pérdidas en el hierro son obligatorias."
+               data-val-length="Las pérdidas deben estar entre 0 y 10000 W."
+               data-val-length-max="10000" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="PerdidasPo" data-valmsg-replace="true"></span>
+    </div>
+    <div class="col-md-4">
+        <label for="edit_PerdidasPcc" class="form-label">Pérdidas Pcc (W) <span class="text-danger">*</span></label>
+        <input type="number" name="PerdidasPcc" id="edit_PerdidasPcc" class="form-control"
+               data-val="true"
+               data-val-required="Las pérdidas en el cobre son obligatorias."
+               data-val-length="Las pérdidas deben estar entre 0 y 10000 W."
+               data-val-length-max="10000" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="PerdidasPcc" data-valmsg-replace="true"></span>
+    </div>
+
+    @* Ucc *@
+    <div class="col-md-4">
+        <label for="edit_Ucc" class="form-label">Ucc (%) <span class="text-danger">*</span></label>
+        <input type="number" name="Ucc" id="edit_Ucc" class="form-control" step="0.01"
+               data-val="true"
+               data-val-required="La tensión de cortocircuito es obligatoria."
+               data-val-length="El valor debe estar entre 0 y 100%."
+               data-val-length-max="100" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Ucc" data-valmsg-replace="true"></span>
+    </div>
+
+    @* Dimensiones *@
+    <div class="col-md-4">
+        <label for="edit_Largo" class="form-label">Largo (mm) <span class="text-danger">*</span></label>
+        <input type="number" name="Largo" id="edit_Largo" class="form-control"
+               data-val="true"
+               data-val-required="El largo es obligatorio."
+               data-val-length="El largo debe estar entre 0 y 10000 mm."
+               data-val-length-max="10000" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Largo" data-valmsg-replace="true"></span>
+    </div>
+    <div class="col-md-4">
+        <label for="edit_Ancho" class="form-label">Ancho (mm) <span class="text-danger">*</span></label>
+        <input type="number" name="Ancho" id="edit_Ancho" class="form-control"
+               data-val="true"
+               data-val-required="El ancho es obligatorio."
+               data-val-length="El ancho debe estar entre 0 y 10000 mm."
+               data-val-length-max="10000" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Ancho" data-valmsg-replace="true"></span>
+    </div>
+    <div class="col-md-4">
+        <label for="edit_Alto" class="form-label">Alto (mm) <span class="text-danger">*</span></label>
+        <input type="number" name="Alto" id="edit_Alto" class="form-control"
+               data-val="true"
+               data-val-required="El alto es obligatorio."
+               data-val-length="El alto debe estar entre 0 y 10000 mm."
+               data-val-length-max="10000" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Alto" data-valmsg-replace="true"></span>
+    </div>
+
+    @* Diámetro y Peso *@
+    <div class="col-md-4">
+        <label for="edit_Diametro" class="form-label">Diámetro (mm) <span class="text-danger">*</span></label>
+        <input type="number" name="Diametro" id="edit_Diametro" class="form-control"
+               data-val="true"
+               data-val-required="El diámetro es obligatorio."
+               data-val-length="El diámetro debe estar entre 0 y 10000 mm."
+               data-val-length-max="10000" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Diametro" data-valmsg-replace="true"></span>
+    </div>
+    <div class="col-md-4">
+        <label for="edit_Peso" class="form-label">Peso (Kg) <span class="text-danger">*</span></label>
+        <input type="number" name="Peso" id="edit_Peso" class="form-control"
+               data-val="true"
+               data-val-required="El peso es obligatorio."
+               data-val-length="El peso debe estar entre 0 y 10000 kg."
+               data-val-length-max="10000" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Peso" data-valmsg-replace="true"></span>
+    </div>
+</div>

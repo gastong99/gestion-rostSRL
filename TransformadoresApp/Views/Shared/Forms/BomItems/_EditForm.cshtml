@@ -1,0 +1,30 @@
+﻿<div class="row g-3">
+    <input type="hidden" name="BomItemId" id="edit_BomItemId" />
+    <input type="hidden" name="ProductId" id="edit_ProductId" />
+
+    <div class="col-12">
+        <label for="edit_MaterialId" class="form-label">Material <span class="text-danger">*</span></label>
+        <select name="MaterialId" id="edit_MaterialId" class="form-select" required
+                data-val="true"
+                data-val-required="Debe seleccionar un material.">
+            <option value="">Seleccionar...</option>
+        </select>
+        <span class="text-danger field-validation-valid" data-valmsg-for="MaterialId" data-valmsg-replace="true"></span>
+    </div>
+
+    <div class="col-12">
+        <label for="edit_UnitDisplay" class="form-label">Unidad de medida</label>
+        <input type="text" id="edit_UnitDisplay" class="form-control" readonly disabled />
+    </div>
+
+    <div class="col-12">
+        <label for="edit_QuantityPerUnit" class="form-label">Cantidad por unidad <span class="text-danger">*</span></label>
+        <input type="number" name="QuantityPerUnit" id="edit_QuantityPerUnit" class="form-control" step="0.0001" required
+               data-val="true"
+               data-val-required="La cantidad por unidad es obligatoria."
+               data-val-range="La cantidad debe ser mayor que cero."
+               data-val-range-min="0.0001"
+               data-val-range-max="999999" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="QuantityPerUnit" data-valmsg-replace="true"></span>
+    </div>
+</div>

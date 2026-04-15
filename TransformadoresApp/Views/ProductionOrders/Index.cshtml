@@ -1,0 +1,291 @@
+@model TransformadoresApp.ViewModels.ProductionOrderListViewModel
+@{
+    ViewData["Title"] = "Órdenes de Producción";
+    var estadoSel = Context.Request.Query["estado"].ToString();
+    var productSel = Context.Request.Query["productId"].ToString();
+    var desdeSel = Context.Request.Query["desde"].ToString();
+    var hastaSel = Context.Request.Query["hasta"].ToString();
+    var searchQuery = Context.Request.Query["search"].ToString();
+}
+
+<a asp-controller="Home" asp-action="Index" class="page-back">
+    <i class="bi bi-arrow-left"></i> Panel Principal
+</a>
+
+<div class="page-card">
+    <h2 class="page-card-title">
+        <i class="bi bi-list-check"></i> Órdenes de Producción
+    </h2>
+
+    <div class="view-actions" style="justify-content: space-between;">
+        <button class="btn-create" onclick="openCreateModal()">
+            <i class="bi bi-plus-circle"></i> Nueva Orden
+        </button>
+        <a asp-action="Trash" class="btn-secondary-action">
+            <i class="bi bi-trash3"></i> Papelera
+        </a>
+    </div>
+
+    <form method="get">
+        <div class="search-bar" style="justify-content: center;">
+            <div class="search-input-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" name="search" value="@searchQuery"
+                       placeholder="Buscar por ID o transformador..." />
+            </div>
+            <button type="submit" class="btn-search">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+            @if (!string.IsNullOrEmpty(searchQuery))
+            {
+                <a asp-action="Index" class="btn-clear-search">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+            }
+        </div>
+        @if (!string.IsNullOrEmpty(estadoSel))
+        {
+            <input type="hidden" name="estado" value="@estadoSel" />
+        }
+        @if (!string.IsNullOrEmpty(productSel))
+        {
+            <input type="hidden" name="productId" value="@productSel" />
+        }
+        @if (!string.IsNullOrEmpty(desdeSel))
+        {
+            <input type="hidden" name="desde" value="@desdeSel" />
+        }
+        @if (!string.IsNullOrEmpty(hastaSel))
+        {
+            <input type="hidden" name="hasta" value="@hastaSel" />
+        }
+    </form>
+
+    <details @(string.IsNullOrEmpty(estadoSel) && string.IsNullOrEmpty(productSel) && string.IsNullOrEmpty(desdeSel) && string.IsNullOrEmpty(hastaSel) ? "" : "open")>
+        <summary class="filters-toggle">
+            <i class="bi bi-funnel"></i> Filtros avanzados
+        </summary>
+        <form method="get">
+            <div class="filters-panel">
+                @if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    <input type="hidden" name="search" value="@searchQuery" />
+                }
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label>Estado</label>
+                        <select name="estado" class="form-select form-select-sm">
+                            <option value="">-- Todos --</option>
+                            <option value="Pendiente" selected="@(estadoSel == "Pendiente")">Pendiente</option>
+                            <option value="En Proceso" selected="@(estadoSel == "En Proceso")">En Proceso</option>
+                            <option value="Completada" selected="@(estadoSel == "Completada")">Completada</option>
+                            <option value="Cancelada" selected="@(estadoSel == "Cancelada")">Cancelada</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Transformador</label>
+                        <select name="productId" class="form-select form-select-sm" asp-items="@(ViewData["Products"] as SelectList)">
+                            <option value="">-- Todos --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Desde</label>
+                        <input type="date" name="desde" value="@desdeSel" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-md-2">
+                        <label>Hasta</label>
+                        <input type="date" name="hasta" value="@hastaSel" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn-search w-100">
+                            <i class="bi bi-funnel-fill"></i> Aplicar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </details>
+
+    @{
+        bool filtrosActivos = !string.IsNullOrEmpty(estadoSel) || !string.IsNullOrEmpty(productSel) ||
+            !string.IsNullOrEmpty(desdeSel) || !string.IsNullOrEmpty(hastaSel) || !string.IsNullOrEmpty(searchQuery);
+    }
+
+    @if (filtrosActivos)
+    {
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-1 flex-wrap">
+                <span class="badge bg-secondary">Filtros activos</span>
+                @if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    <span class="badge bg-info">Búsqueda: @searchQuery</span>
+                }
+                @if (!string.IsNullOrEmpty(estadoSel))
+                {
+                    <span class="badge bg-info">Estado: @estadoSel</span>
+                }
+                @if (!string.IsNullOrEmpty(productSel))
+                {
+                    <span class="badge bg-info">Producto filtrado</span>
+                }
+                @if (!string.IsNullOrEmpty(desdeSel) || !string.IsNullOrEmpty(hastaSel))
+                {
+                    <span class="badge bg-info">Rango de fechas</span>
+                }
+            </div>
+            <a asp-action="Index" class="btn-clear-search">
+                <i class="bi bi-x-circle"></i> Limpiar filtros
+            </a>
+        </div>
+    }
+
+    @if (!Model.Orders.Any())
+    {
+        <div class="alert alert-warning text-center mt-3">
+            <i class="bi bi-exclamation-triangle-fill"></i> No se encontraron órdenes con los criterios aplicados.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mt-3">
+                <thead>
+                    <tr>
+                        <th class="text-center">ID</th>
+                        <th class="text-center">Transformador</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-center">Fecha y Hora</th>
+                        <th class="text-center">Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Orders)
+                    {
+                        string badgeClass = item.Status switch
+                        {
+                            TransformadoresApp.Models.ProductionStatus.Pendiente => "bg-warning text-dark",
+                            TransformadoresApp.Models.ProductionStatus.EnProceso => "bg-info text-dark",
+                            TransformadoresApp.Models.ProductionStatus.Completada => "bg-success",
+                            TransformadoresApp.Models.ProductionStatus.Cancelada => "bg-danger",
+                            _ => "bg-secondary"
+                        };
+                        var orderData = new
+                        {
+                            productionOrderId = item.ProductionOrderId,
+                            productId = item.ProductId,
+                            product = new { name = item.Product?.Name },
+                            quantity = item.Quantity,
+                            orderDate = item.OrderDate,
+                            status = item.Status.ToString()
+                        };
+                        bool isFinalized = item.Status == TransformadoresApp.Models.ProductionStatus.Completada ||
+                            item.Status == TransformadoresApp.Models.ProductionStatus.Cancelada;
+
+                        <tr data-order-id="@item.ProductionOrderId" data-product-id="@item.ProductId"
+                            data-order='@Html.Raw(Json.Serialize(orderData))'>
+                            <td class="text-center order-id">@item.ProductionOrderId</td>
+                            <td class="text-center order-product">@item.Product?.Name</td>
+                            <td class="text-center order-quantity">@item.Quantity?.ToString("0.##")</td>
+                            <td class="text-center order-date">
+                                <div>@item.OrderDate.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                <small class="text-muted">@item.OrderDate.ToLocalTime().ToString("HH:mm") h</small>
+                            </td>
+                            <td class="text-center">
+                                @if (isFinalized)
+                                {
+                                    <span class="badge status-badge @badgeClass">
+                                        @item.Status.ToString().Replace("EnProceso", "En Proceso")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <select class="form-select form-select-sm status-dropdown"
+                                            data-order-id="@item.ProductionOrderId"
+                                            data-original-status="@item.Status.ToString()"
+                                            style="width: auto; display: inline-block; font-size:13px;">
+                                        @if (item.Status == TransformadoresApp.Models.ProductionStatus.Pendiente)
+                                        {
+                                            <option value="Pendiente" selected>Pendiente</option>
+                                            <option value="EnProceso">En Proceso</option>
+                                            <option value="Cancelada">Cancelada</option>
+                                        }
+                                        else if (item.Status == TransformadoresApp.Models.ProductionStatus.EnProceso)
+                                        {
+                                            <option value="EnProceso" selected>En Proceso</option>
+                                            <option value="Completada">Completada</option>
+                                            <option value="Cancelada">Cancelada</option>
+                                        }
+                                    </select>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-btn-group">
+                                    <button class="action-btn action-btn-edit @(isFinalized ? "action-btn-disabled" : "")"
+                                            onclick='openEditModal(@Html.Raw(Json.Serialize(orderData)))'
+                                        @(isFinalized ? "disabled" : "")>
+                                        <i class="bi bi-pencil"></i>
+                                        <span class="action-tooltip">Modificar</span>
+                                    </button>
+                                    <button class="action-btn action-btn-detail"
+                                            onclick="openDetailsModal(@item.ProductionOrderId)">
+                                        <i class="bi bi-file-text"></i>
+                                        <span class="action-tooltip">Detalles</span>
+                                    </button>
+                                    <a href="/ProductionOrders/GeneratePdf/@item.ProductionOrderId"
+                                           target="_blank"
+                                           class="action-btn action-btn-pdf @(isFinalized ? "action-btn-disabled" : "")"
+                                        @(isFinalized ? "onclick='return false;'" : "")>
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                        <span class="action-tooltip">PDF</span>
+                                    </a>
+                                    <button class="action-btn action-btn-trash"
+                                            onclick="openMoveToTrashModal(@item.ProductionOrderId, '@item.Product?.Name')">
+                                        <i class="bi bi-trash"></i>
+                                        <span class="action-tooltip">Papelera</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@searchQuery"
+                           asp-route-estado="@estadoSel" asp-route-productId="@productSel"
+                           asp-route-desde="@desdeSel" asp-route-hasta="@hastaSel">Anterior</a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-route-page="@i" asp-route-search="@searchQuery"
+                               asp-route-estado="@estadoSel" asp-route-productId="@productSel"
+                               asp-route-desde="@desdeSel" asp-route-hasta="@hastaSel">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@searchQuery"
+                           asp-route-estado="@estadoSel" asp-route-productId="@productSel"
+                           asp-route-desde="@desdeSel" asp-route-hasta="@hastaSel">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+</div>
+
+<partial name="_Modals/_CreateOrderModal" />
+<partial name="_Modals/_EditOrderModal" />
+<partial name="_Modals/_DetailsOrderModal" />
+<partial name="_Modals/_TrashModals" />
+
+@section Scripts {
+    <script src="~/js/productionorders.modals.js" asp-append-version="true"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

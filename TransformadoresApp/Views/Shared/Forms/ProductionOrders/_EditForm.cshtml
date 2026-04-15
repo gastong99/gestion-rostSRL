@@ -1,0 +1,28 @@
+﻿<div class="row g-3">
+    <input type="hidden" name="ProductionOrderId" id="edit_ProductionOrderId" />
+    <input type="hidden" name="ProductId" id="edit_ProductId" />
+
+    <div class="col-12">
+        <label class="form-label">Transformador</label>
+        <input type="text" id="edit_ProductName" class="form-control" disabled />
+    </div>
+
+    <div class="col-12">
+        <label for="edit_Quantity" class="form-label">Cantidad a fabricar <span class="text-danger">*</span></label>
+        <input type="number" name="Quantity" id="edit_Quantity" class="form-control" min="1" step="1" required
+               data-val="true"
+               data-val-required="La cantidad a fabricar es obligatoria."
+               data-val-range="La cantidad debe estar entre 1 y 999.999."
+               data-val-range-min="1"
+               data-val-range-max="999999" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Quantity" data-valmsg-replace="true"></span>
+    </div>
+
+    <div class="col-12">
+        <label for="edit_Status" class="form-label">Estado <span class="text-danger">*</span></label>
+        <select name="Status" id="edit_Status" class="form-select" required>
+            <!-- Se llenará dinámicamente según estado actual -->
+        </select>
+        <span class="text-danger field-validation-valid" data-valmsg-for="Status" data-valmsg-replace="true"></span>
+    </div>
+</div>

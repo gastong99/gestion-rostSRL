@@ -1,0 +1,43 @@
+﻿<div class="modal fade" id="deleteUnitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="deleteUnitError" class="alert alert-danger d-none mb-3">
+                    <i class="bi bi-x-octagon-fill"></i>
+                    <strong>No se puede eliminar.</strong>
+                    <p class="mb-0 mt-2">Esta unidad está siendo utilizada por <strong id="deleteUnitMaterialsCount"></strong> material(es):</p>
+                    <ul id="deleteUnitMaterialsList" class="mb-0 mt-2" style="max-height: 150px; overflow-y: auto;"></ul>
+                </div>
+
+                <div id="deleteUnitConfirm">
+                    <div class="alert alert-warning mb-3">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>¿Está seguro que desea eliminar esta unidad?</strong>
+                        <p class="mb-0 mt-2 text-muted">Esta acción no se puede deshacer.</p>
+                    </div>
+
+                    <p class="mb-0">
+                        <strong>Unidad:</strong> <span id="deleteUnitName"></span>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteUnitForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span id="deleteUnitCancelText">Cancelar</span>
+                    </button>
+                    <button type="submit" class="btn btn-danger" id="deleteUnitSubmit">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+﻿<div class="row g-3">
+    <div class="col-12">
+        <label for="create_ProductId" class="form-label">Transformador <span class="text-danger">*</span></label>
+        <select name="ProductId" id="create_ProductId" class="form-select" required
+                data-val="true"
+                data-val-required="Debe seleccionar un transformador.">
+            <option value="">Seleccionar...</option>
+        </select>
+        <span class="text-danger field-validation-valid" data-valmsg-for="ProductId" data-valmsg-replace="true"></span>
+    </div>
+
+    <div class="col-12">
+        <label for="create_Quantity" class="form-label">Cantidad a fabricar <span class="text-danger">*</span></label>
+        <input type="number" name="Quantity" id="create_Quantity" class="form-control" min="1" step="1" required
+               data-val="true"
+               data-val-required="La cantidad a fabricar es obligatoria."
+               data-val-range="La cantidad debe estar entre 1 y 999.999."
+               data-val-range-min="1"
+               data-val-range-max="999999" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Quantity" data-valmsg-replace="true"></span>
+    </div>
+
+    <div class="col-12">
+        <button id="previewBomBtn" type="button" class="btn btn-sm btn-outline-info w-100">
+            <i class="bi bi-eye"></i> Previsualizar materiales necesarios
+        </button>
+    </div>
+
+    <div id="previewBomArea" class="col-12" style="display:none;">
+        <div class="card">
+            <div class="card-header bg-light">
+                <strong><i class="bi bi-list-ul"></i> Materiales necesarios</strong>
+            </div>
+            <div class="card-body p-0" id="previewBomContent">
+                <!-- Se llenará vía AJAX -->
+            </div>
+        </div>
+    </div>
+</div>

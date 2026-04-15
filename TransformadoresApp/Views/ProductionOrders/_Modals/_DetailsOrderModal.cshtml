@@ -1,0 +1,58 @@
+﻿<div class="modal fade" id="detailsOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-file-text"></i> <span id="detailsOrderModalTitle">Detalles de Orden</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th>ID Orden</th>
+                                    <td id="details_OrderId"></td>
+                                </tr>
+                                <tr>
+                                    <th>Transformador</th>
+                                    <td id="details_ProductName"></td>
+                                </tr>
+                                <tr>
+                                    <th>Cantidad</th>
+                                    <td id="details_Quantity"></td>
+                                </tr>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <td id="details_OrderDate"></td>
+                                </tr>
+                                <tr>
+                                    <th>Estado</th>
+                                    <td id="details_Status"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h5 class="mb-3"><i class="bi bi-list-ul"></i> Materiales Necesarios</h5>
+                <div id="details_BomTable">
+                    <!-- Se llenará vía AJAX -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+                <button type="button" class="btn btn-warning" id="detailsEditButton">
+                    <i class="bi bi-pencil"></i> Modificar
+                </button>
+                <a id="detailsPdfButton" class="btn btn-danger" target="_blank">
+                    <i class="bi bi-file-earmark-pdf"></i> Generar PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

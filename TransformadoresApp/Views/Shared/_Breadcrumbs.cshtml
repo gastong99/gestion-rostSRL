@@ -1,0 +1,25 @@
+﻿@{
+    var breadcrumbs = ViewData["Breadcrumbs"] as List<(string Text, string? Action, string? Controller)>;
+}
+
+@if (breadcrumbs != null && breadcrumbs.Any()) {
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            @foreach (var crumb in breadcrumbs) {
+                if (!string.IsNullOrEmpty(crumb.Action)) {
+                    <li class="breadcrumb-item">
+                        <a asp-action="@crumb.Action"
+                           asp-controller="@crumb.Controller">
+                            @crumb.Text
+                        </a>
+                    </li>
+                }
+                else {
+                    <li class="breadcrumb-item active" aria-current="page">
+                        @crumb.Text
+                    </li>
+                }
+            }
+        </ol>
+    </nav>
+}

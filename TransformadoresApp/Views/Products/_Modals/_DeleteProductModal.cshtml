@@ -1,0 +1,34 @@
+﻿<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    ¿Estás seguro que deseas eliminar el transformador
+                    <strong id="deleteProductName"></strong>?
+                </p>
+                <p class="text-muted mb-0">
+                    Esta acción no se puede deshacer.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <form id="deleteProductForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar Transformador
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

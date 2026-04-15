@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Panel de Administración";
+}
+
+<a asp-controller="Home" asp-action="Index" class="page-back">
+    <i class="bi bi-arrow-left"></i> Panel Principal
+</a>
+
+<div class="admin-grid">
+    <a asp-action="UserManagement" class="admin-card">
+        <div class="admin-card-icon">
+            <i class="bi bi-people"></i>
+        </div>
+        <h4 class="admin-card-title">Gestión de Usuarios</h4>
+        <p class="admin-card-desc">Administrá los roles y permisos de los usuarios registrados.</p>
+    </a>
+
+    <a asp-controller="UnitOfMeasures" asp-action="Index" class="admin-card">
+        <div class="admin-card-icon">
+            <i class="bi bi-rulers"></i>
+        </div>
+        <h4 class="admin-card-title">Unidades de Medida</h4>
+        <p class="admin-card-desc">Agregá, editá o eliminá unidades utilizadas por los materiales.</p>
+    </a>
+</div>

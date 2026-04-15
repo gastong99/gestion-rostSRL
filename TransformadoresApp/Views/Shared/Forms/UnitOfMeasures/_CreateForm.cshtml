@@ -1,0 +1,24 @@
+﻿<div class="row g-3">
+    <div class="col-md-6">
+        <label for="create_Name" class="form-label">Nombre completo <span class="text-danger">*</span></label>
+        <input type="text" name="Name" id="create_Name" class="form-control" maxlength="50" required
+               placeholder="Ej: Kilogramos"
+               data-val="true"
+               data-val-required="El nombre de la unidad es obligatorio."
+               data-val-length="El nombre de la unidad no puede tener más de 50 caracteres."
+               data-val-length-max="50" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label for="create_Abbreviation" class="form-label">Abreviatura <span class="text-danger">*</span></label>
+        <input type="text" name="Abbreviation" id="create_Abbreviation" class="form-control" maxlength="10" required
+               placeholder="Ej: kg"
+               data-val="true"
+               data-val-required="La abreviatura es obligatoria."
+               data-val-length="La abreviatura no puede tener más de 10 caracteres."
+               data-val-length-max="10" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Abbreviation" data-valmsg-replace="true"></span>
+        <small class="text-muted">Se mostrará en tablas y listas</small>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+# ============================================================
+#  .gitignore — Rostagno SRL (ASP.NET Core 8 + Visual Studio)
+# ============================================================
+
+
+# ─── Visual Studio ──────────────────────────────────────────
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+
+# ─── Directorios de compilación ─────────────────────────────
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Dd]ebug/
+[Rr]elease/
+[Xx]64/
+[Xx]86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+
+# ─── Archivos compilados ─────────────────────────────────────
+*.dll
+*.exe
+*.pdb
+
+
+# ─── SQL Server LocalDB ──────────────────────────────────────
+*.mdf
+*.ldf
+*.ndf
+*.db
+
+
+# ─── ASP.NET Core ────────────────────────────────────────────
+appsettings.Development.json
+**/publish/
+*.log
+wwwroot/lib/
+
+
+# ─── NuGet ───────────────────────────────────────────────────
+*.nupkg
+**/packages/
+project.lock.json
+project.fragment.lock.json
+
+
+# ─── Node / Frontend tools ───────────────────────────────────
+node_modules/
+
+
+# ─── Sistema operativo — Windows ─────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Sistema operativo — macOS
+.DS_Store
+.AppleDouble
+._*
+.Spotlight-V100
+.Trashes
+
+# Sistema operativo — Linux
+*~
+
+
+# ─── Otros editores ──────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+
+# ─── Archivos temporales ─────────────────────────────────────
+*.bak
+*.tmp
+*.temp
+*.orig

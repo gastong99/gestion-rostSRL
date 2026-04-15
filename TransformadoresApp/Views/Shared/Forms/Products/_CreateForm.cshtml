@@ -1,0 +1,70 @@
+﻿@model TransformadoresApp.Models.Product
+
+<div class="row g-3">
+    <input type="hidden" asp-for="ProductId" id="create_ProductId" />
+
+    @* Identificación *@
+    <div class="col-md-4">
+        <label asp-for="Code" class="form-label"></label>
+        <input asp-for="Code" class="form-control" id="create_Code" />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+    <div class="col-md-8">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" id="create_Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    @* Datos eléctricos *@
+    <div class="col-md-4">
+        <label asp-for="PotenciaKVA" class="form-label"></label>
+        <input asp-for="PotenciaKVA" class="form-control" id="create_PotenciaKVA" />
+        <span asp-validation-for="PotenciaKVA" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="PerdidasPo" class="form-label"></label>
+        <input asp-for="PerdidasPo" class="form-control" id="create_PerdidasPo" />
+        <span asp-validation-for="PerdidasPo" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="PerdidasPcc" class="form-label"></label>
+        <input asp-for="PerdidasPcc" class="form-control" id="create_PerdidasPcc" />
+        <span asp-validation-for="PerdidasPcc" class="text-danger"></span>
+    </div>
+
+    @* Ucc *@
+    <div class="col-md-4">
+        <label asp-for="Ucc" class="form-label"></label>
+        <input asp-for="Ucc" class="form-control" step="any" id="create_Ucc" />
+        <span asp-validation-for="Ucc" class="text-danger"></span>
+    </div>
+
+    @* Dimensiones *@
+    <div class="col-md-4">
+        <label asp-for="Largo" class="form-label"></label>
+        <input asp-for="Largo" class="form-control" id="create_Largo" />
+        <span asp-validation-for="Largo" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Ancho" class="form-label"></label>
+        <input asp-for="Ancho" class="form-control" id="create_Ancho" />
+        <span asp-validation-for="Ancho" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Alto" class="form-label"></label>
+        <input asp-for="Alto" class="form-control" id="create_Alto" />
+        <span asp-validation-for="Alto" class="text-danger"></span>
+    </div>
+
+    @* Diámetro y Peso *@
+    <div class="col-md-4">
+        <label asp-for="Diametro" class="form-label"></label>
+        <input asp-for="Diametro" class="form-control" id="create_Diametro" />
+        <span asp-validation-for="Diametro" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Peso" class="form-label"></label>
+        <input asp-for="Peso" class="form-control" id="create_Peso" />
+        <span asp-validation-for="Peso" class="text-danger"></span>
+    </div>
+</div>

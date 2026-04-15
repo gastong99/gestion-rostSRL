@@ -1,0 +1,90 @@
+@model IEnumerable<TransformadoresApp.Models.Material>
+@{
+    ViewData["Title"] = "Materiales";
+}
+
+<a asp-controller="Home" asp-action="Index" class="page-back">
+    <i class="bi bi-arrow-left"></i> Panel Principal
+</a>
+
+<div class="page-card">
+    <h2 class="page-card-title">
+        <i class="bi bi-gear"></i> Materiales
+    </h2>
+
+    <div class="view-actions">
+        <button class="btn-create" onclick="openCreateModal()">
+            <i class="bi bi-plus-circle"></i> Nuevo Material
+        </button>
+
+        @if (User.IsInRole("Administrador"))
+        {
+            @using (Html.BeginForm("Import", "Materials", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <div class="file-input-wrap">
+                    <label class="file-input-label">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        <span id="fileNameMat">Seleccionar Excel...</span>
+                        <input type="file" name="file" accept=".xlsx" required
+                               onchange="document.getElementById('fileNameMat').textContent = this.files[0]?.name ?? 'Seleccionar Excel...'" />
+                    </label>
+                    <button type="submit" class="btn-import">
+                        <i class="bi bi-upload"></i> Importar
+                    </button>
+                </div>
+            }
+        }
+    </div>
+
+    <table class="table table-hover mt-2">
+        <thead>
+            <tr>
+                <th class="text-center">Código</th>
+                <th class="text-center">Nombre</th>
+                <th class="text-center">Unidad de medida</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var materialData = new
+                {
+                    materialId = item.MaterialId,
+                    code = item.Code,
+                    name = item.Name,
+                    unitOfMeasureId = item.UnitOfMeasureId,
+                    unitOfMeasure = new { name = item.UnitOfMeasure?.Name }
+                };
+                <tr>
+                    <td class="text-center" style="align-content:center">@item.Code</td>
+                    <td class="text-center" style="align-content:center">@item.Name</td>
+                    <td class="text-center" style="align-content:center">@item.UnitOfMeasure?.Abbreviation</td>
+                    <td>
+                        <div class="action-btn-group">
+                            <button class="action-btn action-btn-edit"
+                                    onclick='openEditModal(@Html.Raw(Json.Serialize(materialData)))'>
+                                <i class="bi bi-pencil"></i>
+                                <span class="action-tooltip">Modificar</span>
+                            </button>
+                            <button class="action-btn action-btn-delete"
+                                    onclick='openDeleteModal(@item.MaterialId, "@item.Code", "@item.Name", "@item.UnitOfMeasure?.Name")'>
+                                <i class="bi bi-trash"></i>
+                                <span class="action-tooltip">Eliminar</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<partial name="_Modals/_CreateMaterialModal" />
+<partial name="_Modals/_EditMaterialModal" />
+<partial name="_Modals/_DeleteMaterialModal" />
+
+@section Scripts {
+    <script src="~/js/materials.modals.js" asp-append-version="true"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

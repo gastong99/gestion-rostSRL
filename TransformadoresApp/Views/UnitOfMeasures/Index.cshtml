@@ -1,0 +1,70 @@
+﻿@model IEnumerable<TransformadoresApp.Models.UnitOfMeasure>
+@{
+    ViewData["Title"] = "Unidades de Medidas";
+}
+
+<a asp-controller="Admin" asp-action="Index" class="page-back">
+    <i class="bi bi-arrow-left"></i> Volver
+</a>
+
+<div class="page-card">
+    <h2 class="page-card-title">
+        <i class="bi bi-rulers"></i> Unidades de Medida
+    </h2>
+
+    <div class="view-actions">
+        <button class="btn-create" onclick="openCreateModal()">
+            <i class="bi bi-plus-circle"></i> Nueva unidad
+        </button>
+    </div>
+
+    <table class="table table-striped table-hover mt-2">
+        <thead>
+            <tr>
+                <th class="text-center">ID</th>
+                <th class="text-center">Nombre</th>
+                <th class="text-center">Abreviatura</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var unitData = new
+                {
+                    unitOfMeasureId = item.UnitOfMeasureId,
+                    name = item.Name,
+                    abbreviation = item.Abbreviation
+                };
+                <tr>
+                    <td class="text-center" style="align-content:center">@item.UnitOfMeasureId</td>
+                    <td class="text-center" style="align-content:center">@item.Name</td>
+                    <td class="text-center" style="align-content:center"><strong>@item.Abbreviation</strong></td>
+                    <td>
+                        <div class="action-btn-group">
+                            <button class="action-btn action-btn-edit"
+                                    onclick='openEditModal(@Html.Raw(Json.Serialize(unitData)))'>
+                                <i class="bi bi-pencil"></i>
+                                <span class="action-tooltip">Modificar</span>
+                            </button>
+                            <button class="action-btn action-btn-delete"
+                                    onclick='openDeleteModal(@item.UnitOfMeasureId, "@item.Name")'>
+                                <i class="bi bi-trash"></i>
+                                <span class="action-tooltip">Eliminar</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<partial name="_Modals/_CreateUnitModal" />
+<partial name="_Modals/_EditUnitModal" />
+<partial name="_Modals/_DeleteUnitModal" />
+
+@section Scripts {
+    <script src="~/js/unitofmeasures.modals.js" asp-append-version="true"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

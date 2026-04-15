@@ -1,0 +1,90 @@
+﻿@model IEnumerable<TransformadoresApp.Models.ProductionOrder>
+@{
+    ViewData["Title"] = "Papelera de Órdenes de Producción";
+}
+
+<a asp-action="Index" class="page-back">
+    <i class="bi bi-arrow-left"></i> Volver a Órdenes
+</a>
+
+<div class="page-card">
+    <h2 class="page-card-title">
+        <i class="bi bi-trash3"></i> Papelera de Órdenes
+    </h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            <i class="bi bi-inbox"></i> No hay órdenes en la papelera.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning" style="font-size:13px;">
+            <i class="bi bi-info-circle-fill"></i>
+            <strong>Nota:</strong> Las órdenes en la papelera pueden ser restauradas o eliminadas definitivamente.
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mt-2">
+                <thead>
+                    <tr>
+                        <th class="text-center">ID</th>
+                        <th class="text-center">Transformador</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-center">Fecha y Hora</th>
+                        <th class="text-center">Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        string badgeClass = item.Status switch
+                        {
+                            TransformadoresApp.Models.ProductionStatus.Pendiente => "bg-warning text-dark",
+                            TransformadoresApp.Models.ProductionStatus.EnProceso => "bg-info text-dark",
+                            TransformadoresApp.Models.ProductionStatus.Completada => "bg-success",
+                            TransformadoresApp.Models.ProductionStatus.Cancelada => "bg-danger",
+                            _ => "bg-secondary"
+                        };
+                        <tr>
+                            <td class="text-center">@item.ProductionOrderId</td>
+                            <td class="text-center">@item.Product?.Name</td>
+                            <td class="text-center">@item.Quantity?.ToString("0.##")</td>
+                            <td class="text-center">
+                                <div>@item.OrderDate.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                <small class="text-muted">@item.OrderDate.ToLocalTime().ToString("HH:mm") h</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge @badgeClass">
+                                    @item.Status.ToString().Replace("EnProceso", "En Proceso")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="action-btn-group">
+                                    <button class="action-btn action-btn-restore"
+                                            onclick="openRestoreModal(@item.ProductionOrderId, '@item.Product?.Name')">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                        <span class="action-tooltip">Restaurar</span>
+                                    </button>
+                                    <button class="action-btn action-btn-delete"
+                                            onclick="openDeleteModal(@item.ProductionOrderId, '@item.Product?.Name', '@item.Quantity?.ToString("0.##")')">
+                                        <i class="bi bi-x-circle"></i>
+                                        <span class="action-tooltip">Eliminar definitivamente</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<partial name="_Modals/_TrashModals" />
+
+@section Scripts {
+    <script src="~/js/productionorders.modals.js" asp-append-version="true"></script>
+}

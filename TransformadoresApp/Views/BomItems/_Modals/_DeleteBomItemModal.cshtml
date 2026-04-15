@@ -1,0 +1,39 @@
+﻿<div class="modal fade" id="deleteBomItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning mb-0">
+                    <p class="mb-2">
+                        <strong>¿Está seguro que desea eliminar el siguiente material?</strong>
+                    </p>
+                    <p class="mb-2">
+                        <strong>Material:</strong> <span id="deleteBomMaterialName"></span>
+                    </p>
+                    <p class="mb-2">
+                        <strong>Cantidad:</strong> <span id="deleteBomQuantity"></span> <span id="deleteBomUnit"></span>
+                    </p>
+                    <p class="text-muted mb-0">
+                        <small>Esta acción no se puede deshacer.</small>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteBomItemForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

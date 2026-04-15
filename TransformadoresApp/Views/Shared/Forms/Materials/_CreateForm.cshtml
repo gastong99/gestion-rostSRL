@@ -1,0 +1,32 @@
+﻿@model TransformadoresApp.Models.Material
+<div class="row g-3">
+    <div class="col-md-6">
+        <label for="create_Code" class="form-label">Código <span class="text-danger">*</span></label>
+        <input type="text" name="Code" id="create_Code" class="form-control" maxlength="50" required
+               data-val="true"
+               data-val-required="El código del material es obligatorio."
+               data-val-length="El código no puede tener más de 50 caracteres."
+               data-val-length-max="50" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Code" data-valmsg-replace="true"></span>
+    </div>
+    
+    <div class="col-md-6">
+        <label for="create_Name" class="form-label">Nombre <span class="text-danger">*</span></label>
+        <input type="text" name="Name" id="create_Name" class="form-control" maxlength="100" required
+               data-val="true"
+               data-val-required="El nombre del material es obligatorio."
+               data-val-length="El nombre no puede tener más de 100 caracteres."
+               data-val-length-max="100" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+    </div>
+    
+    <div class="col-12">
+        <label for="create_UnitOfMeasureId" class="form-label">Unidad de medida <span class="text-danger">*</span></label>
+        <select name="UnitOfMeasureId" id="create_UnitOfMeasureId" class="form-select" required
+                data-val="true"
+                data-val-required="Debe seleccionar una unidad de medida.">
+            <option value="">Seleccionar...</option>
+        </select>
+        <span class="text-danger field-validation-valid" data-valmsg-for="UnitOfMeasureId" data-valmsg-replace="true"></span>
+    </div>
+</div>
