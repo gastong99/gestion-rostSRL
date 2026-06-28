@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Models;
+using TransformadoresApp.Models.Catalogs;
 
 namespace TransformadoresApp.Data
 {
@@ -14,6 +15,8 @@ namespace TransformadoresApp.Data
         public DbSet<UnitOfMeasure> UnitOfMeasures => Set<UnitOfMeasure>();
         public DbSet<BomItem> BomItems => Set<BomItem>();
         public DbSet<ProductionOrder> ProductionOrders => Set<ProductionOrder>();
+        public DbSet<Category> Categories => Set<Category>();
+        public DbSet<ItemAttribute> ItemAttributes => Set<ItemAttribute>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +41,12 @@ namespace TransformadoresApp.Data
             modelBuilder.Entity<ProductionOrder>()
                 .Property(o => o.Quantity)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.Parent)
+                .WithMany(c => c.Children)
+                .HasForeignKey(c => c.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
