@@ -1,0 +1,38 @@
+﻿@model TransformadoresApp.Models.Catalogs.Category
+
+<div class="row g-3">
+
+    <div class="col-12">
+        <label for="create_Name" class="form-label">
+            Nombre <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               name="Name"
+               id="create_Name"
+               class="form-control"
+               maxlength="100"
+               required />
+
+        <span class="text-danger"
+              data-valmsg-for="Name">
+        </span>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label">
+            Categoría padre
+        </label>
+
+        <select name="ParentId"
+                id="create_ParentId"
+                class="form-select">
+
+            <option value="">
+                Sin categoría padre
+            </option>
+
+        </select>
+    </div>
+
+</div>

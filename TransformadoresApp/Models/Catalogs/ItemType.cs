@@ -1,9 +1,10 @@
-﻿namespace TransformadoresApp.Models.Catalogs;
-
-public enum ItemType
+﻿namespace TransformadoresApp.Models.Catalogs
 {
-    RawMaterial = 1,
-    FinishedProduct = 2,
-    CommercialProduct = 3,
-    Service = 4
+    public enum ItemType
+    {
+        RawMaterial = 1,
+        FinishedProduct = 2,
+        CommercialProduct = 3,
+        Service = 4
+    }
 }

@@ -6,6 +6,10 @@ public class ItemAttribute
 {
     public int Id { get; set; }
 
+    public int ItemId { get; set; }
+
+    public Item? Item { get; set; }
+
     [Required]
     [MaxLength(100)]
     public string Name { get; set; } = string.Empty;

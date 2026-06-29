@@ -1,0 +1,109 @@
+﻿<div class="modal fade"
+     id="deleteCategoryModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Desactivar categoría
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <div id="deleteCategoryError"
+                     class="alert alert-danger d-none mb-3">
+
+                    <i class="bi bi-x-octagon-fill"></i>
+
+                    <strong>No se puede desactivar.</strong>
+
+                    <p class="mb-0 mt-2">
+                        La categoría posee elementos asociados.
+                    </p>
+
+                    <ul id="deleteCategoryUsedIn"
+                        class="mb-0 mt-2">
+                    </ul>
+
+                </div>
+
+                <div id="deleteCategoryConfirm">
+
+                    <div class="alert alert-warning mb-3">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+
+                        <strong>
+                            ¿Desea desactivar esta categoría?
+                        </strong>
+
+                        <p class="mb-0 mt-2 text-muted">
+                            La categoría dejará de estar disponible,
+                            pero permanecerá almacenada en el sistema.
+                        </p>
+                    </div>
+
+                    <table class="table table-bordered table-sm">
+                        <tbody>
+                            <tr>
+                                <th style="width:40%;">
+                                    Nombre
+                                </th>
+                                <td id="deleteCategoryName"></td>
+                            </tr>
+
+                            <tr>
+                                <th>
+                                    Categoría padre
+                                </th>
+                                <td id="deleteCategoryParent"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <form id="deleteCategoryForm"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        <span id="deleteCategoryCancelText">
+                            Cancelar
+                        </span>
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-warning"
+                            id="deleteCategorySubmit">
+
+                        <i class="bi bi-slash-circle"></i>
+                        Desactivar
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
