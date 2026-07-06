@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
 using TransformadoresApp.Models.Catalogs;
+using TransformadoresApp.Helpers;
 
 namespace TransformadoresApp.Controllers
 {
@@ -19,14 +20,13 @@ namespace TransformadoresApp.Controllers
         public async Task<IActionResult> Index(bool showInactive = false)
         {
             ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
-    {
-        ("Inicio", "Index", "Home"),
-        ("Categorías", null, null)
-    };
+            {
+                ("Inicio", "Index", "Home"),
+                ("Categorías", null, null)
+            };
 
-            var query = _db.Categories
-                .Include(c => c.Parent)
-                .AsQueryable();
+            IQueryable<Category> query = _db.Categories
+                .Include(c => c.Parent);
 
             if (!showInactive)
             {
@@ -65,6 +65,14 @@ namespace TransformadoresApp.Controllers
             {
                 _db.Categories.Add(category);
 
+                if (category.ItemType == null)
+                {
+                    ModelState.AddModelError(nameof(category.ItemType),
+                        "Debe seleccionar un tipo.");
+
+                    return RedirectToAction(nameof(Index));
+                }
+
                 await _db.SaveChangesAsync();
 
                 TempData["Success"] =
@@ -89,6 +97,20 @@ namespace TransformadoresApp.Controllers
 
             existing.Name = category.Name;
             existing.ParentId = category.ParentId;
+
+            if (category.ItemType == null)
+            {
+                ModelState.AddModelError(nameof(category.ItemType),
+                    "Debe seleccionar un tipo.");
+
+                if (category.ParentId == category.Id) {
+                    TempData["Error"] = "Una categoría no puede ser su propia categoría padre.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
 
             await _db.SaveChangesAsync();
 
@@ -140,10 +162,16 @@ namespace TransformadoresApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategoriesList()
+        public async Task<IActionResult> GetCategoriesList(int? excludeId)
         {
-            var categories = await _db.Categories
-                .Where(c => c.IsActive)
+            var query = _db.Categories
+                 .Where(c => c.IsActive);
+
+            if (excludeId.HasValue) {
+                query = query.Where(c => c.Id != excludeId.Value);
+            }
+
+            var categories = await query
                 .OrderBy(c => c.Name)
                 .Select(c => new
                 {
@@ -153,6 +181,19 @@ namespace TransformadoresApp.Controllers
                 .ToListAsync();
 
             return Json(categories);
+        }
+
+        [HttpGet]
+        public IActionResult GetItemTypesList()
+        {
+            var itemTypes = Enum.GetValues<ItemType>()
+                .Select(t => new
+                {
+                    id = (int)t,
+                    name = t.GetDisplayName()
+                });
+
+            return Json(itemTypes);
         }
     }
 }

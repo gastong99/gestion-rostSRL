@@ -1,27 +1,29 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TransformadoresApp.Models.Catalogs
+namespace TransformadoresApp.Models.Catalogs;
+
+public class Category
 {
-    public class Category
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        [Required(ErrorMessage = "El nombre es obligatorio.")]
-        [StringLength(100)]
-        [Display(Name = "Nombre")]
-        public string Name { get; set; } = string.Empty;
+    [Required(ErrorMessage = "El nombre es obligatorio.")]
+    [StringLength(100)]
+    [Display(Name = "Nombre")]
+    public string Name { get; set; } = string.Empty;
 
-        [Display(Name = "Categoría padre")]
-        public int? ParentId { get; set; }
+    [Display(Name = "Categoría padre")]
+    public int? ParentId { get; set; }
 
-        public Category? Parent { get; set; }
+    public Category? Parent { get; set; }
 
-        public ICollection<Category> Children { get; set; }
-            = new List<Category>();
+    public ICollection<Category> Children { get; set; }
+        = new List<Category>();
 
-        public ICollection<Item> Items { get; set; }
-            = new List<Item>();
+    // ← AGREGAR ESTA PROPIEDAD
+    public ICollection<Item> Items { get; set; }
+        = new List<Item>();
 
-        public bool IsActive { get; set; } = true;
-    }
+    public bool IsActive { get; set; } = true;
+
+    public ItemType? ItemType { get; set; }
 }

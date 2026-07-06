@@ -1,0 +1,106 @@
+﻿<div class="modal fade"
+     id="deactivateItemModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+
+                <h5 class="modal-title">
+
+                    <i class="bi bi-pause-circle"></i>
+
+                    Desactivar Item
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="alert alert-warning">
+
+                    ¿Desea desactivar este Item?
+
+                    <br />
+
+                    <small class="text-muted">
+
+                        El Item dejará de estar disponible para nuevas operaciones,
+                        pero conservará todo su historial.
+
+                    </small>
+
+                </div>
+
+                <table class="table table-bordered">
+
+                    <tbody>
+
+                        <tr>
+
+                            <th style="width:35%">
+                                Código
+                            </th>
+
+                            <td id="deactivateItemCode"></td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>
+                                Nombre
+                            </th>
+
+                            <td id="deactivateItemName"></td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <form id="deactivateItemForm"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button class="btn btn-secondary"
+                            type="button"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button class="btn btn-danger"
+                            type="submit">
+
+                        <i class="bi bi-pause-circle"></i>
+
+                        Desactivar
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

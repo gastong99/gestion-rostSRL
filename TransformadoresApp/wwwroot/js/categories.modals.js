@@ -1,18 +1,36 @@
-﻿// ===== CARGAR CATEGORÍAS =====
-async function loadCategories(selectId, selectedCategoryId = null) {
+﻿// =========================
+// CARGAR CATEGORÍAS
+// =========================
+async function loadCategories(
+    selectId,
+    selectedCategoryId = null,
+    excludeId = null) {
     try {
-        const response = await fetch('/Categories/GetCategoriesList');
 
-        if (!response.ok)
-            throw new Error('Error al cargar categorías');
+        let url = "/Categories/GetCategoriesList";
 
-        const categories = await response.json();
+        if (excludeId !== null)
+            url += `?excludeId=${excludeId}`;
+
+        const response = await fetch(url);
+
+        // Excluir la categoría actual
+        if (currentCategoryId) {
+            categories = categories.filter(c => c.id !== currentCategoryId);
+        }
+
+        // Mostrar sólo categorías activas
+        categories = categories.filter(c => c.isActive);
+
+        // Filtrar por tipo (si se especificó)
+        if (itemType !== null && itemType !== undefined) {
+            categories = categories.filter(c => c.itemType === itemType);
+        }
 
         const select = document.getElementById(selectId);
 
         if (!select) return;
 
-        // Limpiar opciones
         select.innerHTML =
             '<option value="">Sin categoría padre</option>';
 
@@ -23,40 +41,105 @@ async function loadCategories(selectId, selectedCategoryId = null) {
             option.value = category.id;
             option.textContent = category.name;
 
-            if (
-                selectedCategoryId &&
-                category.id === selectedCategoryId
-            ) {
+            if (selectedCategoryId === category.id) {
                 option.selected = true;
             }
 
             select.appendChild(option);
         });
 
-    } catch (error) {
+    }
+    catch (error) {
+
         console.error(
             'Error cargando categorías:',
             error
         );
+
     }
 }
 
-// ===== MODAL CREATE =====
-function openCreateModal() {
+// =========================
+// CARGAR TIPOS DE ITEM
+// =========================
+async function loadItemTypes(selectId, selectedId = null) {
+
+    try {
+
+        const response =
+            await fetch('/Categories/GetItemTypesList');
+
+        if (!response.ok)
+            throw new Error('No se pudieron cargar los tipos.');
+
+        const itemTypes = await response.json();
+
+        const select =
+            document.getElementById(selectId);
+
+        if (!select) return;
+
+        select.innerHTML =
+            '<option value="">Seleccionar...</option>';
+
+        itemTypes.forEach(type => {
+
+            const option =
+                document.createElement('option');
+
+            option.value = type.id;
+            option.textContent = type.name;
+
+            if (selectedId === type.id) {
+                option.selected = true;
+            }
+
+            select.appendChild(option);
+
+        });
+
+    }
+    catch (error) {
+
+        console.error(
+            'Error cargando tipos:',
+            error
+        );
+
+    }
+
+}
+
+// =========================
+// MODAL CREATE
+// =========================
+async function openCreateModal() {
 
     resetCreateForm();
 
-    loadCategories('create_ParentId');
-
-    const modal = new bootstrap.Modal(
-        document.getElementById('createCategoryModal')
+    await loadItemTypes(
+        'create_ItemType'
     );
 
+    await loadCategories(
+        'create_ParentId'
+    );
+
+    const modal =
+        new bootstrap.Modal(
+            document.getElementById(
+                'createCategoryModal'
+            )
+        );
+
     modal.show();
+
 }
 
-// ===== MODAL EDIT =====
-function openEditModal(category) {
+// =========================
+// MODAL EDIT
+// =========================
+async function openEditModal(category) {
 
     resetEditForm();
 
@@ -71,26 +154,30 @@ function openEditModal(category) {
 
     document.getElementById(
         'edit_Name'
-    ).value = category.name || '';
+    ).value = category.name;
 
-    loadCategories(
-        'edit_ParentId',
-        category.parentId
+    await loadItemTypes(
+        'edit_ItemType',
+        category.itemType
     );
 
-    const form =
-        document.getElementById(
-            'editCategoryForm'
-        );
+    await loadCategories(
+        "edit_ParentId",
+        category.parentId,
+        category.id
+    );
 
-    form.action =
+    document.getElementById(
+        'editCategoryForm'
+    ).action =
         `/Categories/Edit/${category.id}`;
 
-    const modal = new bootstrap.Modal(
-        document.getElementById(
-            'editCategoryModal'
-        )
-    );
+    const modal =
+        new bootstrap.Modal(
+            document.getElementById(
+                'editCategoryModal'
+            )
+        );
 
     modal.show();
 
@@ -98,16 +185,25 @@ function openEditModal(category) {
 
         if (typeof $.validator !== 'undefined') {
 
-            $(form).removeData("validator");
-            $(form).removeData("unobtrusiveValidation");
+            const form =
+                document.getElementById(
+                    'editCategoryForm'
+                );
+
+            $(form).removeData('validator');
+            $(form).removeData('unobtrusiveValidation');
 
             $.validator.unobtrusive.parse(form);
+
         }
 
     }, 100);
+
 }
 
-// ===== MODAL DELETE =====
+// =========================
+// MODAL DELETE
+// =========================
 function openDeleteModal(
     categoryId,
     name,
@@ -142,18 +238,38 @@ function openDeleteModal(
 
     document.getElementById(
         'deleteCategoryCancelText'
-    ).textContent = 'Cancelar';
+    ).textContent =
+        'Cancelar';
+
+    const modal =
+        new bootstrap.Modal(
+            document.getElementById(
+                'deleteCategoryModal'
+            )
+        );
+
+    modal.show();
+
+}
+
+// ===== MODAL RESTORE =====
+function openRestoreModal(categoryId, name) {
+
+    document.getElementById("restoreCategoryName").textContent = name;
+
+    document.getElementById("restoreCategoryForm").action =
+        `/Categories/Restore/${categoryId}`;
 
     const modal = new bootstrap.Modal(
-        document.getElementById(
-            'deleteCategoryModal'
-        )
+        document.getElementById("restoreCategoryModal")
     );
 
     modal.show();
 }
 
-// ===== LIMPIAR CREATE =====
+// =========================
+// RESET CREATE
+// =========================
 function resetCreateForm() {
 
     const form =
@@ -172,6 +288,7 @@ function resetCreateForm() {
 
         if (validator)
             validator.resetForm();
+
     }
 
     form.querySelectorAll(
@@ -187,6 +304,7 @@ function resetCreateForm() {
         span.classList.add(
             'field-validation-valid'
         );
+
     });
 
     form.querySelectorAll(
@@ -197,10 +315,14 @@ function resetCreateForm() {
             'is-invalid',
             'input-validation-error'
         );
+
     });
+
 }
 
-// ===== LIMPIAR EDIT =====
+// =========================
+// RESET EDIT
+// =========================
 function resetEditForm() {
 
     const form =
@@ -224,6 +346,7 @@ function resetEditForm() {
 
         if (validator)
             validator.resetForm();
+
     }
 
     form.querySelectorAll(
@@ -239,6 +362,7 @@ function resetEditForm() {
         span.classList.add(
             'field-validation-valid'
         );
+
     });
 
     form.querySelectorAll(
@@ -249,10 +373,14 @@ function resetEditForm() {
             'is-invalid',
             'input-validation-error'
         );
+
     });
+
 }
 
-// ===== LIMPIAR AL CERRAR =====
+// =========================
+// LIMPIAR AL CERRAR MODALES
+// =========================
 document.addEventListener(
     'DOMContentLoaded',
     function () {
@@ -272,9 +400,12 @@ document.addEventListener(
             createModal.addEventListener(
                 'hidden.bs.modal',
                 function () {
+
                     resetCreateForm();
+
                 }
             );
+
         }
 
         if (editModal) {
@@ -282,9 +413,13 @@ document.addEventListener(
             editModal.addEventListener(
                 'hidden.bs.modal',
                 function () {
+
                     resetEditForm();
+
                 }
             );
+
         }
+
     }
 );

@@ -25,7 +25,10 @@ namespace TransformadoresApp.Models.Catalogs
         public Category? Category { get; set; }
 
         [Display(Name = "Tipo")]
-        public ItemType ItemType { get; set; }
+        public ItemType ItemType { get; internal set; }
+
+        [NotMapped]
+        public string ItemTypeName => Category?.ItemType?.ToString() ?? "-";
 
         [Display(Name = "Unidad de medida")]
         public int? UnitOfMeasureId { get; set; }

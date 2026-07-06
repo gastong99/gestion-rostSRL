@@ -1,28 +1,57 @@
-﻿<input type="hidden"
-       name="Id"
-       id="edit_Id" />
+﻿<div class="row g-3">
 
-<div class="row g-3">
+    <input type="hidden"
+           id="edit_Id"
+           name="Id" />
 
-    <div class="col-12">
-        <label class="form-label">
-            Nombre
+    <div class="col-md-6">
+
+        <label for="edit_Name" class="form-label">
+
+            Nombre <span class="text-danger">*</span>
+
         </label>
 
-        <input type="text"
+        <input id="edit_Name"
                name="Name"
-               id="edit_Name"
                class="form-control"
+               maxlength="100"
                required />
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label for="edit_ItemType" class="form-label">
+
+            Tipo <span class="text-danger">*</span>
+
+        </label>
+
+        <select id="edit_ItemType"
+                name="ItemType"
+                class="form-select"
+                required>
+
+            <option value="">
+                Seleccionar...
+            </option>
+
+        </select>
+
     </div>
 
     <div class="col-12">
-        <label class="form-label">
+
+        <label for="edit_ParentId"
+               class="form-label">
+
             Categoría padre
+
         </label>
 
-        <select name="ParentId"
-                id="edit_ParentId"
+        <select id="edit_ParentId"
+                name="ParentId"
                 class="form-select">
 
             <option value="">
@@ -30,6 +59,7 @@
             </option>
 
         </select>
+
     </div>
 
 </div>

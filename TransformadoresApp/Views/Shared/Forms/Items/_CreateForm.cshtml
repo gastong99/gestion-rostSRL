@@ -1,0 +1,122 @@
+﻿@model TransformadoresApp.Models.Catalogs.Item
+
+<div class="row g-3">
+
+    <div class="col-md-4">
+        <label for="create_Code" class="form-label">
+            Código <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               id="create_Code"
+               name="Code"
+               class="form-control"
+               maxlength="50"
+               required />
+
+        <span class="text-danger"
+              data-valmsg-for="Code"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label for="create_Name" class="form-label">
+            Nombre <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               id="create_Name"
+               name="Name"
+               class="form-control"
+               maxlength="150"
+               required />
+
+        <span class="text-danger"
+              data-valmsg-for="Name"></span>
+    </div>
+
+    <div class="col-12">
+        <label for="create_Description" class="form-label">
+            Descripción
+        </label>
+
+        <textarea id="create_Description"
+                  name="Description"
+                  class="form-control"
+                  rows="3"></textarea>
+    </div>
+
+    <div class="col-md-4">
+        <label for="create_CategoryId" class="form-label">
+            Categoría <span class="text-danger">*</span>
+        </label>
+
+        <select id="create_CategoryId"
+                name="CategoryId"
+                class="form-select"
+                required>
+            <option value="">
+                Seleccionar...
+            </option>
+        </select>
+
+        <span class="text-danger"
+              data-valmsg-for="CategoryId"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label for="create_UnitOfMeasureId" class="form-label">
+            Unidad de medida
+        </label>
+
+        <select id="create_UnitOfMeasureId"
+                name="UnitOfMeasureId"
+                class="form-select">
+            <option value="">
+                Seleccionar...
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label for="create_Cost" class="form-label">
+            Costo
+        </label>
+
+        <input type="number"
+               step="0.01"
+               min="0"
+               id="create_Cost"
+               name="Cost"
+               class="form-control"
+               value="0" />
+    </div>
+
+    <div class="col-md-4">
+        <label for="create_Price" class="form-label">
+            Precio
+        </label>
+
+        <input type="number"
+               step="0.01"
+               min="0"
+               id="create_Price"
+               name="Price"
+               class="form-control"
+               value="0" />
+    </div>
+
+    <div class="col-md-4">
+        <label for="create_MinimumStock" class="form-label">
+            Stock mínimo
+        </label>
+
+        <input type="number"
+               step="0.01"
+               min="0"
+               id="create_MinimumStock"
+               name="MinimumStock"
+               class="form-control"
+               value="0" />
+    </div>
+
+</div>

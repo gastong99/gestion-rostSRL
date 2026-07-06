@@ -1,8 +1,8 @@
-﻿@model IEnumerable<TransformadoresApp.Models.Catalogs.Category>
+﻿@model IEnumerable<TransformadoresApp.Models.Catalogs.Item>
 @using TransformadoresApp.Models.Catalogs
 
 @{
-    ViewData["Title"] = "Categorías";
+    ViewData["Title"] = "Items";
 }
 
 <a asp-controller="Home"
@@ -15,8 +15,8 @@
 <div class="page-card">
 
     <h2 class="page-card-title">
-        <i class="bi bi-diagram-3"></i>
-        Categorías
+        <i class="bi bi-box-seam"></i>
+        Items
     </h2>
 
     <div class="view-actions">
@@ -25,7 +25,7 @@
                 onclick="openCreateModal()">
 
             <i class="bi bi-plus-circle"></i>
-            Nueva Categoría
+            Nuevo Item
 
         </button>
 
@@ -36,8 +36,8 @@
             <i class="bi bi-eye"></i>
 
             @(ViewBag.ShowInactive == true
-                ? "Ocultar inactivas"
-                : "Mostrar inactivas")
+                ? "Ocultar inactivos"
+                : "Mostrar inactivos")
 
         </a>
 
@@ -49,23 +49,31 @@
 
             <tr>
 
-                <th style="width:30%">
+                <th style="width:12%">
+                    Código
+                </th>
+
+                <th style="width:24%">
                     Nombre
                 </th>
 
-                <th style="width:20%">
+                <th style="width:18%">
+                    Categoría
+                </th>
+
+                <th style="width:16%">
                     Tipo
                 </th>
 
-                <th style="width:25%">
-                    Categoría padre
+                <th style="width:10%">
+                    Unidad
                 </th>
 
                 <th style="width:10%" class="text-center">
                     Estado
                 </th>
 
-                <th style="width:15%" class="text-center">
+                <th style="width:10%" class="text-center">
                     Acciones
                 </th>
 
@@ -77,18 +85,31 @@
 
             @foreach (var item in Model)
             {
-                var categoryData = new
+                var itemData = new
                 {
                     id = item.Id,
+                    code = item.Code,
                     name = item.Name,
-                    parentId = item.ParentId,
-                    itemType = item.ItemType
+                    description = item.Description,
+                    categoryId = item.CategoryId,
+                    unitOfMeasureId = item.UnitOfMeasureId,
+                    cost = item.Cost,
+                    price = item.Price,
+                    minimumStock = item.MinimumStock
                 };
 
                 <tr>
 
                     <td style="vertical-align:middle">
+                        @item.Code
+                    </td>
+
+                    <td style="vertical-align:middle">
                         @item.Name
+                    </td>
+
+                    <td style="vertical-align:middle">
+                        @(item.Category?.Name ?? "-")
                     </td>
 
                     <td style="vertical-align:middle">
@@ -140,7 +161,7 @@
 
                     <td style="vertical-align:middle">
 
-                        @(item.Parent?.Name ?? "-")
+                        @(item.UnitOfMeasure?.Abbreviation ?? "-")
 
                     </td>
 
@@ -150,13 +171,13 @@
                         @if (item.IsActive)
                         {
                             <span class="badge bg-success">
-                                Activa
+                                Activo
                             </span>
                         }
                         else
                         {
                             <span class="badge bg-secondary">
-                                Inactiva
+                                Inactivo
                             </span>
                         }
 
@@ -169,7 +190,7 @@
                             @if (item.IsActive)
                             {
                                 <button class="action-btn action-btn-edit"
-                                        onclick='openEditModal(@Html.Raw(Json.Serialize(categoryData)))'>
+                                        onclick='openEditModal(@Html.Raw(Json.Serialize(itemData)))'>
 
                                     <i class="bi bi-pencil"></i>
 
@@ -180,9 +201,14 @@
                                 </button>
 
                                 <button class="action-btn action-btn-delete"
-                                        onclick='openDeleteModal(@item.Id, "@item.Name", "@(item.Parent?.Name ?? "")")'>
+                                        onclick='openDeactivateModal(@Html.Raw(Json.Serialize(new
+                                        {
+                                            id = item.Id,
+                                            code = item.Code,
+                                            name = item.Name
+                                        })))'>
 
-                                    <i class="bi bi-trash"></i>
+                                    <i class="bi bi-pause-circle"></i>
 
                                     <span class="action-tooltip">
                                         Desactivar
@@ -192,12 +218,20 @@
                             }
                             else
                             {
-                                <button class="action-btn action-btn-restore" onclick='openRestoreModal(@item.Id, "@item.Name")'>
+                                <button class="action-btn action-btn-restore"
+                                        onclick='openRestoreModal(@Html.Raw(Json.Serialize(new
+                                        {
+                                            id = item.Id,
+                                            code = item.Code,
+                                            name = item.Name
+                                        })))'>
+
                                     <i class="bi bi-arrow-clockwise"></i>
 
                                     <span class="action-tooltip">
                                         Restaurar
                                     </span>
+
                                 </button>
                             }
 
@@ -207,23 +241,22 @@
 
                 </tr>
             }
-
         </tbody>
 
     </table>
 
 </div>
 
-<partial name="_Modals/_CreateCategoryModal" />
-<partial name="_Modals/_EditCategoryModal" />
-<partial name="_Modals/_DeleteCategoryModal" />
-<partial name="_Modals/_RestoreCategoryModal" />
+<partial name="_Modals/_CreateItemModal" />
+<partial name="_Modals/_EditItemModal" />
+<partial name="_Modals/_DeactivateItemModal" />
+<partial name="_Modals/_RestoreItemModal" />
 
 @section Scripts{
 
-    <script src="~/js/categories.modals.js"
+    <script src="~/js/items.modals.js"
             asp-append-version="true"></script>
 
-    <partial name="_ValidationScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial" />
 
 }

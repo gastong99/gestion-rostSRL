@@ -54,8 +54,14 @@
 <div class="dashboard-section">
     <div class="section-title">Configuración</div>
     <div class="dashboard-grid-section grid-one-col">
-        <a asp-controller="Categories" asp-action="Index" class="dashboard-card">
-            <i class="bi bi-tags"></i><span>Categorías</span>
+        <a asp-controller="Categories" asp-action="Index" class="dashboard-card text-decoration-none">
+            <div class="dashboard-card-icon-wrap">
+                <i class="bi bi-tags dashboard-card-icon"></i>
+            </div>
+            <div class="dashboard-card-body">
+                <h4 class="dashboard-card-title">Categorías</h4>
+                <p class="dashboard-card-desc">Gestionar categorías de productos</p>
+            </div>
         </a>
 
         <a asp-controller="Admin" asp-action="Index" class="dashboard-card text-decoration-none">

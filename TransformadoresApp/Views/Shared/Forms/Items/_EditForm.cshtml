@@ -1,0 +1,112 @@
+﻿<div class="row g-3">
+
+    <input type="hidden"
+           id="edit_Id"
+           name="Id" />
+
+    <div class="col-md-4">
+        <label for="edit_Code" class="form-label">
+            Código <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               id="edit_Code"
+               name="Code"
+               class="form-control"
+               maxlength="50"
+               required />
+    </div>
+
+    <div class="col-md-8">
+        <label for="edit_Name" class="form-label">
+            Nombre <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               id="edit_Name"
+               name="Name"
+               class="form-control"
+               maxlength="150"
+               required />
+    </div>
+
+    <div class="col-12">
+        <label for="edit_Description" class="form-label">
+            Descripción
+        </label>
+
+        <textarea id="edit_Description"
+                  name="Description"
+                  class="form-control"
+                  rows="3"></textarea>
+    </div>
+
+    <div class="col-md-4">
+        <label for="edit_CategoryId" class="form-label">
+            Categoría <span class="text-danger">*</span>
+        </label>
+
+        <select id="edit_CategoryId"
+                name="CategoryId"
+                class="form-select"
+                required>
+            <option value="">
+                Seleccionar...
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label for="edit_UnitOfMeasureId" class="form-label">
+            Unidad de medida
+        </label>
+
+        <select id="edit_UnitOfMeasureId"
+                name="UnitOfMeasureId"
+                class="form-select">
+            <option value="">
+                Seleccionar...
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label for="edit_Cost" class="form-label">
+            Costo
+        </label>
+
+        <input type="number"
+               step="0.01"
+               min="0"
+               id="edit_Cost"
+               name="Cost"
+               class="form-control" />
+    </div>
+
+    <div class="col-md-4">
+        <label for="edit_Price" class="form-label">
+            Precio
+        </label>
+
+        <input type="number"
+               step="0.01"
+               min="0"
+               id="edit_Price"
+               name="Price"
+               class="form-control" />
+    </div>
+
+    <div class="col-md-4">
+        <label for="edit_MinimumStock" class="form-label">
+            Stock mínimo
+        </label>
+
+        <input type="number"
+               step="0.01"
+               min="0"
+               id="edit_MinimumStock"
+               name="MinimumStock"
+               class="form-control" />
+    </div>
+
+</div>
