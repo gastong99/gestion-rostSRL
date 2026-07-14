@@ -1,0 +1,208 @@
+﻿@model IEnumerable<TransformadoresApp.Models.Inventory.ItemStock>
+
+@{
+    ViewData["Title"] = "Stock";
+}
+
+<a asp-controller="Home"
+   asp-action="Index"
+   class="page-back">
+
+    <i class="bi bi-arrow-left"></i>
+
+    Panel Principal
+
+</a>
+
+<div class="page-card">
+
+    <h2 class="page-card-title">
+
+        <i class="bi bi-collection"></i>
+
+        Stock
+
+    </h2>
+
+    <div class="view-actions">
+
+        <button class="btn-create"
+                onclick="openCreateStockModal()">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Cargar Stock Inicial
+
+        </button>
+
+    </div>
+
+    <table class="table table-hover mt-3">
+
+        <thead>
+
+            <tr>
+
+                <th style="width:10%">
+                    Código
+                </th>
+
+                <th style="width:25%">
+                    Item
+                </th>
+
+                <th style="width:20%">
+                    Categoría
+                </th>
+
+                <th style="width:15%">
+                    Depósito
+                </th>
+
+                <th class="text-end" style="width:10%">
+                    Stock
+                </th>
+
+                <th class="text-end" style="width:10%">
+                    Reservado
+                </th>
+
+                <th class="text-end" style="width:10%">
+                    Disponible
+                </th>
+
+                <th class="text-center" style="width:10%">
+                    Acciones
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @if (!Model.Any())
+            {
+                <tr>
+
+                    <td colspan="8"
+                        class="text-center text-muted py-4">
+
+                        No existen registros de stock.
+
+                    </td>
+
+                </tr>
+            }
+            else
+            {
+                @foreach (var stock in Model)
+                {
+                    var stockData = new
+                    {
+                        id = stock.Id,
+                        itemId = stock.ItemId,
+                        warehouseId = stock.WarehouseId,
+                        quantity = stock.Quantity,
+                        reservedQuantity = stock.ReservedQuantity
+                    };
+
+                    <tr>
+
+                        <td style="vertical-align:middle">
+                            @stock.Item?.Code
+                        </td>
+
+                        <td style="vertical-align:middle">
+                            @stock.Item?.Name
+                        </td>
+
+                        <td style="vertical-align:middle">
+                            @stock.Item?.Category?.Name
+                        </td>
+
+                        <td style="vertical-align:middle">
+                            @stock.Warehouse?.Name
+                        </td>
+
+                        <td class="text-end"
+                            style="vertical-align:middle">
+
+                            @stock.Quantity.ToString("N2")
+
+                        </td>
+
+                        <td class="text-end"
+                            style="vertical-align:middle">
+
+                            @stock.ReservedQuantity.ToString("N2")
+
+                        </td>
+
+                        <td class="text-end"
+                            style="vertical-align:middle">
+
+                            @if (stock.AvailableQuantity <= 0)
+                            {
+                                <span class="badge bg-danger">
+                                    @stock.AvailableQuantity.ToString("N2")
+                                </span>
+                            }
+                            else if (stock.Item != null &&
+                                     stock.AvailableQuantity <= stock.Item.MinimumStock)
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    @stock.AvailableQuantity.ToString("N2")
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">
+                                    @stock.AvailableQuantity.ToString("N2")
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            <div class="action-btn-group">
+
+                                <button class="action-btn action-btn-edit"
+                                        onclick='openEditStockModal(@Html.Raw(Json.Serialize(stockData)))'>
+
+                                    <i class="bi bi-pencil"></i>
+
+                                    <span class="action-tooltip">
+                                        Modificar
+                                    </span>
+
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                }
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<partial name="~/Views/Shared/_Alerts.cshtml" />
+
+<partial name="_Modals/_CreateStockModal" />
+<partial name="_Modals/_EditStockModal" />
+
+@section Scripts{
+
+    <script src="~/js/stocks.modals.js"
+            asp-append-version="true"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

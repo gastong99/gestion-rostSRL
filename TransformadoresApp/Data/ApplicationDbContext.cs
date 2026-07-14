@@ -18,11 +18,12 @@ namespace TransformadoresApp.Data
         public DbSet<UnitOfMeasure> UnitOfMeasures => Set<UnitOfMeasure>();
         public DbSet<BomItem> BomItems => Set<BomItem>();
         public DbSet<ProductionOrder> ProductionOrders => Set<ProductionOrder>();
-
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<ItemAttribute> ItemAttributes => Set<ItemAttribute>();
         public DbSet<Item> Items => Set<Item>();
         public DbSet<Warehouse> Warehouses => Set<Warehouse>();
+        public DbSet<ItemStock> ItemStocks => Set<ItemStock>();
+        public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -114,6 +115,50 @@ namespace TransformadoresApp.Data
             modelBuilder.Entity<Warehouse>()
                 .HasIndex(w => w.Code)
                 .IsUnique();
+
+            // ItemStock → Item
+            modelBuilder.Entity<ItemStock>()
+                .HasOne(s => s.Item)
+                .WithMany(i => i.Stocks)
+                .HasForeignKey(s => s.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ItemStock → Warehouse
+            modelBuilder.Entity<ItemStock>()
+                .HasOne(s => s.Warehouse)
+                .WithMany(w => w.Stocks)
+                .HasForeignKey(s => s.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Un único registro por Item y Depósito
+            modelBuilder.Entity<ItemStock>()
+                .HasIndex(s => new
+                {
+                    s.ItemId,
+                    s.WarehouseId
+                })
+                .IsUnique();
+
+            // Decimales
+            modelBuilder.Entity<ItemStock>()
+                .Property(s => s.Quantity)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ItemStock>()
+                .Property(s => s.ReservedQuantity)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<StockMovement>()
+                .HasOne(sm => sm.Item)
+                .WithMany(i => i.StockMovements)
+                .HasForeignKey(sm => sm.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StockMovement>()
+                .HasOne(sm => sm.Warehouse)
+                .WithMany(w => w.StockMovements)
+                .HasForeignKey(sm => sm.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

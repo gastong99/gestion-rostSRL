@@ -1,0 +1,174 @@
+﻿@model IEnumerable<TransformadoresApp.Models.Inventory.StockMovement>
+
+@{
+    ViewData["Title"] = "Movimientos de Stock";
+}
+
+<a asp-controller="Home"
+   asp-action="Index"
+   class="page-back">
+
+    <i class="bi bi-arrow-left"></i>
+
+    Panel Principal
+
+</a>
+
+<div class="page-card">
+
+    <h2 class="page-card-title">
+
+        <i class="bi bi-arrow-left-right"></i>
+
+        Movimientos de Stock
+
+    </h2>
+
+    <table class="table table-hover mt-3">
+
+        <thead>
+
+            <tr>
+
+                <th class="text-center">
+                    Fecha
+                </th>
+
+                <th class="text-center">
+                    Código
+                </th>
+
+                <th class="text-center">
+                    Item
+                </th>
+
+                <th class="text-center">
+                    Categoría
+                </th>
+
+                <th class="text-center">
+                    Depósito
+                </th>
+
+                <th class="text-center">
+                    Tipo
+                </th>
+
+                <th class="text-center">
+                    Cantidad
+                </th>
+
+                <th class="text-center">
+                    Observaciones
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @if (!Model.Any())
+            {
+                <tr>
+
+                    <td colspan="8"
+                        class="text-center text-muted py-4">
+
+                        No existen movimientos registrados.
+
+                    </td>
+
+                </tr>
+            }
+            else
+            {
+                @foreach (var movement in Model)
+                {
+                    <tr>
+
+                        <td style="vertical-align:middle" class="text-center">
+
+                            @(movement.MovementDate
+                                .ToLocalTime()
+                                .ToString("dd/MM/yyyy HH:mm:ss"))
+                        </td>
+
+                        <td style="vertical-align:middle" class="text-center">
+
+                            @movement.Item?.Code
+
+                        </td>
+
+                        <td style="vertical-align:middle" class="text-center">
+
+                            @movement.Item?.Name
+
+                        </td>
+
+                        <td style="vertical-align:middle" class="text-center">
+
+                            @movement.Item?.Category?.Name
+
+                        </td>
+
+                        <td style="vertical-align:middle" class="text-center">
+
+                            @movement.Warehouse?.Name
+
+                        </td>
+
+                        <td class="text-center" style="vertical-align:middle">
+
+                            @if (movement.MovementType ==
+                                 TransformadoresApp.Models.Inventory.MovementType.InitialLoad)
+                            {
+                                <span class="badge bg-primary">
+                                    Inicial
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    Ajuste
+                                </span>
+                            }
+
+                        </td>
+
+                        <td class="text-center" style="vertical-align:middle">
+
+                            @if (movement.Quantity > 0)
+                            {
+                                <span class="text-success fw-bold">
+
+                                    +@movement.Quantity.ToString("N2")
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-danger fw-bold">
+
+                                    @movement.Quantity.ToString("N2")
+
+                                </span>
+                            }
+
+                        </td>
+
+                        <td style="vertical-align:middle" class="text-center">
+
+                            @movement.Notes
+
+                        </td>
+
+                    </tr>
+                }
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

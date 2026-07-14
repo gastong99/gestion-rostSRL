@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TransformadoresApp.Models;
+using TransformadoresApp.Models.Inventory;
 
 namespace TransformadoresApp.Models.Catalogs
 {
@@ -48,6 +49,11 @@ namespace TransformadoresApp.Models.Catalogs
         public ICollection<ItemAttribute> Attributes { get; set; }
             = new List<ItemAttribute>();
 
+        public ICollection<ItemStock> Stocks { get; set; }
+            = new List<ItemStock>();
+
+        public ICollection<StockMovement> StockMovements { get; set; } 
+            = new List<StockMovement>();
         public bool IsActive { get; set; } = true;
     }
 }

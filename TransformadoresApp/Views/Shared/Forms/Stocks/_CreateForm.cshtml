@@ -1,0 +1,58 @@
+﻿@model TransformadoresApp.Models.Inventory.ItemStock
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+        <label for="create_ItemId" class="form-label">
+            Item <span class="text-danger">*</span>
+        </label>
+
+        <select id="create_ItemId"
+                name="ItemId"
+                class="form-select"
+                required>
+            <option value="">
+                Seleccione un item...
+            </option>
+        </select>
+
+        <span class="text-danger"
+              data-valmsg-for="ItemId"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label for="create_WarehouseId" class="form-label">
+            Depósito <span class="text-danger">*</span>
+        </label>
+
+        <select id="create_WarehouseId"
+                name="WarehouseId"
+                class="form-select"
+                required>
+            <option value="">
+                Seleccione un depósito...
+            </option>
+        </select>
+
+        <span class="text-danger"
+              data-valmsg-for="WarehouseId"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label for="create_Quantity" class="form-label">
+            Stock inicial <span class="text-danger">*</span>
+        </label>
+
+        <input type="number"
+               id="create_Quantity"
+               name="Quantity"
+               class="form-control"
+               step="0.01"
+               min="0"
+               required />
+
+        <span class="text-danger"
+              data-valmsg-for="Quantity"></span>
+    </div>
+
+</div>

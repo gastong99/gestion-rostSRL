@@ -1,0 +1,77 @@
+﻿@model TransformadoresApp.Models.Inventory.ItemStock
+
+<div class="row g-3">
+
+    <input type="hidden"
+           id="edit_Id"
+           name="Id" />
+
+    <div class="col-md-6">
+        <label for="edit_ItemId" class="form-label">
+            Item <span class="text-danger">*</span>
+        </label>
+
+        <select id="edit_ItemId"
+                name="ItemId"
+                class="form-select"
+                required>
+            <option value="">
+                Seleccione un item...
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-6">
+        <label for="edit_WarehouseId" class="form-label">
+            Depósito <span class="text-danger">*</span>
+        </label>
+
+        <select id="edit_WarehouseId"
+                name="WarehouseId"
+                class="form-select"
+                required>
+            <option value="">
+                Seleccione un depósito...
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label for="edit_Quantity" class="form-label">
+            Stock actual <span class="text-danger">*</span>
+        </label>
+
+        <input type="number"
+               id="edit_Quantity"
+               name="Quantity"
+               class="form-control"
+               step="0.01"
+               min="0"
+               required />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">
+            Reservado
+        </label>
+
+        <input type="text"
+               id="edit_ReservedQuantity"
+               class="form-control"
+               value="0.00"
+               readonly />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">
+            Disponible
+        </label>
+
+        <input type="text"
+               id="edit_AvailableQuantity"
+               class="form-control"
+               value="0.00"
+               readonly />
+    </div>
+
+</div>

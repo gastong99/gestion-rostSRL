@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TransformadoresApp.Data;
 
@@ -11,9 +12,11 @@ using TransformadoresApp.Data;
 namespace TransformadoresApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260714004120_AddItemStockModule")]
+    partial class AddItemStockModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -398,42 +401,6 @@ namespace TransformadoresApp.Migrations
                     b.ToTable("ItemStocks");
                 });
 
-            modelBuilder.Entity("TransformadoresApp.Models.Inventory.StockMovement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("MovementDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MovementType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
-
-                    b.HasIndex("WarehouseId");
-
-                    b.ToTable("StockMovements");
-                });
-
             modelBuilder.Entity("TransformadoresApp.Models.Inventory.Warehouse", b =>
                 {
                     b.Property<int>("Id")
@@ -727,25 +694,6 @@ namespace TransformadoresApp.Migrations
                     b.Navigation("Warehouse");
                 });
 
-            modelBuilder.Entity("TransformadoresApp.Models.Inventory.StockMovement", b =>
-                {
-                    b.HasOne("TransformadoresApp.Models.Catalogs.Item", "Item")
-                        .WithMany("StockMovements")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TransformadoresApp.Models.Inventory.Warehouse", "Warehouse")
-                        .WithMany("StockMovements")
-                        .HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Item");
-
-                    b.Navigation("Warehouse");
-                });
-
             modelBuilder.Entity("TransformadoresApp.Models.Material", b =>
                 {
                     b.HasOne("TransformadoresApp.Models.UnitOfMeasure", "UnitOfMeasure")
@@ -779,15 +727,11 @@ namespace TransformadoresApp.Migrations
                 {
                     b.Navigation("Attributes");
 
-                    b.Navigation("StockMovements");
-
                     b.Navigation("Stocks");
                 });
 
             modelBuilder.Entity("TransformadoresApp.Models.Inventory.Warehouse", b =>
                 {
-                    b.Navigation("StockMovements");
-
                     b.Navigation("Stocks");
                 });
 

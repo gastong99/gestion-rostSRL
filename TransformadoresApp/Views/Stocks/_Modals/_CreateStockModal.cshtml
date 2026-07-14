@@ -1,10 +1,10 @@
 ﻿<div class="modal fade"
-     id="createWarehouseModal"
+     id="createStockModal"
      tabindex="-1"
+     aria-labelledby="createStockModalLabel"
      aria-hidden="true">
 
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
             <div class="modal-header"
@@ -12,7 +12,7 @@
 
                 <h5 class="modal-title">
                     <i class="bi bi-plus-circle"></i>
-                    Nuevo Depósito
+                    Cargar Stock Inicial
                 </h5>
 
                 <button type="button"
@@ -21,16 +21,16 @@
                 </button>
             </div>
 
-            <form asp-action="Create"
+            <form id="createStockForm"
+                  asp-controller="Stocks"
+                  asp-action="Create"
                   method="post">
 
                 @Html.AntiForgeryToken()
 
                 <div class="modal-body">
-
-                    <partial name="~/Views/Shared/Forms/Warehouses/_CreateForm.cshtml"
-                             model="new TransformadoresApp.Models.Inventory.Warehouse()" />
-
+                    <partial name="~/Views/Shared/Forms/Stocks/_CreateForm.cshtml"
+                             model="new TransformadoresApp.Models.Inventory.ItemStock()" />
                 </div>
 
                 <div class="modal-footer">
@@ -45,14 +45,11 @@
                             style="background: #1E6B45; color: #fff;">
 
                         <i class="bi bi-save"></i>
-                        Guardar Depósito
+                        Guardar Stock
                     </button>
                 </div>
-
             </form>
 
         </div>
-
     </div>
-
 </div>
