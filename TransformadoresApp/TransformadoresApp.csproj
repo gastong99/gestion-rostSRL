@@ -37,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Inventory\" />
     <Folder Include="Models\Administration\" />
     <Folder Include="Models\Purchases\" />
     <Folder Include="Models\Sales\" />

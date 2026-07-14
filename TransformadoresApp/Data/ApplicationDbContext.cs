@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Models;
 using TransformadoresApp.Models.Catalogs;
+using TransformadoresApp.Models.Inventory;
 
 namespace TransformadoresApp.Data
 {
@@ -21,10 +22,15 @@ namespace TransformadoresApp.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<ItemAttribute> ItemAttributes => Set<ItemAttribute>();
         public DbSet<Item> Items => Set<Item>();
+        public DbSet<Warehouse> Warehouses => Set<Warehouse>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // =====================
+            // PRODUCCIÓN
+            // =====================
 
             // Relación Material → UnitOfMeasure
             modelBuilder.Entity<Material>()
@@ -45,6 +51,10 @@ namespace TransformadoresApp.Data
             modelBuilder.Entity<ProductionOrder>()
                 .Property(o => o.Quantity)
                 .HasPrecision(18, 2);
+
+            // =====================
+            // CATÁLOGOS
+            // =====================
 
             // Categorías jerárquicas
             modelBuilder.Entity<Category>()
@@ -96,6 +106,14 @@ namespace TransformadoresApp.Data
                 .WithMany(i => i.Attributes)
                 .HasForeignKey(a => a.ItemId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================
+            // INVENTARIO
+            // =====================
+
+            modelBuilder.Entity<Warehouse>()
+                .HasIndex(w => w.Code)
+                .IsUnique();
         }
     }
 }

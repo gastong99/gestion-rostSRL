@@ -4,75 +4,20 @@
 
 <div class="dashboard-header">
     <div class="dashboard-header-top">
-        <h1 class="dashboard-title">Panel Principal</h1>
-        <span class="dashboard-badge">Administrador</span>
+        <h1 class="dashboard-title">
+            Panel Principal
+        </h1>
+
+        <span class="dashboard-badge">
+            Administrador
+        </span>
     </div>
 </div>
 
-<div class="dashboard-section">
-    <div class="section-title">Gestión de datos</div>
-    <div class="dashboard-grid-section grid-two-cols">
-        <a asp-controller="Products" asp-action="Index" class="dashboard-card text-decoration-none">
-            <div class="dashboard-card-icon-wrap">
-                <i class="bi bi-lightning-charge dashboard-card-icon"></i>
-            </div>
-            <div class="dashboard-card-body">
-                <h4 class="dashboard-card-title">Transformadores</h4>
-                <p class="dashboard-card-desc">Registro y gestión de transformadores</p>
-            </div>
-            <i class="bi bi-chevron-right dashboard-card-arrow"></i>
-        </a>
-        <a asp-controller="Materials" asp-action="Index" class="dashboard-card text-decoration-none">
-            <div class="dashboard-card-icon-wrap">
-                <i class="bi bi-gear dashboard-card-icon"></i>
-            </div>
-            <div class="dashboard-card-body">
-                <h4 class="dashboard-card-title">Materiales</h4>
-                <p class="dashboard-card-desc">Registro y gestión de insumos</p>
-            </div>
-            <i class="bi bi-chevron-right dashboard-card-arrow"></i>
-        </a>
-    </div>
-</div>
+<partial name="_Sections/_CatalogsSection" />
 
-<div class="dashboard-section">
-    <div class="section-title">Producción</div>
-    <div class="dashboard-grid-section grid-one-col">
-        <a asp-controller="ProductionOrders" asp-action="Index" class="dashboard-card dashboard-card-featured text-decoration-none">
-            <div class="dashboard-card-icon-wrap dashboard-card-icon-wrap-featured">
-                <i class="bi bi-list-check dashboard-card-icon dashboard-card-icon-featured"></i>
-            </div>
-            <div class="dashboard-card-body">
-                <h4 class="dashboard-card-title dashboard-card-title-featured">Ordenes de Producción</h4>
-                <p class="dashboard-card-desc">Gestionar y crear órdenes de fabricación</p>
-            </div>
-            <i class="bi bi-chevron-right dashboard-card-arrow dashboard-card-arrow-featured"></i>
-        </a>
-    </div>
-</div>
+<partial name="_Sections/_InventorySection" />
 
-<div class="dashboard-section">
-    <div class="section-title">Configuración</div>
-    <div class="dashboard-grid-section grid-one-col">
-        <a asp-controller="Categories" asp-action="Index" class="dashboard-card text-decoration-none">
-            <div class="dashboard-card-icon-wrap">
-                <i class="bi bi-tags dashboard-card-icon"></i>
-            </div>
-            <div class="dashboard-card-body">
-                <h4 class="dashboard-card-title">Categorías</h4>
-                <p class="dashboard-card-desc">Gestionar categorías de productos</p>
-            </div>
-        </a>
+<partial name="_Sections/_ProductionSection" />
 
-        <a asp-controller="Admin" asp-action="Index" class="dashboard-card text-decoration-none">
-            <div class="dashboard-card-icon-wrap">
-                <i class="bi bi-speedometer2 dashboard-card-icon"></i>
-            </div>
-            <div class="dashboard-card-body">
-                <h4 class="dashboard-card-title">Panel de Administración</h4>
-                <p class="dashboard-card-desc">Usuarios y unidades de medida del sistema</p>
-            </div>
-            <i class="bi bi-chevron-right dashboard-card-arrow"></i>
-        </a>
-    </div>
-</div>
+<partial name="_Sections/_AdministrationSection" />

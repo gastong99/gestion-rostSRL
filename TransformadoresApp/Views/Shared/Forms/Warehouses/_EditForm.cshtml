@@ -1,0 +1,44 @@
+﻿<div class="row g-3">
+
+    <input type="hidden"
+           id="edit_Id"
+           name="Id" />
+
+    <div class="col-md-4">
+        <label for="edit_Code" class="form-label">
+            Código <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               id="edit_Code"
+               name="Code"
+               class="form-control"
+               maxlength="20"
+               required />
+    </div>
+
+    <div class="col-md-8">
+        <label for="edit_Name" class="form-label">
+            Nombre <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               id="edit_Name"
+               name="Name"
+               class="form-control"
+               maxlength="100"
+               required />
+    </div>
+
+    <div class="col-12">
+        <label for="edit_Description" class="form-label">
+            Descripción
+        </label>
+
+        <textarea id="edit_Description"
+                  name="Description"
+                  class="form-control"
+                  rows="3"></textarea>
+    </div>
+
+</div>

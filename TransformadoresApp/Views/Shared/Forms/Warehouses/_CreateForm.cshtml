@@ -1,0 +1,33 @@
+﻿@model TransformadoresApp.Models.Inventory.Warehouse
+
+<div class="row g-3">
+
+    <div class="col-md-4">
+        <label for="create_Code" class="form-label">
+            Código <span class="text-danger">*</span>
+        </label>
+
+        <input type="text" id="create_Code" name="Code" class="form-control" maxlength="20" required />
+
+        <span class="text-danger" data-valmsg-for="Code"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label for="create_Name" class="form-label">
+            Nombre <span class="text-danger">*</span>
+        </label>
+
+        <input type="text" id="create_Name" name="Name" class="form-control" maxlength="100" required />
+
+        <span class="text-danger" data-valmsg-for="Name"></span>
+    </div>
+
+    <div class="col-12">
+        <label for="create_Description" class="form-label">
+            Descripción
+        </label>
+
+        <textarea id="create_Description" name="Description" class="form-control" rows="3"></textarea>
+    </div>
+
+</div>
