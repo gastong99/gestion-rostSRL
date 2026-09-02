@@ -1,0 +1,56 @@
+﻿<div class="modal fade" id="restoreSupplierModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-arrow-clockwise"></i> Restaurar Proveedor
+                </h5>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-success">
+                    ¿Desea volver a activar este proveedor?
+                </div>
+
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th style="width:35%">Código</th>
+                            <td id="restoreSupplierCode"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Razón Social</th>
+                            <td id="restoreSupplierBusinessName"></td>
+                        </tr>
+
+                        <tr>
+                            <th>CUIT / RUT / NIT</th>
+                            <td id="restoreSupplierTaxId"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <form id="restoreSupplierForm" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-arrow-clockwise"></i> Restaurar
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

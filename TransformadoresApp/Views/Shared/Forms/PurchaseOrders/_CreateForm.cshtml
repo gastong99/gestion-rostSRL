@@ -1,0 +1,88 @@
+﻿@model TransformadoresApp.Models.Purchasing.PurchaseOrder
+
+<div class="row g-3">
+
+    <div class="col-md-4">
+
+        <label for="create_Number" class="form-label">
+            Número <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               id="create_Number"
+               name="Number"
+               class="form-control"
+               maxlength="20"
+               required />
+
+        <span class="text-danger"
+              data-valmsg-for="Number"></span>
+
+    </div>
+
+    <div class="col-md-8">
+
+        <label for="create_SupplierId" class="form-label">
+            Proveedor <span class="text-danger">*</span>
+        </label>
+
+        <select id="create_SupplierId"
+                name="SupplierId"
+                class="form-select"
+                asp-items="ViewBag.Suppliers"
+                required>
+
+            <option value="">
+                -- Seleccione un proveedor --
+            </option>
+
+        </select>
+
+        <span class="text-danger"
+              data-valmsg-for="SupplierId"></span>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label for="create_OrderDate" class="form-label">
+            Fecha de la Orden <span class="text-danger">*</span>
+        </label>
+
+        <input type="date"
+               id="create_OrderDate"
+               name="OrderDate"
+               class="form-control"
+               value="@DateTime.Today.ToString("yyyy-MM-dd")"
+               required />
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label for="create_ExpectedDate" class="form-label">
+            Fecha Estimada
+        </label>
+
+        <input type="date"
+               id="create_ExpectedDate"
+               name="ExpectedDate"
+               class="form-control" />
+
+    </div>
+
+    <div class="col-12">
+
+        <label for="create_Notes" class="form-label">
+            Observaciones
+        </label>
+
+        <textarea id="create_Notes"
+                  name="Notes"
+                  class="form-control"
+                  rows="4"
+                  maxlength="500"></textarea>
+
+    </div>
+
+</div>

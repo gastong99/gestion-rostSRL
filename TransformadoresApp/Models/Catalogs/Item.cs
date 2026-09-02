@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using TransformadoresApp.Models;
 using TransformadoresApp.Models.Inventory;
+using TransformadoresApp.Models.Purchasing;
 
 namespace TransformadoresApp.Models.Catalogs
 {
@@ -46,14 +47,14 @@ namespace TransformadoresApp.Models.Catalogs
         [Column(TypeName = "decimal(18,2)")]
         public decimal MinimumStock { get; set; }
 
-        public ICollection<ItemAttribute> Attributes { get; set; }
-            = new List<ItemAttribute>();
+        public ICollection<ItemAttribute> Attributes { get; set; } = new List<ItemAttribute>();
 
-        public ICollection<ItemStock> Stocks { get; set; }
-            = new List<ItemStock>();
+        public ICollection<ItemStock> Stocks { get; set; } = new List<ItemStock>();
 
-        public ICollection<StockMovement> StockMovements { get; set; } 
-            = new List<StockMovement>();
+        public ICollection<StockMovement> StockMovements { get; set; }  = new List<StockMovement>();
+
+        public ICollection<PurchaseOrderItem> PurchaseOrderItems { get; set; } = new List<PurchaseOrderItem>();
+
         public bool IsActive { get; set; } = true;
     }
 }

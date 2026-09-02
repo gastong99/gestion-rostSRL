@@ -1,0 +1,65 @@
+﻿<div class="modal fade"
+     id="deactivatePurchaseOrderModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-pause-circle"></i>
+                    Desactivar Orden
+                </h5>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    ¿Desea desactivar esta orden de compra?
+                    <br />
+                    <small class="text-muted">
+                        La orden conservará todo su historial.
+                    </small>
+                </div>
+
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th style="width:35%">
+                                Número
+                            </th>
+                            <td id="deactivatePurchaseOrderNumber"></td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Proveedor
+                            </th>
+                            <td id="deactivatePurchaseOrderSupplier"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <form id="deactivatePurchaseOrderForm" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-pause-circle"></i>
+                        Desactivar
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

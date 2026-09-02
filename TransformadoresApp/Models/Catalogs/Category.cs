@@ -16,12 +16,9 @@ public class Category
 
     public Category? Parent { get; set; }
 
-    public ICollection<Category> Children { get; set; }
-        = new List<Category>();
+    public ICollection<Category> Children { get; set; } = new List<Category>();
 
-    // ← AGREGAR ESTA PROPIEDAD
-    public ICollection<Item> Items { get; set; }
-        = new List<Item>();
+    public ICollection<Item> Items { get; set; } = new List<Item>();
 
     public bool IsActive { get; set; } = true;
 

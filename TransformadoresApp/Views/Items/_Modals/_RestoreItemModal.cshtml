@@ -10,88 +10,56 @@
             <div class="modal-header bg-success text-white">
 
                 <h5 class="modal-title">
-
                     <i class="bi bi-arrow-clockwise"></i>
-
                     Restaurar Item
-
                 </h5>
 
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
                 </button>
 
             </div>
 
             <div class="modal-body">
-
                 <div class="alert alert-success">
-
                     ¿Desea volver a activar este Item?
-
                 </div>
 
                 <table class="table table-bordered">
-
                     <tbody>
-
                         <tr>
-
                             <th style="width:35%">
                                 Código
                             </th>
-
                             <td id="restoreItemCode"></td>
-
                         </tr>
 
                         <tr>
-
                             <th>
                                 Nombre
                             </th>
-
                             <td id="restoreItemName"></td>
-
                         </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
 
             <div class="modal-footer">
 
-                <form id="restoreItemForm"
-                      method="post">
+                <form id="restoreItemForm" method="post">
 
                     @Html.AntiForgeryToken()
 
-                    <button class="btn btn-secondary"
-                            type="button"
-                            data-bs-dismiss="modal">
-
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">
                         Cancelar
-
                     </button>
 
-                    <button class="btn btn-success"
-                            type="submit">
-
+                    <button class="btn btn-success" type="submit">
                         <i class="bi bi-arrow-clockwise"></i>
-
                         Restaurar
-
                     </button>
 
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
 </div>

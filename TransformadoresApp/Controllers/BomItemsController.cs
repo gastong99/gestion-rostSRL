@@ -61,14 +61,14 @@ namespace TransformadoresApp.Controllers
 
             if (exists) ModelState.AddModelError("", "Este material ya está asociado a este transformador. Si desea cambiar la cantidad, modifíquelo desde la tabla de materiales de fabricación.");
 
-            if (ModelState.IsValid){
+            if (ModelState.IsValid) {
                 try
                 {
                     _db.Add(bomItem);
                     await _db.SaveChangesAsync();
                     return RedirectToAction("Details", "Products", new { id = bomItem.ProductId });
                 }
-                catch (Exception ex)
+                catch (Exception ex) 
                 {
                     Console.WriteLine("ERROR guardando BOM: " + ex);
                     ModelState.AddModelError("", "Ocurrió un error al guardar el material. Intente nuevamente.");

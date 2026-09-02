@@ -1,97 +1,51 @@
-﻿<div class="modal fade"
-     id="restoreWarehouseModal"
-     tabindex="-1"
-     aria-hidden="true">
+﻿<div class="modal fade" id="restoreWarehouseModal" tabindex="-1" aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered">
-
         <div class="modal-content">
-
             <div class="modal-header bg-success text-white">
-
                 <h5 class="modal-title">
-
-                    <i class="bi bi-arrow-clockwise"></i>
-
-                    Restaurar Depósito
-
+                    <i class="bi bi-arrow-clockwise"></i> Restaurar Depósito
                 </h5>
 
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
                 </button>
-
             </div>
 
             <div class="modal-body">
-
                 <div class="alert alert-success">
-
                     ¿Desea volver a activar este depósito?
-
                 </div>
 
                 <table class="table table-bordered">
-
                     <tbody>
-
                         <tr>
-
-                            <th style="width:35%">
-                                Código
-                            </th>
-
+                            <th style="width:35%">Código</th>
                             <td id="restoreWarehouseCode"></td>
-
                         </tr>
 
                         <tr>
-
-                            <th>
-                                Nombre
-                            </th>
-
+                            <th>Nombre</th>
                             <td id="restoreWarehouseName"></td>
-
                         </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
 
             <div class="modal-footer">
-
-                <form id="restoreWarehouseForm"
-                      method="post">
+                <form id="restoreWarehouseForm" method="post">
 
                     @Html.AntiForgeryToken()
 
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cancelar
-
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-success">
-
-                        <i class="bi bi-arrow-clockwise"></i>
-
-                        Restaurar
-
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-arrow-clockwise"></i> Restaurar
                     </button>
 
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
 </div>

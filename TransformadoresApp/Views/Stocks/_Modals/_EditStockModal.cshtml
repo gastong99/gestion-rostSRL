@@ -6,48 +6,38 @@
 
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-
             <div class="modal-header bg-warning">
-
                 <h5 class="modal-title">
-                    <i class="bi bi-pencil"></i>
+                    <i class="bi bi-sliders"></i>
                     <span id="editCategoryModalTitle">
-                        Editar Stock
+                        Ajustar Stock
                     </span>
                 </h5>
 
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
                 </button>
-
             </div>
 
-            <form id="editStockForm"
-                  method="post">
+            <form id="editStockForm" method="post">
 
                 @Html.AntiForgeryToken()
 
                 <div class="modal-body">
-                    <partial name="~/Views/Shared/Forms/Stocks/_EditForm.cshtml"
-                             model="new TransformadoresApp.Models.Inventory.ItemStock()" />
+                    <partial name="~/Views/Shared/Forms/Stocks/_EditForm.cshtml" model="new TransformadoresApp.Models.Inventory.ItemStock()" />
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cancelar
                     </button>
 
                     <button type="submit" class="btn btn-warning">
                         <i class="bi bi-save"></i>
-                        Guardar cambios
+                        Registrar Ajuste
                     </button>
                 </div>
 
             </form>
-
         </div>
     </div>
 </div>

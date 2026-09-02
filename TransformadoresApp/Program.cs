@@ -6,6 +6,9 @@ using System.Globalization;
 using TransformadoresApp.Data;
 using TransformadoresApp.Models;
 using TransformadoresApp.Services;
+using TransformadoresApp.Services.Interfaces;
+using TransformadoresApp.Services.Purchasing;
+using TransformadoresApp.Services.Inventory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +51,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddDefaultUI();
 
 // Servicios
+builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
+builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<IStockMovementService, StockMovementService>();
+builder.Services.AddScoped<IPurchaseReceivingService, PurchaseReceivingService>();
+builder.Services.AddScoped<IPurchaseOrderItemService, PurchaseOrderItemService>();
+
 builder.Services.AddScoped<BomService>();
 builder.Services.AddScoped<PdfService>();
 
@@ -68,8 +77,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Middleware
-if (!app.Environment.IsDevelopment())
-{
+if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }

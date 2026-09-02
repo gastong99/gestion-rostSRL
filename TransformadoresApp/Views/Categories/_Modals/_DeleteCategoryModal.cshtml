@@ -12,19 +12,15 @@
                     Desactivar categoría
                 </h5>
 
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
                 </button>
             </div>
 
             <div class="modal-body">
 
-                <div id="deleteCategoryError"
-                     class="alert alert-danger d-none mb-3">
+                <div id="deleteCategoryError" class="alert alert-danger d-none mb-3">
 
                     <i class="bi bi-x-octagon-fill"></i>
-
                     <strong>No se puede desactivar.</strong>
 
                     <p class="mb-0 mt-2">
@@ -76,34 +72,23 @@
 
             <div class="modal-footer">
 
-                <form id="deleteCategoryForm"
-                      method="post">
+                <form id="deleteCategoryForm" method="post">
 
                     @Html.AntiForgeryToken()
 
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <span id="deleteCategoryCancelText">
                             Cancelar
                         </span>
-
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-warning"
-                            id="deleteCategorySubmit">
-
+                    <button type="submit" class="btn btn-warning" id="deleteCategorySubmit">
                         <i class="bi bi-slash-circle"></i>
                         Desactivar
-
                     </button>
 
                 </form>
-
             </div>
-
         </div>
     </div>
 </div>

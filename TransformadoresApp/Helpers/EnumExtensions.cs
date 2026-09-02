@@ -9,8 +9,7 @@ namespace TransformadoresApp.Helpers
         {
             var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
 
-            if (member == null)
-                return value.ToString();
+            if (member == null) return value.ToString();
 
             var attribute = member.GetCustomAttribute<DisplayAttribute>();
 

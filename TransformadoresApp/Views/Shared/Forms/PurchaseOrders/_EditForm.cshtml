@@ -1,0 +1,83 @@
+﻿<div class="row g-3">
+
+    <input type="hidden"
+           id="edit_Id"
+           name="Id" />
+
+    <div class="col-md-4">
+
+        <label for="edit_Number" class="form-label">
+            Número <span class="text-danger">*</span>
+        </label>
+
+        <input type="text"
+               id="edit_Number"
+               name="Number"
+               class="form-control"
+               maxlength="20"
+               required />
+
+    </div>
+
+    <div class="col-md-8">
+
+        <label for="edit_SupplierId" class="form-label">
+            Proveedor <span class="text-danger">*</span>
+        </label>
+
+        <select id="edit_SupplierId"
+                name="SupplierId"
+                class="form-select"
+                asp-items="ViewBag.Suppliers"
+                required>
+
+            <option value="">
+                -- Seleccione un proveedor --
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label for="edit_OrderDate" class="form-label">
+            Fecha de la Orden <span class="text-danger">*</span>
+        </label>
+
+        <input type="date"
+               id="edit_OrderDate"
+               name="OrderDate"
+               class="form-control"
+               required />
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label for="edit_ExpectedDate" class="form-label">
+            Fecha Estimada
+        </label>
+
+        <input type="date"
+               id="edit_ExpectedDate"
+               name="ExpectedDate"
+               class="form-control" />
+
+    </div>
+
+    <div class="col-12">
+
+        <label for="edit_Notes" class="form-label">
+            Observaciones
+        </label>
+
+        <textarea id="edit_Notes"
+                  name="Notes"
+                  class="form-control"
+                  rows="4"
+                  maxlength="500"></textarea>
+
+    </div>
+
+</div>

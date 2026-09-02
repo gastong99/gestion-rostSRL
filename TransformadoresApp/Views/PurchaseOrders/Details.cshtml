@@ -1,0 +1,306 @@
+﻿@model TransformadoresApp.Models.Purchasing.PurchaseOrder
+
+@{
+    ViewData["Title"] = $"Orden de Compra {Model.Number}";
+}
+
+@{
+    var isDraft = Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Draft;
+
+    var isPending =
+        Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Pending;
+
+    var isPartiallyReceived =
+        Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.PartiallyReceived;
+
+    var isCompleted =
+        Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Completed;
+
+    var isCancelled =
+        Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Cancelled;
+
+    var canEditOrder =
+        isDraft;
+
+    var canReceive =
+        isPending || isPartiallyReceived;
+}
+
+<a asp-action="Index" class="page-back">
+    <i class="bi bi-arrow-left"></i>
+    Órdenes de Compra
+</a>
+
+<div class="page-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-card-title mb-0">
+            <i class="bi bi-cart-check"></i>
+            Orden de Compra @Model.Number
+        </h2>
+
+        <div class="d-flex align-items-center gap-2">
+            @switch (Model.Status) {
+                case TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Draft:
+                    <span class="badge bg-secondary fs-6">
+                        Borrador
+                    </span>
+                    break;
+
+                case TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Pending:
+                    <span class="badge bg-primary fs-6">
+                        Pendiente
+                    </span>
+                    break;
+
+                case TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.PartiallyReceived:
+                    <span class="badge bg-warning text-dark fs-6">
+                        Recepción Parcial
+                    </span>
+                    break;
+
+                case TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Completed:
+                    <span class="badge bg-success fs-6">
+                        Completada
+                    </span>
+                    break;
+
+                case TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Cancelled:
+                    <span class="badge bg-danger fs-6">
+                        Cancelada
+                    </span>
+                    break;
+            }
+
+            @if (isDraft) {
+                <button type="button" class="btn btn-success" onclick='openConfirmPurchaseOrderModal(
+                    @Html.Raw(Json.Serialize(new
+                        {
+                            id = Model.Id,
+                            number = Model.Number,
+                            supplierName = Model.Supplier?.BusinessName
+                        }))
+                    )'>
+
+                    <i class="bi bi-check-circle"></i>
+                    Confirmar Orden
+                </button>
+            }
+
+            @if (isDraft || isPending) {
+                <button type="button" class="btn btn-danger" onclick='openCancelPurchaseOrderModal(
+                    @Html.Raw(Json.Serialize(new
+                        {
+                            id = Model.Id,
+                            number = Model.Number,
+                            supplierName = Model.Supplier?.BusinessName
+                        }))
+                    )'>
+
+                    <i class="bi bi-x-circle"></i>
+                    Cancelar Orden
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">
+                Proveedor
+            </label>
+
+            <div class="form-control bg-light">
+                @Model.Supplier?.BusinessName
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-bold">
+                Fecha
+            </label>
+
+            <div class="form-control bg-light">
+                @Model.OrderDate.ToString("dd/MM/yyyy")
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-bold">
+                Fecha estimada
+            </label>
+
+            <div class="form-control bg-light">
+                @(Model.ExpectedDate?.ToString("dd/MM/yyyy") ?? "-")
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label fw-bold">
+                Observaciones
+            </label>
+
+            <div class="form-control bg-light" style="min-height:90px;">
+                @(string.IsNullOrWhiteSpace(Model.Notes)
+                    ? "-"
+                    : Model.Notes)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-card mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">
+            <i class="bi bi-list-ul"></i> Detalle de la Orden
+        </h3>
+
+        <span class="badge bg-primary">
+            @Model.Items.Count Item(s)
+        </span>
+
+        @if (canEditOrder) {
+            <button class="btn-create" onclick="openCreateItemModal(@Model.Id)">             
+                <i class="bi bi-plus-circle"></i> Agregar Item
+            </button>
+        }
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th style="width:20%">
+                    Código
+                </th>
+
+                <th style="width:35%">
+                    Item
+                </th>
+
+                <th style="width:10%" class="text-end">
+                    Cantidad
+                </th>
+
+                <th style="width:10%" class="text-end">
+                    Recibido
+                </th>
+
+                <th style="width:10%" class="text-end">
+                    Pendiente
+                </th>
+
+                <th style="width:10%" class="text-end">
+                    Precio
+                </th>
+
+                <th style="width:10%" class="text-end">
+                    Subtotal
+                </th>
+
+                <th style="width:20%" class="text-center">
+                    Acciones
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Items.Any()) {
+                foreach (var item in Model.Items) {
+
+                    var itemData = new
+                        {
+                            id = item.Id,
+                            purchaseOrderId = item.PurchaseOrderId,
+                            itemId = item.ItemId,
+                            itemCode = item.Item?.Code,
+                            itemName = item.Item?.Name,
+                            quantity = item.Quantity,
+                            receivedQuantity = item.ReceivedQuantity,
+                            pendingQuantity = item.Quantity - item.ReceivedQuantity,
+                            unitPrice = item.UnitPrice
+                        };
+
+                    <tr>
+                        <td>
+                            @item.Item?.Code
+                        </td>
+
+                        <td>
+                            @item.Item?.Name
+                        </td>
+
+                        <td class="text-end">
+                            @item.Quantity
+                        </td>
+
+                        <td class="text-end">
+                            @item.ReceivedQuantity
+                        </td>
+
+                        <td class="text-end">
+                            @(item.Quantity - item.ReceivedQuantity)
+                        </td>
+
+                        <td class="text-end">
+                            @item.UnitPrice.ToString("N2")
+                        </td>
+
+                        <td class="text-end">
+                            @item.Subtotal.ToString("N2")
+                        </td>
+
+                        <td>
+                            <div class="action-btn-group">
+                                @if (canReceive && item.PendingQuantity > 0) {
+                                    <button class="action-btn action-btn-success" onclick='openReceiveItemModal(@Html.Raw(Json.Serialize(itemData)))'>
+                                        <i class="bi bi-box-seam"></i><span class="action-tooltip"> Recibir</span>
+                                    </button>
+                                }
+
+                                @if (canEditOrder) {
+                                    <button class="action-btn action-btn-edit" onclick='openEditItemModal(@Html.Raw(Json.Serialize(itemData)))'>
+                                        <i class="bi bi-pencil"></i><span class="action-tooltip"> Modificar</span>
+                                    </button>
+
+                                    <button class="action-btn action-btn-delete" onclick='openDeleteItemModal(@Html.Raw(Json.Serialize(itemData)))'>
+                                        <i class="bi bi-trash"></i><span class="action-tooltip"> Eliminar</span>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else {
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-5">
+                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                        La orden todavía no contiene productos.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-end mt-4">
+        <h4>
+            Total:
+            <strong>
+                @Model.Items.Sum(i => i.Subtotal).ToString("N2")
+            </strong>
+        </h4>
+    </div>
+</div>
+
+<partial name="_Modals/_ConfirmPurchaseOrderModal" />
+<partial name="_Modals/_CancelPurchaseOrderModal" />
+<partial name="_Modals/_CreatePurchaseOrderItemModal" />
+<partial name="_Modals/_EditPurchaseOrderItemModal" />
+<partial name="_Modals/_ReceivePurchaseOrderItemModal" />
+<partial name="_Modals/_DeletePurchaseOrderItemModal" />
+
+@section Scripts{
+    <script src="~/js/purchaseorders.modals.js" asp-append-version="true"></script>
+    <script src="~/js/purchaseorderitems.modals.js" asp-append-version="true"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+}

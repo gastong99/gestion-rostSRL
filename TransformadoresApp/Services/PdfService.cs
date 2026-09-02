@@ -48,9 +48,7 @@ namespace TransformadoresApp.Services
             document.Add(title);
 
             // Datos de la orden
-            var orderInfo = new Table(2)
-                .UseAllAvailableWidth()
-                .SetMarginBottom(20);
+            var orderInfo = new Table(2).UseAllAvailableWidth().SetMarginBottom(20);
 
             orderInfo.AddCell(CellInfo("N° de Orden:", order.ProductionOrderId.ToString()));
             orderInfo.AddCell(CellInfo("Fecha:", order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy [HH:mm 'h']")));

@@ -1,0 +1,63 @@
+﻿<div class="dashboard-section">
+
+    <div class="section-title">
+        Compras
+    </div>
+
+    <div class="dashboard-grid-section grid-two-cols">
+
+        <a asp-controller="Suppliers" asp-action="Index" class="dashboard-card text-decoration-none">
+            <div class="dashboard-card-icon-wrap">
+                <i class="bi bi-truck dashboard-card-icon"></i>
+            </div>
+
+            <div class="dashboard-card-body">
+                <h4 class="dashboard-card-title">
+                    Proveedores
+                </h4>
+
+                <p class="dashboard-card-desc">
+                    Administración de proveedores y datos comerciales
+                </p>
+            </div>
+
+            <i class="bi bi-chevron-right dashboard-card-arrow"></i>
+        </a>
+
+        <a asp-controller="PurchaseOrders" asp-action="Index" class="dashboard-card text-decoration-none">
+            <div class="dashboard-card-icon-wrap">
+                <i class="bi bi-cart dashboard-card-icon"></i>
+            </div>
+
+            <div class="dashboard-card-body">
+                <h4 class="dashboard-card-title">
+                    Órdenes de Compra
+                </h4>
+
+                <p class="dashboard-card-desc">
+                    Administración de órdenes de compras
+                </p>
+            </div>
+
+            <i class="bi bi-chevron-right dashboard-card-arrow"></i>
+        </a>
+
+        <a class="dashboard-card text-decoration-none">
+            <div class="dashboard-card-icon-wrap">
+                <i class="bi bi-box-seam dashboard-card-icon"></i>
+            </div>
+
+            <div class="dashboard-card-body">
+                <div class="dashboard-card-title">
+                    Recepciones
+                </div>
+
+                <div class="dashboard-card-desc">
+                    Próximamente.
+                </div>
+            </div>
+
+            <i class="bi bi-chevron-right dashboard-card-arrow"></i>
+        </a>
+    </div>
+</div>

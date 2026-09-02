@@ -20,11 +20,9 @@ namespace TransformadoresApp.Models.Inventory
         [Display(Name = "Descripción")]
         public string? Description { get; set; }
 
-        public ICollection<ItemStock> Stocks { get; set; }
-            = new List<ItemStock>();
+        public ICollection<ItemStock> Stocks { get; set; } = new List<ItemStock>();
 
-        public ICollection<StockMovement> StockMovements { get; set; } 
-            = new List<StockMovement>();
+        public ICollection<StockMovement> StockMovements { get; set; }  = new List<StockMovement>();
 
         public bool IsActive { get; set; } = true;
     }

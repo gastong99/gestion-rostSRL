@@ -37,16 +37,27 @@
     </div>
 
     <div class="col-md-4">
-        <label for="edit_Quantity" class="form-label">
+        <label for="edit_CurrentQuantity" class="form-label">
             Stock actual <span class="text-danger">*</span>
         </label>
 
+        <input type="text"
+               id="edit_CurrentQuantity"
+               class="form-control"
+               readonly />
+    </div>
+
+    <div class="col-md-4">
+
+        <label class="form-label">
+            Ajuste <span class="text-danger">*</span>
+        </label>
+
         <input type="number"
-               id="edit_Quantity"
-               name="Quantity"
+               id="edit_Adjustment"
+               name="adjustment"
                class="form-control"
                step="0.01"
-               min="0"
                required />
     </div>
 
@@ -64,14 +75,22 @@
 
     <div class="col-md-4">
         <label class="form-label">
-            Disponible
+            Nuevo Stock
         </label>
 
         <input type="text"
-               id="edit_AvailableQuantity"
+               id="edit_NewQuantity"
                class="form-control"
                value="0.00"
                readonly />
+    </div>
+
+    <div class="col-12">
+
+        <div id="edit_AdjustmentValidation" class="text-danger fw-semibold" style="display:none;">
+            El ajuste dejaría el stock en una cantidad negativa.
+        </div>
+
     </div>
 
 </div>

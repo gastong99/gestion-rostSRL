@@ -27,7 +27,6 @@ namespace TransformadoresApp.Models.Inventory
         [StringLength(500)]
         public string? Notes { get; set; }
 
-        public DateTime MovementDate { get; set; }
-            = DateTime.UtcNow;
+        public DateTime MovementDate { get; set; } = DateTime.UtcNow;
     }
 }

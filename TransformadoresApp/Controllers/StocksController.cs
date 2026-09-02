@@ -1,22 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
 using TransformadoresApp.Models.Inventory;
+using TransformadoresApp.Services.Interfaces;
 
 namespace TransformadoresApp.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class StocksController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IStockService _stockService;
 
-        public StocksController(ApplicationDbContext context)
+        public StocksController(ApplicationDbContext context, IStockService stockService)
         {
             _context = context;
+            _stockService = stockService;
         }
-
-        // =========================
-        // INDEX
-        // =========================
 
         public async Task<IActionResult> Index()
         {
@@ -31,143 +32,59 @@ namespace TransformadoresApp.Controllers
             return View(stock);
         }
 
-        // =========================
-        // CREATE
-        // =========================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ItemStock stock)
         {
-            if (!ModelState.IsValid)
-                return RedirectToAction(nameof(Index));
-
-            var exists = await _context.ItemStocks
-                .AnyAsync(s =>
-                    s.ItemId == stock.ItemId &&
-                    s.WarehouseId == stock.WarehouseId);
-
-            if (exists)
-            {
-                TempData["Error"] =
-                    "Ya existe stock para ese item en el depósito seleccionado.";
+            if (!ModelState.IsValid) {
+                TempData["Error"] = "Los datos ingresados no son válidos.";
 
                 return RedirectToAction(nameof(Index));
             }
 
-            if (stock.Quantity < 0)
+            try
             {
-                TempData["Error"] =
-                    "La cantidad no puede ser negativa.";
+                await _stockService.CreateInitialStockAsync(stock.ItemId, stock.WarehouseId, stock.Quantity);
 
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Stock inicial cargado correctamente.";
             }
-
-            stock.ReservedQuantity = 0;
-
-            _context.ItemStocks.Add(stock);
-
-            await _context.SaveChangesAsync();
-
-            _context.StockMovements.Add(new StockMovement
-            {
-                ItemId = stock.ItemId,
-                WarehouseId = stock.WarehouseId,
-                MovementType = MovementType.InitialLoad,
-                Quantity = stock.Quantity,
-                Notes = "Carga inicial de stock",
-                MovementDate = DateTime.UtcNow
-            });
-
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] =
-                "Stock inicial cargado correctamente.";
+            catch (InvalidOperationException ex) {
+                TempData["Error"] = ex.Message;
+            }
 
             return RedirectToAction(nameof(Index));
         }
-
-        // =========================
-        // EDIT
-        // =========================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ItemStock stock)
+        public async Task<IActionResult> Edit(int id, int itemId, int warehouseId, decimal adjustment)
         {
-            if (id != stock.Id)
-                return NotFound();
-
-            if (!ModelState.IsValid)
-                return RedirectToAction(nameof(Index));
-
-            var existingStock = await _context.ItemStocks
-                .FirstOrDefaultAsync(s => s.Id == id);
-
-            if (existingStock == null)
-                return NotFound();
-
-            var duplicate = await _context.ItemStocks
-                .AnyAsync(s =>
-                    s.ItemId == stock.ItemId &&
-                    s.WarehouseId == stock.WarehouseId &&
-                    s.Id != stock.Id);
-
-            if (duplicate)
+            try
             {
-                TempData["Error"] =
-                    "Ya existe stock para ese item en el depósito seleccionado.";
+                var stock = await _context.ItemStocks.FirstOrDefaultAsync(s => s.Id == id);
 
-                return RedirectToAction(nameof(Index));
-            }
+                if (stock == null) return NotFound();
 
-            if (stock.Quantity < 0)
-            {
-                TempData["Error"] =
-                    "La cantidad no puede ser negativa.";
+                if (stock.ItemId != itemId || stock.WarehouseId != warehouseId) {
+                    TempData["Error"] = "No es posible modificar el Item o el Depósito desde un ajuste de stock.";
 
-                return RedirectToAction(nameof(Index));
-            }
+                    return RedirectToAction(nameof(Index));
+                }
 
-            // Guardamos el contexto original para la auditoría
-            var originalItemId = existingStock.ItemId;
-            var originalWarehouseId = existingStock.WarehouseId;
-
-            // Calculamos la diferencia antes de modificar el registro
-            var quantityDifference =
-                stock.Quantity - existingStock.Quantity;
-
-            existingStock.ItemId = stock.ItemId;
-            existingStock.WarehouseId = stock.WarehouseId;
-            existingStock.Quantity = stock.Quantity;
-
-            await _context.SaveChangesAsync();
-
-            // Registramos solamente si realmente hubo un cambio
-            if (quantityDifference != 0)
-            {
-                _context.StockMovements.Add(new StockMovement
-                {
-                    ItemId = originalItemId,
-                    WarehouseId = originalWarehouseId,
-                    MovementType = MovementType.InventoryAdjustment,
-                    Quantity = quantityDifference,
-                    Notes = "Ajuste manual de inventario",
-                    MovementDate = DateTime.UtcNow
-                });
+                await _stockService.AdjustStockAsync(id, adjustment);
 
                 await _context.SaveChangesAsync();
-            }
 
-            TempData["Success"] =
-                "Stock actualizado correctamente.";
+                TempData["Success"] = "Ajuste de stock registrado correctamente.";
+            }
+            catch (InvalidOperationException ex) {
+                TempData["Error"] = ex.Message;
+            }
 
             return RedirectToAction(nameof(Index));
         }
-
-        // =========================
-        // GET ITEMS LIST
-        // =========================
 
         [HttpGet]
         public async Task<IActionResult> GetItemsList()
@@ -185,10 +102,6 @@ namespace TransformadoresApp.Controllers
 
             return Json(items);
         }
-
-        // =========================
-        // GET WAREHOUSES LIST
-        // =========================
 
         [HttpGet]
         public async Task<IActionResult> GetWarehousesList()

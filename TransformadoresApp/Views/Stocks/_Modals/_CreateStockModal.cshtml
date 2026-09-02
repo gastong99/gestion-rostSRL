@@ -6,50 +6,36 @@
 
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-
-            <div class="modal-header"
-                 style="background: #1E6B45; color: #fff;">
-
+            <div class="modal-header" style="background: #1E6B45; color: #fff;">
                 <h5 class="modal-title">
                     <i class="bi bi-plus-circle"></i>
                     Cargar Stock Inicial
                 </h5>
 
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
                 </button>
             </div>
 
-            <form id="createStockForm"
-                  asp-controller="Stocks"
-                  asp-action="Create"
-                  method="post">
+            <form id="createStockForm" asp-controller="Stocks" asp-action="Create" method="post">
 
                 @Html.AntiForgeryToken()
 
                 <div class="modal-body">
-                    <partial name="~/Views/Shared/Forms/Stocks/_CreateForm.cshtml"
-                             model="new TransformadoresApp.Models.Inventory.ItemStock()" />
+                    <partial name="~/Views/Shared/Forms/Stocks/_CreateForm.cshtml" model="new TransformadoresApp.Models.Inventory.ItemStock()" />
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cancelar
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-success"
-                            style="background: #1E6B45; color: #fff;">
-
+                    <button type="submit" class="btn btn-success" style="background: #1E6B45; color: #fff;">
                         <i class="bi bi-save"></i>
                         Guardar Stock
                     </button>
                 </div>
-            </form>
 
+            </form>
         </div>
     </div>
 </div>

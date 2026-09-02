@@ -8,9 +8,7 @@
                     Nuevo Item
                 </h5>
 
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
                 </button>
             </div>
 
@@ -19,31 +17,21 @@
                 @Html.AntiForgeryToken()
 
                 <div class="modal-body">
-
-                    <partial name="~/Views/Shared/Forms/Items/_CreateForm.cshtml"
-                             model="new TransformadoresApp.Models.Catalogs.Item()" />
-
+                    <partial name="~/Views/Shared/Forms/Items/_CreateForm.cshtml" model="new TransformadoresApp.Models.Catalogs.Item()" />
                 </div>
 
                 <div class="modal-footer">
-
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cancelar
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-success"
-                            style="background:#1E6B45;">
+                    <button type="submit" class="btn btn-success" style="background:#1E6B45;">
                         <i class="bi bi-save"></i>
                         Guardar
                     </button>
-
                 </div>
 
             </form>
-
         </div>
     </div>
 </div>

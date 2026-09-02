@@ -1,0 +1,69 @@
+﻿<div class="modal fade"
+     id="cancelPurchaseOrderModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-x-circle"></i>
+                    Cancelar Orden
+                </h5>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    ¿Desea cancelar esta orden de compra?
+                    <br />
+                    <small class="text-muted">
+                        La orden pasará al estado Cancelada y no podrá continuar con el proceso de recepción.
+                    </small>
+                </div>
+
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th style="width:35%">
+                                Número
+                            </th>
+
+                            <td id="cancelPurchaseOrderNumber"></td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Proveedor
+                            </th>
+
+                            <td id="cancelPurchaseOrderSupplier"></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+
+                <form id="cancelPurchaseOrderForm" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Volver
+                    </button>
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-circle"></i>
+                        Cancelar Orden
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

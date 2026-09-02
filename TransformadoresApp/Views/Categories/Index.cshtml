@@ -5,9 +5,7 @@
     ViewData["Title"] = "Categorías";
 }
 
-<a asp-controller="Home"
-   asp-action="Index"
-   class="page-back">
+<a asp-controller="Home" asp-action="Index" class="page-back">
     <i class="bi bi-arrow-left"></i>
     Panel Principal
 </a>
@@ -21,24 +19,17 @@
 
     <div class="view-actions">
 
-        <button class="btn-create"
-                onclick="openCreateModal()">
-
+        <button class="btn-create" onclick="openCreateModal()">
             <i class="bi bi-plus-circle"></i>
             Nueva Categoría
-
         </button>
 
-        <a asp-action="Index"
-           asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))"
-           class="btn btn-outline-secondary">
-
+        <a asp-action="Index" asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))" class="btn btn-outline-secondary">
             <i class="bi bi-eye"></i>
 
             @(ViewBag.ShowInactive == true
                 ? "Ocultar inactivas"
                 : "Mostrar inactivas")
-
         </a>
 
     </div>
@@ -48,7 +39,6 @@
         <thead>
 
             <tr>
-
                 <th style="width:30%">
                     Nombre
                 </th>
@@ -68,15 +58,13 @@
                 <th style="width:15%" class="text-center">
                     Acciones
                 </th>
-
             </tr>
 
         </thead>
 
         <tbody>
 
-            @foreach (var item in Model)
-            {
+            @foreach (var item in Model) {
                 var categoryData = new
                 {
                     id = item.Id,
@@ -147,14 +135,12 @@
                     <td class="text-center"
                         style="vertical-align:middle">
 
-                        @if (item.IsActive)
-                        {
+                        @if (item.IsActive) {
                             <span class="badge bg-success">
                                 Activa
                             </span>
                         }
-                        else
-                        {
+                        else {
                             <span class="badge bg-secondary">
                                 Inactiva
                             </span>
@@ -166,52 +152,37 @@
 
                         <div class="action-btn-group">
 
-                            @if (item.IsActive)
-                            {
-                                <button class="action-btn action-btn-edit"
-                                        onclick='openEditModal(@Html.Raw(Json.Serialize(categoryData)))'>
-
+                            @if (item.IsActive) {
+                                <button class="action-btn action-btn-edit" onclick='openEditModal(@Html.Raw(Json.Serialize(categoryData)))'>
                                     <i class="bi bi-pencil"></i>
-
                                     <span class="action-tooltip">
                                         Modificar
                                     </span>
-
                                 </button>
 
-                                <button class="action-btn action-btn-delete"
-                                        onclick='openDeleteModal(@item.Id, "@item.Name", "@(item.Parent?.Name ?? "")")'>
-
+                                <button class="action-btn action-btn-delete" onclick='openDeleteModal(@item.Id, "@item.Name", "@(item.Parent?.Name ?? "")")'>
                                     <i class="bi bi-trash"></i>
-
                                     <span class="action-tooltip">
                                         Desactivar
                                     </span>
-
                                 </button>
                             }
-                            else
-                            {
+                            else {
                                 <button class="action-btn action-btn-restore" onclick='openRestoreModal(@item.Id, "@item.Name")'>
                                     <i class="bi bi-arrow-clockwise"></i>
-
                                     <span class="action-tooltip">
                                         Restaurar
                                     </span>
                                 </button>
                             }
-
                         </div>
 
                     </td>
 
                 </tr>
             }
-
         </tbody>
-
     </table>
-
 </div>
 
 <partial name="_Modals/_CreateCategoryModal" />

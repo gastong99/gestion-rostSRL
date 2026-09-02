@@ -1,0 +1,66 @@
+﻿<div class="modal fade"
+     id="deletePurchaseOrderItemModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-trash"></i>
+                    Eliminar Item
+                </h5>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    ¿Desea eliminar este item de la orden de compra?
+                    <br />
+                    <small class="text-muted">
+                        Esta acción quitará el producto de la orden, pero no eliminará el producto del catálogo.
+                    </small>
+                </div>
+
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th style="width:35%">
+                                Item
+                            </th>
+                            <td id="deleteItemName"></td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Cantidad
+                            </th>
+                            <td id="deleteQuantity"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+
+                <form id="deletePurchaseOrderItemForm" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i>
+                        Eliminar
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

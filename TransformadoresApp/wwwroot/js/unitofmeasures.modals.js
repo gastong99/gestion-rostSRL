@@ -1,20 +1,16 @@
-﻿// ===== MODAL CREATE =====
+﻿// MODAL CREATE
 function openCreateModal() {
     resetCreateForm();
 
-    const modal = new bootstrap.Modal(
-        document.getElementById("createUnitModal")
-    );
+    const modal = new bootstrap.Modal(document.getElementById("createUnitModal"));
     modal.show();
 }
 
-// ===== MODAL EDIT =====
+// MODAL EDIT
 function openEditModal(unit) {
     resetEditForm();
 
-    document.getElementById('editUnitModalTitle').textContent =
-        `Editando unidad '${unit.name}'`;
-
+    document.getElementById('editUnitModalTitle').textContent = `Editando unidad '${unit.name}'`;
     document.getElementById('edit_UnitOfMeasureId').value = unit.unitOfMeasureId;
     document.getElementById('edit_Name').value = unit.name || '';
     document.getElementById('edit_Abbreviation').value = unit.abbreviation || '';
@@ -22,9 +18,7 @@ function openEditModal(unit) {
     const form = document.getElementById('editUnitForm');
     form.action = `/UnitOfMeasures/Edit/${unit.unitOfMeasureId}`;
 
-    const modal = new bootstrap.Modal(
-        document.getElementById('editUnitModal')
-    );
+    const modal = new bootstrap.Modal(document.getElementById('editUnitModal'));
     modal.show();
 
     setTimeout(() => {
@@ -36,16 +30,16 @@ function openEditModal(unit) {
     }, 100);
 }
 
-// ===== MODAL DELETE =====
+// MODAL DELETE
 async function openDeleteModal(unitId, name) {
-    // Establecer nombre
+
     document.getElementById('deleteUnitName').textContent = name;
 
-    // Configurar acción del formulario
     document.getElementById('deleteUnitForm').action = `/UnitOfMeasures/DeleteConfirmed/${unitId}`;
 
     // Verificar si la unidad está en uso
-    try {
+    try
+    {
         const response = await fetch(`/UnitOfMeasures/CheckUnitUsage?unitId=${unitId}`);
         if (response.ok) {
             const data = await response.json();
@@ -74,7 +68,8 @@ async function openDeleteModal(unitId, name) {
                     li.textContent = materialName;
                     materialsList.appendChild(li);
                 });
-            } else {
+            }
+            else {
                 // Unidad NO está en uso - permitir eliminar
                 errorDiv.classList.add('d-none');
                 confirmDiv.classList.remove('d-none');
@@ -82,24 +77,22 @@ async function openDeleteModal(unitId, name) {
                 cancelText.textContent = 'Cancelar';
             }
         }
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error verificando uso de la unidad:', error);
     }
 
     // Mostrar modal
-    const modal = new bootstrap.Modal(
-        document.getElementById('deleteUnitModal')
-    );
+    const modal = new bootstrap.Modal(document.getElementById('deleteUnitModal'));
     modal.show();
 }
 
-// ===== FUNCIONES DE LIMPIEZA =====
+// FUNCIONES DE LIMPIEZA
 function resetCreateForm() {
     const form = document.querySelector('#createUnitModal form');
     if (form) {
         form.reset();
 
-        // Limpiar validación jQuery
         if (typeof $.validator !== 'undefined') {
             const validator = $(form).validate();
             if (validator) validator.resetForm();
@@ -147,7 +140,7 @@ function resetEditForm() {
     }
 }
 
-// ===== LIMPIAR AL CERRAR MODALES =====
+// LIMPIAR AL CERRAR MODALES
 document.addEventListener('DOMContentLoaded', function () {
     const createModal = document.getElementById('createUnitModal');
     const editModal = document.getElementById('editUnitModal');

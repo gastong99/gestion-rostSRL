@@ -14,9 +14,7 @@
                     Restaurar categoría
                 </h5>
 
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
                 </button>
 
             </div>
@@ -55,34 +53,21 @@
 
             <div class="modal-footer">
 
-                <form id="restoreCategoryForm"
-                      method="post">
+                <form id="restoreCategoryForm" method="post">
 
                     @Html.AntiForgeryToken()
 
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cancelar
-
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-success">
-
+                    <button type="submit" class="btn btn-success">
                         <i class="bi bi-arrow-clockwise"></i>
-
                         Restaurar
-
                     </button>
 
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
 </div>

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Models;
 using TransformadoresApp.Models.Catalogs;
 using TransformadoresApp.Models.Inventory;
+using TransformadoresApp.Models.Purchasing;
 
 namespace TransformadoresApp.Data
 {
@@ -24,6 +25,9 @@ namespace TransformadoresApp.Data
         public DbSet<Warehouse> Warehouses => Set<Warehouse>();
         public DbSet<ItemStock> ItemStocks => Set<ItemStock>();
         public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+        public DbSet<Supplier> Suppliers => Set<Supplier>();
+        public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
+        public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -159,6 +163,109 @@ namespace TransformadoresApp.Data
                 .WithMany(w => w.StockMovements)
                 .HasForeignKey(sm => sm.WarehouseId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================
+            // COMPRAS
+            // =====================
+
+            modelBuilder.Entity<Supplier>(entity =>
+            {
+                entity.HasIndex(s => s.Code)
+                    .IsUnique();
+
+                entity.Property(s => s.Code)
+                    .HasMaxLength(20);
+
+                entity.Property(s => s.BusinessName)
+                    .HasMaxLength(150);
+
+                entity.Property(s => s.FantasyName)
+                    .HasMaxLength(150);
+
+                entity.Property(s => s.TaxId)
+                    .HasMaxLength(20);
+
+                entity.Property(s => s.Email)
+                    .HasMaxLength(150);
+
+                entity.Property(s => s.Phone)
+                    .HasMaxLength(50);
+
+                entity.Property(s => s.Address)
+                    .HasMaxLength(200);
+
+                entity.Property(s => s.City)
+                    .HasMaxLength(100);
+
+                entity.Property(s => s.Province)
+                    .HasMaxLength(100);
+
+                entity.Property(s => s.Country)
+                    .HasMaxLength(100);
+
+                entity.Property(s => s.Notes)
+                    .HasMaxLength(500);
+            });
+
+            // PurchaseOrder → Supplier
+            modelBuilder.Entity<PurchaseOrder>()
+                .HasOne(po => po.Supplier)
+                .WithMany()
+                .HasForeignKey(po => po.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Número único
+            modelBuilder.Entity<PurchaseOrder>()
+                .HasIndex(po => po.Number)
+                .IsUnique();
+
+            modelBuilder.Entity<PurchaseOrder>()
+                .Property(po => po.Number)
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<PurchaseOrder>()
+                .Property(po => po.Status)
+                .HasConversion<int>();
+
+            modelBuilder.Entity<PurchaseOrder>()
+                .Property(po => po.Notes)
+                .HasMaxLength(500);
+
+            // PurchaseOrderItem → PurchaseOrder
+            modelBuilder.Entity<PurchaseOrderItem>()
+                .HasOne(poi => poi.PurchaseOrder)
+                .WithMany(po => po.Items)
+                .HasForeignKey(poi => poi.PurchaseOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // PurchaseOrderItem → Item
+            modelBuilder.Entity<PurchaseOrderItem>()
+                .HasOne(poi => poi.Item)
+                .WithMany(i => i.PurchaseOrderItems)
+                .HasForeignKey(poi => poi.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Cantidad
+            modelBuilder.Entity<PurchaseOrderItem>()
+                .Property(poi => poi.Quantity)
+                .HasPrecision(18, 2);
+
+            // Precio Unitario
+            modelBuilder.Entity<PurchaseOrderItem>()
+                .Property(poi => poi.UnitPrice)
+                .HasPrecision(18, 2);
+
+            // Cantidad Recibida
+            modelBuilder.Entity<PurchaseOrderItem>()
+                .Property(poi => poi.ReceivedQuantity)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PurchaseOrderItem>()
+                .HasIndex(poi => new
+                {
+                    poi.PurchaseOrderId,
+                    poi.ItemId
+                });
         }
     }
 }

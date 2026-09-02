@@ -4,57 +4,34 @@
     ViewData["Title"] = "Depósitos";
 }
 
-<a asp-controller="Home"
-   asp-action="Index"
-   class="page-back">
-
+<a asp-controller="Home" asp-action="Index" class="page-back">
     <i class="bi bi-arrow-left"></i>
-
     Panel Principal
-
 </a>
 
 <div class="page-card">
-
     <h2 class="page-card-title">
-
         <i class="bi bi-buildings"></i>
-
         Depósitos
-
     </h2>
 
     <div class="view-actions">
-
-        <button class="btn-create"
-                onclick="openCreateModal()">
-
+        <button class="btn-create" onclick="openCreateModal()">
             <i class="bi bi-plus-circle"></i>
-
             Nuevo Depósito
-
         </button>
 
-        <a asp-action="Index"
-           asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))"
-           class="btn btn-outline-secondary">
-
+        <a asp-action="Index" asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))" class="btn btn-outline-secondary">
             <i class="bi bi-eye"></i>
-
             @(ViewBag.ShowInactive == true
                 ? "Ocultar inactivos"
                 : "Mostrar inactivos")
-
         </a>
-
     </div>
 
     <table class="table table-hover mt-3">
-
         <thead>
-
             <tr>
-
                 <th style="width:20%">
                     Código
                 </th>
@@ -70,15 +47,11 @@
                 <th style="width:15%" class="text-center">
                     Acciones
                 </th>
-
             </tr>
-
         </thead>
 
         <tbody>
-
-            @foreach (var item in Model)
-            {
+            @foreach (var item in Model) {
                 var warehouseData = new
                 {
                     id = item.Id,
@@ -88,7 +61,6 @@
                 };
 
                 <tr>
-
                     <td style="vertical-align:middle">
                         @item.Code
                     </td>
@@ -100,74 +72,49 @@
                     <td class="text-center"
                         style="vertical-align:middle">
 
-                        @if (item.IsActive)
-                        {
+                        @if (item.IsActive) {
                             <span class="badge bg-success">
                                 Activo
                             </span>
                         }
-                        else
-                        {
+                        else {
                             <span class="badge bg-secondary">
                                 Inactivo
                             </span>
                         }
-
                     </td>
 
                     <td>
-
                         <div class="action-btn-group">
-
-                            @if (item.IsActive)
-                            {
-                                <button class="action-btn action-btn-edit"
-                                        onclick='openEditModal(@Html.Raw(Json.Serialize(warehouseData)))'>
-
+                            @if (item.IsActive) {
+                                <button class="action-btn action-btn-edit" onclick='openEditModal(@Html.Raw(Json.Serialize(warehouseData)))'>
                                     <i class="bi bi-pencil"></i>
-
                                     <span class="action-tooltip">
                                         Modificar
                                     </span>
-
                                 </button>
 
-                                <button class="action-btn action-btn-delete"
-                                        onclick='openDeactivateModal(@Html.Raw(Json.Serialize(warehouseData)))'>
-
+                                <button class="action-btn action-btn-delete" onclick='openDeactivateModal(@Html.Raw(Json.Serialize(warehouseData)))'>
                                     <i class="bi bi-pause-circle"></i>
-
                                     <span class="action-tooltip">
                                         Desactivar
                                     </span>
-
                                 </button>
                             }
-                            else
-                            {
-                                <button class="action-btn action-btn-restore"
-                                        onclick='openRestoreModal(@Html.Raw(Json.Serialize(warehouseData)))'>
-
+                            else {
+                                <button class="action-btn action-btn-restore" onclick='openRestoreModal(@Html.Raw(Json.Serialize(warehouseData)))'>
                                     <i class="bi bi-arrow-clockwise"></i>
-
                                     <span class="action-tooltip">
                                         Restaurar
                                     </span>
-
                                 </button>
                             }
-
                         </div>
-
                     </td>
-
                 </tr>
             }
-
         </tbody>
-
     </table>
-
 </div>
 
 <partial name="_Modals/_CreateWarehouseModal" />
@@ -176,10 +123,6 @@
 <partial name="_Modals/_RestoreWarehouseModal" />
 
 @section Scripts{
-
-    <script src="~/js/warehouses.modals.js"
-            asp-append-version="true"></script>
-
+    <script src="~/js/warehouses.modals.js" asp-append-version="true"></script>
     <partial name="_ValidationScriptsPartial" />
-
 }

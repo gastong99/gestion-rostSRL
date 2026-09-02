@@ -1,0 +1,41 @@
+﻿<div class="modal fade"
+     id="createPurchaseOrderItemModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+
+        <div class="modal-content">
+            <div class="modal-header" style="background:#1E6B45;color:white;">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle"></i>
+                    Agregar Item
+                </h5>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <form asp-controller="PurchaseOrderItems" asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    <partial name="~/Views/Shared/Forms/PurchaseOrders/_CreateItemForm.cshtml" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i>
+                        Agregar Item
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

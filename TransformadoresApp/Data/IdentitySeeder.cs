@@ -36,7 +36,7 @@ namespace TransformadoresApp.Data
                     await userManager.AddToRoleAsync(adminUser, "Administrador");
                 }
                 else {
-                    Console.WriteLine("❌ Error al crear el usuario administrador: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                    Console.WriteLine("Error al crear el usuario administrador: " + string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
             else {

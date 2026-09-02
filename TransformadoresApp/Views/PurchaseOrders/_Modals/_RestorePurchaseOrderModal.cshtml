@@ -1,0 +1,61 @@
+﻿<div class="modal fade"
+     id="restorePurchaseOrderModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Restaurar Orden
+                </h5>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-success">
+                    ¿Desea volver a activar esta orden de compra?
+                </div>
+
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th style="width:35%">
+                                Número
+                            </th>
+                            <td id="restorePurchaseOrderNumber"></td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Proveedor
+                            </th>
+                            <td id="restorePurchaseOrderSupplier"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <form id="restorePurchaseOrderForm" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Restaurar
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

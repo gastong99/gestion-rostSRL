@@ -14,9 +14,6 @@ namespace TransformadoresApp.Controllers
             _context = context;
         }
 
-        // =========================
-        // INDEX
-        // =========================
         public async Task<IActionResult> Index(bool showInactive = false)
         {
             ViewBag.ShowInactive = showInactive;
@@ -26,8 +23,7 @@ namespace TransformadoresApp.Controllers
                 .Include(i => i.UnitOfMeasure)
                 .AsQueryable();
 
-            if (!showInactive)
-            {
+            if (!showInactive) {
                 query = query.Where(i => i.IsActive);
             }
 
@@ -42,14 +38,12 @@ namespace TransformadoresApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Item item)
         {
-            if (!ModelState.IsValid)
-                return RedirectToAction(nameof(Index));
+            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.Id == item.CategoryId);
 
-            if (category == null)
-                return RedirectToAction(nameof(Index));
+            if (category == null) return RedirectToAction(nameof(Index));
 
             item.ItemType = category.ItemType ?? ItemType.CommercialProduct;
             item.Code = item.Code.Trim();
@@ -67,33 +61,26 @@ namespace TransformadoresApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Item item)
         {
-            if (id != item.Id)
-                return NotFound();
+            if (id != item.Id) return NotFound();
 
-            if (!ModelState.IsValid)
-                return RedirectToAction(nameof(Index));
+            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
 
             var existingItem = await _context.Items
                 .FirstOrDefaultAsync(i => i.Id == id);
 
-            if (existingItem == null)
-                return NotFound();
+            if (existingItem == null) return NotFound();
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.Id == item.CategoryId);
 
-            if (category == null)
-                return RedirectToAction(nameof(Index));
+            if (category == null) return RedirectToAction(nameof(Index));
 
             existingItem.Code = item.Code.Trim();
             existingItem.Name = item.Name.Trim();
             existingItem.Description = item.Description?.Trim();
-
             existingItem.CategoryId = item.CategoryId;
             existingItem.ItemType = category.ItemType ?? ItemType.CommercialProduct;
-
             existingItem.UnitOfMeasureId = item.UnitOfMeasureId;
-
             existingItem.Cost = item.Cost;
             existingItem.Price = item.Price;
             existingItem.MinimumStock = item.MinimumStock;
@@ -109,8 +96,7 @@ namespace TransformadoresApp.Controllers
         {
             var item = await _context.Items.FindAsync(id);
 
-            if (item == null)
-                return NotFound();
+            if (item == null) return NotFound();
 
             item.IsActive = false;
 
@@ -125,8 +111,7 @@ namespace TransformadoresApp.Controllers
         {
             var item = await _context.Items.FindAsync(id);
 
-            if (item == null)
-                return NotFound();
+            if (item == null) return NotFound();
 
             item.IsActive = true;
 

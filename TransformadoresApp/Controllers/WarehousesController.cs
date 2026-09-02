@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
 using TransformadoresApp.Models.Inventory;
 
 namespace TransformadoresApp.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class WarehousesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -13,10 +15,6 @@ namespace TransformadoresApp.Controllers
         {
             _context = context;
         }
-
-        // =========================
-        // INDEX
-        // =========================
 
         public async Task<IActionResult> Index(bool showInactive = false)
         {
@@ -39,19 +37,15 @@ namespace TransformadoresApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Warehouse warehouse)
         {
-            if (!ModelState.IsValid)
-                return RedirectToAction(nameof(Index));
+            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
 
             warehouse.Code = warehouse.Code.Trim();
             warehouse.Name = warehouse.Name.Trim();
 
-            var codeExists = await _context.Warehouses
-                .AnyAsync(w => w.Code == warehouse.Code);
+            var codeExists = await _context.Warehouses.AnyAsync(w => w.Code == warehouse.Code);
 
-            if (codeExists)
-            {
-                TempData["Error"] =
-                    "Ya existe un depósito con ese código.";
+            if (codeExists) {
+                TempData["Error"] = "Ya existe un depósito con ese código.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -60,8 +54,7 @@ namespace TransformadoresApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] =
-                "Depósito creado correctamente.";
+            TempData["Success"] = "Depósito creado correctamente.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -70,28 +63,21 @@ namespace TransformadoresApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Warehouse warehouse)
         {
-            if (id != warehouse.Id)
-                return NotFound();
+            if (id != warehouse.Id) return NotFound();
 
-            if (!ModelState.IsValid)
-                return RedirectToAction(nameof(Index));
+            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
 
             warehouse.Code = warehouse.Code.Trim();
             warehouse.Name = warehouse.Name.Trim();
 
             var existingWarehouse = await _context.Warehouses.FindAsync(id);
 
-            if (existingWarehouse == null)
-                return NotFound();
+            if (existingWarehouse == null) return NotFound();
 
-            var codeExists = await _context.Warehouses
-                .AnyAsync(w => w.Code == warehouse.Code &&
-                               w.Id != warehouse.Id);
+            var codeExists = await _context.Warehouses.AnyAsync(w => w.Code == warehouse.Code && w.Id != warehouse.Id);
 
-            if (codeExists)
-            {
-                TempData["Error"] =
-                    "Ya existe un depósito con ese código.";
+            if (codeExists) {
+                TempData["Error"] = "Ya existe un depósito con ese código.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -102,8 +88,7 @@ namespace TransformadoresApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] =
-                "Depósito actualizado correctamente.";
+            TempData["Success"] = "Depósito actualizado correctamente.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -114,13 +99,10 @@ namespace TransformadoresApp.Controllers
         {
             var warehouse = await _context.Warehouses.FindAsync(id);
 
-            if (warehouse == null)
-                return NotFound();
+            if (warehouse == null) return NotFound();
 
-            if (!warehouse.IsActive)
-            {
-                TempData["Warning"] =
-                    "El depósito ya se encuentra desactivado.";
+            if (!warehouse.IsActive) {
+                TempData["Warning"] = "El depósito ya se encuentra desactivado.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -129,8 +111,7 @@ namespace TransformadoresApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] =
-                "Depósito desactivado correctamente.";
+            TempData["Success"] = "Depósito desactivado correctamente.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -141,13 +122,10 @@ namespace TransformadoresApp.Controllers
         {
             var warehouse = await _context.Warehouses.FindAsync(id);
 
-            if (warehouse == null)
-                return NotFound();
+            if (warehouse == null) return NotFound();
 
-            if (warehouse.IsActive)
-            {
-                TempData["Warning"] =
-                    "El depósito ya se encuentra activo.";
+            if (warehouse.IsActive) {
+                TempData["Warning"] = "El depósito ya se encuentra activo.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -156,8 +134,7 @@ namespace TransformadoresApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] =
-                "Depósito restaurado correctamente.";
+            TempData["Success"] = "Depósito restaurado correctamente.";
 
             return RedirectToAction(nameof(Index));
         }

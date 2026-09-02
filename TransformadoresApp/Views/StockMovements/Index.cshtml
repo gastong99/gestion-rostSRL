@@ -4,171 +4,249 @@
     ViewData["Title"] = "Movimientos de Stock";
 }
 
-<a asp-controller="Home"
-   asp-action="Index"
-   class="page-back">
-
-    <i class="bi bi-arrow-left"></i>
-
-    Panel Principal
-
+<a asp-controller="Home" asp-action="Index" class="page-back">
+    <i class="bi bi-arrow-left"></i>Panel Principal
 </a>
 
 <div class="page-card">
 
     <h2 class="page-card-title">
-
-        <i class="bi bi-arrow-left-right"></i>
-
-        Movimientos de Stock
-
+        <i class="bi bi-arrow-left-right"></i>Movimientos de Stock
     </h2>
 
-    <table class="table table-hover mt-3">
+    <form asp-action="Index" method="get" class="mt-3">
 
-        <thead>
+        <div class="row g-3">
 
-            <tr>
-
-                <th class="text-center">
-                    Fecha
-                </th>
-
-                <th class="text-center">
-                    Código
-                </th>
-
-                <th class="text-center">
+            <div class="col-md-3">
+                <label class="form-label">
                     Item
-                </th>
+                </label>
 
-                <th class="text-center">
-                    Categoría
-                </th>
+                <select name="itemId" class="form-select" asp-items="ViewBag.Items">
+                    <option value="">
+                        Todos los items
+                    </option>
+                </select>
+            </div>
 
-                <th class="text-center">
+            <div class="col-md-3">
+                <label class="form-label">
                     Depósito
-                </th>
+                </label>
 
-                <th class="text-center">
-                    Tipo
-                </th>
+                <select name="warehouseId" class="form-select" asp-items="ViewBag.Warehouses">
+                    <option value="">
+                        Todos los depósitos
+                    </option>
+                </select>
+            </div>
 
-                <th class="text-center">
-                    Cantidad
-                </th>
+            <div class="col-md-3">
+                <label class="form-label">
+                    Tipo de movimiento
+                </label>
 
-                <th class="text-center">
-                    Observaciones
-                </th>
+                <select name="movementType" class="form-select" asp-items="ViewBag.MovementTypes">
+                    <option value="">
+                        Todos los tipos
+                    </option>
+                </select>
+            </div>
 
-            </tr>
+            <div class="col-md-3">
+                <label class="form-label">
+                    Fecha desde
+                </label>
 
-        </thead>
+                <input type="date"
+                       name="dateFrom"
+                       class="form-control"
+                       value="@ViewBag.DateFrom" />
+            </div>
 
-        <tbody>
+            <div class="col-md-3">
+                <label class="form-label">
+                    Fecha hasta
+                </label>
 
-            @if (!Model.Any())
-            {
+                <input type="date"
+                       name="dateTo"
+                       class="form-control"
+                       value="@ViewBag.DateTo" />
+            </div>
+
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-funnel"></i> Filtrar
+            </button>
+
+            <a asp-action="Index" class="btn-clear-search">
+                <i class="bi bi-x-circle"></i> Limpiar filtros
+            </a>
+
+        </div>
+
+    </form>
+
+    <div class="mt-4">
+
+        <table class="table table-hover">
+
+            <thead>
                 <tr>
+                    <th class="text-center">
+                        Fecha
+                    </th>
 
-                    <td colspan="8"
-                        class="text-center text-muted py-4">
+                    <th class="text-center">
+                        Código
+                    </th>
 
-                        No existen movimientos registrados.
+                    <th class="text-center">
+                        Item
+                    </th>
 
-                    </td>
+                    <th class="text-center">
+                        Categoría
+                    </th>
 
+                    <th class="text-center">
+                        Depósito
+                    </th>
+
+                    <th class="text-center">
+                        Tipo
+                    </th>
+
+                    <th class="text-center">
+                        Cantidad
+                    </th>
+
+                    <th class="text-center">
+                        Observaciones
+                    </th>
                 </tr>
-            }
-            else
-            {
-                @foreach (var movement in Model)
-                {
+            </thead>
+
+            <tbody>
+
+                @if (!Model.Any()) {
                     <tr>
-
-                        <td style="vertical-align:middle" class="text-center">
-
-                            @(movement.MovementDate
-                                .ToLocalTime()
-                                .ToString("dd/MM/yyyy HH:mm:ss"))
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No existen movimientos que coincidan con los filtros seleccionados.
                         </td>
-
-                        <td style="vertical-align:middle" class="text-center">
-
-                            @movement.Item?.Code
-
-                        </td>
-
-                        <td style="vertical-align:middle" class="text-center">
-
-                            @movement.Item?.Name
-
-                        </td>
-
-                        <td style="vertical-align:middle" class="text-center">
-
-                            @movement.Item?.Category?.Name
-
-                        </td>
-
-                        <td style="vertical-align:middle" class="text-center">
-
-                            @movement.Warehouse?.Name
-
-                        </td>
-
-                        <td class="text-center" style="vertical-align:middle">
-
-                            @if (movement.MovementType ==
-                                 TransformadoresApp.Models.Inventory.MovementType.InitialLoad)
-                            {
-                                <span class="badge bg-primary">
-                                    Inicial
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    Ajuste
-                                </span>
-                            }
-
-                        </td>
-
-                        <td class="text-center" style="vertical-align:middle">
-
-                            @if (movement.Quantity > 0)
-                            {
-                                <span class="text-success fw-bold">
-
-                                    +@movement.Quantity.ToString("N2")
-
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="text-danger fw-bold">
-
-                                    @movement.Quantity.ToString("N2")
-
-                                </span>
-                            }
-
-                        </td>
-
-                        <td style="vertical-align:middle" class="text-center">
-
-                            @movement.Notes
-
-                        </td>
-
                     </tr>
                 }
-            }
+                else {
+                    @foreach (var movement in Model) {
+                        <tr>
 
-        </tbody>
+                            <td style="vertical-align:middle" class="text-center">
+                                @(movement.MovementDate
+                                    .ToLocalTime()
+                                    .ToString("dd/MM/yyyy HH:mm:ss"))
+                            </td>
 
-    </table>
+                            <td style="vertical-align:middle" class="text-center">
+                                @movement.Item?.Code
+                            </td>
 
+                            <td style="vertical-align:middle" class="text-center">
+                                @movement.Item?.Name
+                            </td>
+
+                            <td style="vertical-align:middle" class="text-center">
+                                @movement.Item?.Category?.Name
+                            </td>
+
+                            <td style="vertical-align:middle" class="text-center">
+                                @movement.Warehouse?.Name
+                            </td>
+
+                            <td class="text-center" style="vertical-align:middle">
+                                @switch (movement.MovementType)
+                                {
+                                    case TransformadoresApp.Models.Inventory.MovementType.InitialLoad:
+                                        <span class="badge bg-primary">
+                                            Carga Inicial
+                                        </span>
+                                        break;
+
+                                    case TransformadoresApp.Models.Inventory.MovementType.Purchase:
+                                        <span class="badge bg-success">
+                                            Compra
+                                        </span>
+                                        break;
+
+                                    case TransformadoresApp.Models.Inventory.MovementType.Sale:
+                                        <span class="badge bg-danger">
+                                            Venta
+                                        </span>
+                                        break;
+
+                                    case TransformadoresApp.Models.Inventory.MovementType.ProductionConsumption:
+                                        <span class="badge bg-warning text-dark">
+                                            Consumo Producción
+                                        </span>
+                                        break;
+
+                                    case TransformadoresApp.Models.Inventory.MovementType.ProductionOutput:
+                                        <span class="badge bg-info text-dark">
+                                            Producción
+                                        </span>
+                                        break;
+
+                                    case TransformadoresApp.Models.Inventory.MovementType.InventoryAdjustment:
+                                        <span class="badge bg-secondary">
+                                            Ajuste
+                                        </span>
+                                        break;
+
+                                    case TransformadoresApp.Models.Inventory.MovementType.TransferIn:
+                                        <span class="badge bg-success">
+                                            Transferencia Entrada
+                                        </span>
+                                        break;
+
+                                    case TransformadoresApp.Models.Inventory.MovementType.TransferOut:
+                                        <span class="badge bg-dark">
+                                            Transferencia Salida
+                                        </span>
+                                        break;
+
+                                    default:
+                                        <span class="badge bg-light text-dark">
+                                            Desconocido
+                                        </span>
+                                        break;
+                                }
+                            </td>
+
+                            <td class="text-center" style="vertical-align:middle">
+                                @if (movement.Quantity > 0) {
+                                    <span class="text-success fw-bold">
+                                        +@movement.Quantity.ToString("N2")
+                                    </span>
+                                }
+                                else {
+                                    <span class="text-danger fw-bold">
+                                        @movement.Quantity.ToString("N2")
+                                    </span>
+                                }
+                            </td>
+
+                            <td style="vertical-align:middle" class="text-center">
+                                @movement.Notes
+                            </td>
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

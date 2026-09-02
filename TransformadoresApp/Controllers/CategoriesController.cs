@@ -28,8 +28,7 @@ namespace TransformadoresApp.Controllers
             IQueryable<Category> query = _db.Categories
                 .Include(c => c.Parent);
 
-            if (!showInactive)
-            {
+            if (!showInactive) {
                 query = query.Where(c => c.IsActive);
             }
 
@@ -55,28 +54,23 @@ namespace TransformadoresApp.Controllers
                 c.IsActive &&
                 c.Name.ToLower() == category.Name.ToLower()))
             {
-                TempData["Error"] =
-                    "Ya existe una categoría con ese nombre.";
+                TempData["Error"] = "Ya existe una categoría con ese nombre.";
 
                 return RedirectToAction(nameof(Index));
             }
 
-            if (ModelState.IsValid)
-            {
+            if (ModelState.IsValid) {
                 _db.Categories.Add(category);
 
-                if (category.ItemType == null)
-                {
-                    ModelState.AddModelError(nameof(category.ItemType),
-                        "Debe seleccionar un tipo.");
+                if (category.ItemType == null) {
+                    ModelState.AddModelError(nameof(category.ItemType), "Debe seleccionar un tipo.");
 
                     return RedirectToAction(nameof(Index));
                 }
 
                 await _db.SaveChangesAsync();
 
-                TempData["Success"] =
-                    $"Categoría '{category.Name}' creada correctamente.";
+                TempData["Success"] = $"Categoría '{category.Name}' creada correctamente.";
             }
 
             return RedirectToAction(nameof(Index));
@@ -87,21 +81,17 @@ namespace TransformadoresApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Category category)
         {
-            if (id != category.Id)
-                return NotFound();
+            if (id != category.Id) return NotFound();
 
             var existing = await _db.Categories.FindAsync(id);
 
-            if (existing == null)
-                return NotFound();
+            if (existing == null) return NotFound();
 
             existing.Name = category.Name;
             existing.ParentId = category.ParentId;
 
-            if (category.ItemType == null)
-            {
-                ModelState.AddModelError(nameof(category.ItemType),
-                    "Debe seleccionar un tipo.");
+            if (category.ItemType == null) {
+                ModelState.AddModelError(nameof(category.ItemType), "Debe seleccionar un tipo.");
 
                 if (category.ParentId == category.Id) {
                     TempData["Error"] = "Una categoría no puede ser su propia categoría padre.";
@@ -114,8 +104,7 @@ namespace TransformadoresApp.Controllers
 
             await _db.SaveChangesAsync();
 
-            TempData["Info"] =
-                $"Categoría '{existing.Name}' actualizada correctamente.";
+            TempData["Info"] = $"Categoría '{existing.Name}' actualizada correctamente.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -127,15 +116,13 @@ namespace TransformadoresApp.Controllers
         {
             var category = await _db.Categories.FindAsync(id);
 
-            if (category == null)
-                return NotFound();
+            if (category == null) return NotFound();
 
             category.IsActive = false;
 
             await _db.SaveChangesAsync();
 
-            TempData["Success"] =
-                $"Categoría '{category.Name}' desactivada correctamente.";
+            TempData["Success"] = $"Categoría '{category.Name}' desactivada correctamente.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -147,15 +134,13 @@ namespace TransformadoresApp.Controllers
         {
             var category = await _db.Categories.FindAsync(id);
 
-            if (category == null)
-                return NotFound();
+            if (category == null) return NotFound();
 
             category.IsActive = true;
 
             await _db.SaveChangesAsync();
 
-            TempData["Success"] =
-                $"Categoría '{category.Name}' reactivada correctamente.";
+            TempData["Success"] = $"Categoría '{category.Name}' reactivada correctamente.";
 
             return RedirectToAction(nameof(Index),
                 new { showInactive = true });

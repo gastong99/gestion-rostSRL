@@ -134,6 +134,17 @@ body {
     pointer-events: none;
 }
 
+.action-btn-success {
+    color: #155724;
+    border-color: #28a745;
+}
+
+    .action-btn-success:hover {
+        background: #e8f5e9;
+        border-color: #1e7e34;
+        color: #0d3b1a;
+    }
+
 .action-btn-edit {
     color: #856404;
     border-color: #ffc107;
@@ -165,6 +176,17 @@ body {
         background: #fdecea;
         border-color: #b02a37;
         color: #58151c;
+    }
+
+.action-btn-view {
+    color: #0c5460;
+    border-color: #17a2b8;
+}
+
+    .action-btn-view:hover {
+        background: #e0f7fa;
+        border-color: #138496;
+        color: #0a444e;
     }
 
 .action-btn-pdf {

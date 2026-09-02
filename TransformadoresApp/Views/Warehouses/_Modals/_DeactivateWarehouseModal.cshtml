@@ -1,106 +1,61 @@
-﻿<div class="modal fade"
-     id="deactivateWarehouseModal"
-     tabindex="-1"
-     aria-hidden="true">
+﻿<div class="modal fade" id="deactivateWarehouseModal" tabindex="-1" aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered">
-
         <div class="modal-content">
-
             <div class="modal-header bg-danger text-white">
-
                 <h5 class="modal-title">
-
-                    <i class="bi bi-pause-circle"></i>
-
-                    Desactivar Depósito
-
+                    <i class="bi bi-pause-circle"></i> Desactivar Depósito
                 </h5>
 
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
                 </button>
-
             </div>
 
             <div class="modal-body">
-
                 <div class="alert alert-warning">
-
                     ¿Desea desactivar este depósito?
-
                     <br />
-
                     <small class="text-muted">
-
                         El depósito dejará de estar disponible para nuevas operaciones,
                         pero conservará todo su historial.
-
                     </small>
-
                 </div>
 
                 <table class="table table-bordered">
-
                     <tbody>
-
                         <tr>
-
                             <th style="width:35%">
                                 Código
                             </th>
-
                             <td id="deactivateWarehouseCode"></td>
-
                         </tr>
 
                         <tr>
-
                             <th>
                                 Nombre
                             </th>
-
                             <td id="deactivateWarehouseName"></td>
-
                         </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
 
             <div class="modal-footer">
 
-                <form id="deactivateWarehouseForm"
-                      method="post">
+                <form id="deactivateWarehouseForm" method="post">
 
                     @Html.AntiForgeryToken()
 
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cancelar
-
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-danger">
-
-                        <i class="bi bi-pause-circle"></i>
-
-                        Desactivar
-
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-pause-circle"></i> Desactivar
                     </button>
 
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
 </div>

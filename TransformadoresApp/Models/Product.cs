@@ -60,8 +60,6 @@ namespace TransformadoresApp.Models
         [Display(Name = "Peso (Kg)")]
         [Range(0, 10000, ErrorMessage = "El peso debe estar entre 0 y 10000 kg.")]
         public int? Peso { get; set; }
-
-
         public ICollection<BomItem>? BomItems { get; set; }
     }
 }

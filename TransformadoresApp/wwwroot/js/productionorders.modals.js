@@ -1,9 +1,10 @@
-﻿// ===== VARIABLES GLOBALES =====
+﻿// VARIABLES GLOBALES
 let currentOrderData = null;
 
-// ===== CARGAR PRODUCTOS =====
+// CARGAR PRODUCTOS
 async function loadProducts(selectId, selectedProductId = null) {
-    try {
+    try
+    {
         const response = await fetch('/ProductionOrders/GetProductsList');
         if (!response.ok) throw new Error('Error al cargar productos');
 
@@ -23,34 +24,38 @@ async function loadProducts(selectId, selectedProductId = null) {
             }
             select.appendChild(option);
         });
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error cargando productos:', error);
     }
 }
 
-// ===== PREVISUALIZAR BOM =====
+// PREVISUALIZAR BOM
 async function previewBom(productId, quantity, contentElementId) {
     if (!productId || !quantity || quantity <= 0) {
         alert('Seleccione un producto y una cantidad válida.');
         return;
     }
 
-    try {
+    try
+    {
         const response = await fetch(`/ProductionOrders/PreviewBom?productId=${productId}&quantity=${quantity}`);
         if (!response.ok) throw new Error('Error al cargar materiales');
 
         const html = await response.text();
         document.getElementById(contentElementId).innerHTML = html;
         document.getElementById('previewBomArea').style.display = 'block';
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error cargando BOM:', error);
         alert('No se pudo cargar la lista de materiales');
     }
 }
 
-// ===== CAMBIAR ESTADO (AJAX) =====
+// CAMBIAR ESTADO (AJAX)
 async function changeOrderStatus(orderId, newStatus, rowElement) {
-    try {
+    try
+    {
         const response = await fetch('/ProductionOrders/UpdateStatus', {
             method: 'POST',
             headers: {
@@ -70,11 +75,12 @@ async function changeOrderStatus(orderId, newStatus, rowElement) {
                 rowElement.setAttribute('data-order', JSON.stringify(orderData));
             }
 
-            // ⭐ Actualizar dropdown con nuevas opciones válidas
+            // Actualizar dropdown con nuevas opciones válidas
             updateStatusDropdown(rowElement, newStatus);
 
             showToast('success', result.message);
-        } else {
+        }
+        else {
             showToast('error', result.message);
             // Revertir el dropdown
             const select = rowElement.querySelector('.status-dropdown');
@@ -82,7 +88,8 @@ async function changeOrderStatus(orderId, newStatus, rowElement) {
                 select.value = select.getAttribute('data-original-status');
             }
         }
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error cambiando estado:', error);
         showToast('error', 'Error al cambiar el estado');
     }
@@ -120,7 +127,7 @@ function updateStatusDropdown(rowElement, newStatus) {
             break;
         case 'Completada':
         case 'Cancelada':
-            // ⭐ Si llega a estado final, reemplazar dropdown con badge
+            // Si llega a estado final, reemplazar dropdown con badge
             const statusText = newStatus === 'Completada' ? 'Completada' : 'Cancelada';
             const badgeClass = newStatus === 'Completada' ? 'bg-success' : 'bg-danger';
             const tdElement = select.closest('td');
@@ -206,7 +213,7 @@ function showToast(type, message) {
     });
 }
 
-// ===== MODAL CREATE =====
+// MODAL CREATE
 function openCreateModal() {
     resetCreateForm();
     loadProducts('create_ProductId');
@@ -222,7 +229,7 @@ function openCreateModal() {
     modal.show();
 }
 
-// ===== MODAL EDIT =====
+// MODAL EDIT
 async function openEditModal(order) {
     resetEditForm();
 
@@ -291,7 +298,7 @@ function loadStatusOptions(currentStatus) {
     });
 }
 
-// ===== MODAL DETAILS =====
+// MODAL DETAILS
 async function openDetailsModal(orderId) {
     try {
         const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
@@ -316,7 +323,7 @@ async function openDetailsModal(orderId) {
         document.getElementById('details_ProductName').textContent = orderData.product?.name || '';
         document.getElementById('details_Quantity').textContent = orderData.quantity || '';
 
-        // ⭐ Formatear fecha LOCAL correctamente (sin adelantar horas)
+        // Formatear fecha LOCAL correctamente (sin adelantar horas)
         const orderDateStr = orderData.orderDate;
         let formattedDate = '';
 
@@ -428,7 +435,7 @@ async function openDetailsModal(orderId) {
     }
 }
 
-// ===== MODALES DE PAPELERA =====
+// MODALES DE PAPELERA
 function openMoveToTrashModal(orderId, productName) {
     document.getElementById('trash_OrderId').textContent = orderId;
     document.getElementById('trash_ProductName').textContent = productName;
@@ -457,7 +464,7 @@ function openDeleteModal(orderId, productName, quantity) {
     modal.show();
 }
 
-// ===== FUNCIONES DE LIMPIEZA =====
+// FUNCIONES DE LIMPIEZA
 function resetCreateForm() {
     const form = document.querySelector('#createOrderModal form');
     if (form) {
@@ -504,8 +511,7 @@ function resetEditForm() {
     }
 }
 
-// ===== LIMPIAR AL CERRAR MODALES =====
-// DESPUÉS — reemplazar por esto:
+// LIMPIAR AL CERRAR MODALES
 let pendingStatusChange = null;
 
 document.querySelectorAll('.status-dropdown').forEach(select => {

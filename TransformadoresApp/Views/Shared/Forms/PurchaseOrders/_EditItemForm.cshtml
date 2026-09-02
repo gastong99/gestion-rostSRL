@@ -1,0 +1,81 @@
+﻿<input type="hidden"
+       id="edit_ItemId"
+       name="Id" />
+
+<input type="hidden"
+       id="edit_PurchaseOrderId"
+       name="PurchaseOrderId" />
+
+<input type="hidden"
+       id="edit_CatalogItemId"
+       name="ItemId" />
+
+<div class="row g-3">
+
+    <div class="col-md-8">
+
+        <label class="form-label">
+
+            Item
+
+        </label>
+
+        <input type="text"
+               id="edit_ItemName"
+               class="form-control"
+               readonly />
+
+    </div>
+
+    <div class="col-md-2">
+
+        <label class="form-label">
+
+            Cantidad
+
+        </label>
+
+        <input type="number"
+               id="edit_Quantity"
+               name="Quantity"
+               class="form-control"
+               step="0.01"
+               min="0.01"
+               required />
+
+    </div>
+
+    <div class="col-md-2">
+
+        <label class="form-label">
+
+            Precio Unitario
+
+        </label>
+
+        <input type="number"
+               id="edit_UnitPrice"
+               name="UnitPrice"
+               class="form-control"
+               step="0.01"
+               min="0"
+               required />
+
+    </div>
+
+    <div class="col-12">
+
+        <label class="form-label">
+
+            Subtotal
+
+        </label>
+
+        <input type="text"
+               id="edit_Subtotal"
+               class="form-control"
+               readonly />
+
+    </div>
+
+</div>

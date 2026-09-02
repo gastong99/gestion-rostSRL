@@ -87,8 +87,7 @@ namespace TransformadoresApp.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_db.UnitOfMeasures.Any(e => e.UnitOfMeasureId == id))
-                        return NotFound();
+                    if (!_db.UnitOfMeasures.Any(e => e.UnitOfMeasureId == id)) return NotFound();
                     else throw;
                 }
             }
@@ -101,8 +100,7 @@ namespace TransformadoresApp.Controllers
         {
             if (id == null) return NotFound();
 
-            var unit = await _db.UnitOfMeasures
-                .FirstOrDefaultAsync(u => u.UnitOfMeasureId == id);
+            var unit = await _db.UnitOfMeasures.FirstOrDefaultAsync(u => u.UnitOfMeasureId == id);
 
             if (unit == null) return NotFound();
 
@@ -149,4 +147,3 @@ namespace TransformadoresApp.Controllers
         }
     }
 }
-
