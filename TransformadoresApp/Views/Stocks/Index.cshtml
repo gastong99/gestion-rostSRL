@@ -18,6 +18,10 @@
         <button class="btn-create" onclick="openCreateStockModal()">
             <i class="bi bi-plus-circle"></i> Cargar Stock Inicial
         </button>
+
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transferStockModal">
+            <i class="bi bi-arrow-left-right"></i> Transferir Stock
+        </button>
     </div>
 
     <table class="table table-hover mt-3">
@@ -139,8 +143,10 @@
 <partial name="~/Views/Shared/_Alerts.cshtml" />
 <partial name="_Modals/_CreateStockModal" />
 <partial name="_Modals/_EditStockModal" />
+<partial name="_Modals/_TransferStockModal" />
 
 @section Scripts{
     <script src="~/js/stocks.modals.js" asp-append-version="true"></script>
+    <script src="~/js/stocktransfers.js" asp-append-version="true"></script>
     <partial name="_ValidationScriptsPartial" />
 }

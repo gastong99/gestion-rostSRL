@@ -1,0 +1,127 @@
+﻿<div class="modal fade" id="transferStockModal" tabindex="-1" aria-labelledby="transferStockModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #0d6efd; color: #fff">
+                <h5 class="modal-title" id="transferStockModalLabel">
+                    <i class="bi bi-arrow-left-right"></i>
+                    Transferir Stock
+                </h5>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <form asp-controller="StockTransfers" asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="transferItemId" class="form-label">
+                                Item
+                            </label>
+
+                            <select id="transferItemId" name="itemId" class="form-select" required>
+                                <option value="">
+                                    Seleccione un item
+                                </option>
+
+                                @foreach (var item in ViewBag.Items) {
+                                    <option value="@item.Id">
+                                        @item.Code - @item.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="transferSourceWarehouseId" class="form-label">
+                                Depósito de origen
+                            </label>
+
+                            <select id="transferSourceWarehouseId" name="sourceWarehouseId" class="form-select" required>
+                                <option value="">
+                                    Seleccione un depósito
+                                </option>
+
+                                @foreach (var warehouse in ViewBag.Warehouses) {
+                                    <option value="@warehouse.Id">
+                                        @warehouse.Code - @warehouse.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Stock disponible
+                            </label>
+
+                            <input type="text"
+                                   id="transferAvailableStock"
+                                   class="form-control"
+                                   value="-"
+                                   readonly />
+
+                            <div id="transferStockHelp" class="form-text">
+                                Seleccione un item y un depósito de origen.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="transferDestinationWarehouseId"
+                                   class="form-label">
+                                Depósito de destino
+                            </label>
+
+                            <select id="transferDestinationWarehouseId" name="destinationWarehouseId" class="form-select" required>
+                                <option value="">
+                                    Seleccione un depósito
+                                </option>
+
+                                @foreach (var warehouse in ViewBag.Warehouses) {
+                                    <option value="@warehouse.Id">
+                                        @warehouse.Code - @warehouse.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="transferQuantity" class="form-label">
+                                Cantidad a transferir
+                            </label>
+
+                            <input type="number"
+                                   id="transferQuantity"
+                                   name="quantity"
+                                   class="form-control"
+                                   min="0.01"
+                                   step="0.01"
+                                   required />
+
+                            <div class="form-text">
+                                La cantidad no puede superar el stock disponible.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" id="transferSubmitButton" class="btn btn-primary" disabled>
+                        <i class="bi bi-arrow-left-right"></i>
+                        Transferir Stock
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

@@ -54,6 +54,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IStockMovementService, StockMovementService>();
+builder.Services.AddScoped<IStockTransferService, StockTransferService>();
 builder.Services.AddScoped<IPurchaseReceivingService, PurchaseReceivingService>();
 builder.Services.AddScoped<IPurchaseOrderItemService, PurchaseOrderItemService>();
 

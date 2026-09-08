@@ -29,6 +29,28 @@ namespace TransformadoresApp.Controllers
                 .ThenBy(s => s.Warehouse!.Name)
                 .ToListAsync();
 
+            ViewBag.Items = await _context.Items
+                .Where(i => i.IsActive)
+                .OrderBy(i => i.Name)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.Code,
+                    i.Name
+                })
+                .ToListAsync();
+
+            ViewBag.Warehouses = await _context.Warehouses
+                .Where(w => w.IsActive)
+                .OrderBy(w => w.Name)
+                .Select(w => new
+                {
+                    w.Id,
+                    w.Code,
+                    w.Name
+                })
+                .ToListAsync();
+
             return View(stock);
         }
 
@@ -118,6 +140,34 @@ namespace TransformadoresApp.Controllers
                 .ToListAsync();
 
             return Json(warehouses);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableStock(int itemId, int warehouseId)
+        {
+            if (itemId <= 0 || warehouseId <= 0) {
+                return Json(new
+                {
+                    success = false,
+                    message = "El item y el depósito son obligatorios."
+                });
+            }
+
+            var stock = await _context.ItemStocks.FirstOrDefaultAsync(s => s.ItemId == itemId && s.WarehouseId == warehouseId);
+
+            if (stock == null) {
+                return Json(new
+                {
+                    success = true,
+                    availableQuantity = 0
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                availableQuantity = stock.AvailableQuantity
+            });
         }
     }
 }
