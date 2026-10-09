@@ -16,30 +16,55 @@ namespace TransformadoresApp.Services.Inventory
 
         public async Task RegisterMovementAsync(int itemId, int warehouseId, MovementType movementType, decimal quantity, string? notes = null)
         {
-            if (itemId <= 0) throw new InvalidOperationException("Debe seleccionar un item válido.");
+            ValidateIds(itemId, warehouseId);
 
-            if (warehouseId <= 0) throw new InvalidOperationException("Debe seleccionar un depósito válido.");
+            if (quantity == 0) {
+                throw new InvalidOperationException("La cantidad del movimiento no puede ser cero.");
+            }
 
-            if (quantity == 0) throw new InvalidOperationException("La cantidad del movimiento no puede ser cero.");
+            await ValidateItemAsync(itemId);
+            await ValidateWarehouseAsync(warehouseId);
 
-            var itemExists = await _context.Items.AnyAsync(i => i.Id == itemId && i.IsActive);
+            var movement = new StockMovement
+            {
+                ItemId = itemId,
+                WarehouseId = warehouseId,
+                MovementType = movementType,
+                Quantity = quantity,
+                Notes = notes?.Trim(),
+                MovementDate = DateTime.UtcNow
+            };
 
-            if (!itemExists) throw new InvalidOperationException("El item seleccionado no existe o está inactivo.");
+            _context.StockMovements.Add(movement);
+        }
 
-            var warehouseExists = await _context.Warehouses.AnyAsync(w => w.Id == warehouseId && w.IsActive);
+        private static void ValidateIds(int itemId, int warehouseId)
+        {
+            if (itemId <= 0) {
+                throw new InvalidOperationException("Debe seleccionar un item válido.");
+            }
 
-            if (!warehouseExists) throw new InvalidOperationException("El depósito seleccionado no existe o está inactivo.");
+            if (warehouseId <= 0) {
+                throw new InvalidOperationException("Debe seleccionar un depósito válido.");
+            }
+        }
 
-            _context.StockMovements.Add(
-                new StockMovement
-                {
-                    ItemId = itemId,
-                    WarehouseId = warehouseId,
-                    MovementType = movementType,
-                    Quantity = quantity,
-                    Notes = notes?.Trim(),
-                    MovementDate = DateTime.UtcNow
-                });
+        private async Task ValidateItemAsync(int itemId)
+        {
+            var exists = await _context.Items.AnyAsync(i => i.Id == itemId && i.IsActive);
+
+            if (!exists) {
+                throw new InvalidOperationException("El item seleccionado no existe o está inactivo.");
+            }
+        }
+
+        private async Task ValidateWarehouseAsync(int warehouseId)
+        {
+            var exists = await _context.Warehouses.AnyAsync(w => w.Id == warehouseId && w.IsActive);
+
+            if (!exists) {
+                throw new InvalidOperationException("El depósito seleccionado no existe o está inactivo.");
+            }
         }
     }
 }

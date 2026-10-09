@@ -1,0 +1,112 @@
+﻿@model IEnumerable<TransformadoresApp.Models.Inventory.StockMovement>
+
+@{
+    ViewData["Title"] = "Recepciones";
+}
+
+<div class="page-card">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="page-card-title mb-0">
+            <i class="bi bi-box-seam"></i>
+            Recepciones
+        </h2>
+
+        <span class="badge bg-primary fs-6">
+            @Model.Count() Recepción(es)
+        </span>
+
+    </div>
+
+    @if (Model.Any()) {
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+                    <tr>
+
+                        <th>
+                            Fecha
+                        </th>
+
+                        <th>
+                            Código
+                        </th>
+
+                        <th>
+                            Item
+                        </th>
+
+                        <th>
+                            Depósito
+                        </th>
+
+                        <th class="text-end">
+                            Cantidad
+                        </th>
+
+                        <th>
+                            Observaciones
+                        </th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var receipt in Model) {
+                        <tr>
+
+                            <td>
+                                @receipt.MovementDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                            </td>
+
+                            <td>
+                                @receipt.Item?.Code
+                            </td>
+
+                            <td>
+                                @receipt.Item?.Name
+                            </td>
+
+                            <td>
+                                @receipt.Warehouse?.Name
+                            </td>
+
+                            <td class="text-end">
+                                @receipt.Quantity.ToString("N2")
+                            </td>
+
+                            <td>
+                                @(string.IsNullOrWhiteSpace(receipt.Notes)
+                                    ? "-"
+                                    : receipt.Notes)
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+    else {
+        <div class="text-center text-muted py-5">
+
+            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+            <h5>
+                No hay recepciones registradas.
+            </h5>
+
+            <p class="mb-0">
+                Las recepciones aparecerán aquí cuando se registre
+                mercadería desde una orden de compra.
+            </p>
+
+        </div>
+    }
+</div>
