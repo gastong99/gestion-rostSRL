@@ -20,6 +20,15 @@ namespace TransformadoresApp.Services.Purchasing
         // CREATE
         public async Task CreateAsync(PurchaseOrderItem item)
         {
+            // VALIDAR DATOS
+            if (item.Quantity <= 0) {
+                throw new InvalidOperationException("La cantidad debe ser mayor que cero.");
+            }
+
+            if (item.UnitPrice < 0) {
+                throw new InvalidOperationException("El precio unitario no puede ser negativo.");
+            }
+
             // VALIDAR ORDEN
             var purchaseOrder = await _context.PurchaseOrders.FirstOrDefaultAsync(p => p.Id == item.PurchaseOrderId);
 
