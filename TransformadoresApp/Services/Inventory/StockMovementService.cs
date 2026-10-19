@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
 using TransformadoresApp.Models.Inventory;
 using TransformadoresApp.Services.Interfaces;
@@ -17,6 +18,10 @@ namespace TransformadoresApp.Services.Inventory
         public async Task RegisterMovementAsync(int itemId, int warehouseId, MovementType movementType, decimal quantity, string? notes = null)
         {
             ValidateIds(itemId, warehouseId);
+
+            if (!Enum.IsDefined(movementType)) {
+                throw new InvalidOperationException("El tipo de movimiento indicado no es válido.");
+            }
 
             if (quantity == 0) {
                 throw new InvalidOperationException("La cantidad del movimiento no puede ser cero.");
@@ -38,6 +43,7 @@ namespace TransformadoresApp.Services.Inventory
             _context.StockMovements.Add(movement);
         }
 
+        // VALIDACIONES
         private static void ValidateIds(int itemId, int warehouseId)
         {
             if (itemId <= 0) {

@@ -272,6 +272,22 @@ namespace TransformadoresApp.Tests.Services.Inventory
             Assert.Equal("Compra de prueba", movement.Notes);
         }
 
+
+        [Fact]
+        public async Task RegisterMovementAsync_Throws_WhenMovementTypeIsInvalid()
+        {
+            using var factory = new TestDbContextFactory();
+            await using var context = factory.CreateContext();
+
+            var service = new StockMovementService(context);
+
+            var invalidMovementType = (MovementType)999;
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.RegisterMovementAsync(1, 1, invalidMovementType, 10));
+
+            Assert.Equal("El tipo de movimiento indicado no es válido.", exception.Message);
+        }
+
         // HELPERS
         private static async Task<Category> CreateCategoryAsync(
             DbContext context)
