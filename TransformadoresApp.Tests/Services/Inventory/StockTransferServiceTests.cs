@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TransformadoresApp.Data;
 using TransformadoresApp.Models.Catalogs;
 using TransformadoresApp.Models.Inventory;
+using TransformadoresApp.Services.Interfaces;
 using TransformadoresApp.Services.Inventory;
 using TransformadoresApp.Tests.Infrastructure;
 
@@ -735,6 +737,172 @@ namespace TransformadoresApp.Tests.Services.Inventory
             Assert.Equal(4, sourceStock.ReservedQuantity);
 
             Assert.Empty(context.StockMovements);
+        }
+
+        [Fact]
+        public async Task TransferAsync_TransfersExactlyAvailableStock_WhenStockIsReserved()
+        {
+            using var factory = new TestDbContextFactory();
+            await using var context = factory.CreateContext();
+
+            var category = new Category
+            {
+                Name = "Categoría de prueba",
+                IsActive = true
+            };
+
+            var item = new Item
+            {
+                Code = "TRANSFER-013",
+                Name = "Item con stock reservado",
+                Category = category,
+                IsActive = true
+            };
+
+            var sourceWarehouse = new Warehouse
+            {
+                Code = "DEP-ORIGEN-13",
+                Name = "Depósito origen 13",
+                IsActive = true
+            };
+
+            var destinationWarehouse = new Warehouse
+            {
+                Code = "DEP-DESTINO-13",
+                Name = "Depósito destino 13",
+                IsActive = true
+            };
+
+            context.Categories.Add(category);
+            context.Items.Add(item);
+            context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
+
+            await context.SaveChangesAsync();
+
+            context.ItemStocks.Add(new ItemStock
+            {
+                ItemId = item.Id,
+                WarehouseId = sourceWarehouse.Id,
+                Quantity = 10,
+                ReservedQuantity = 4
+            });
+
+            await context.SaveChangesAsync();
+
+            var movementService = new StockMovementService(context);
+            var transferService = new StockTransferService(context, movementService);
+
+            await transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 6);
+
+            await using var verificationContext = factory.CreateContext();
+
+            var updatedSourceStock = await verificationContext.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id);
+
+            var updatedDestinationStock = await verificationContext.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id);
+
+            var movements = await verificationContext.StockMovements.OrderBy(m => m.Id).ToListAsync();
+
+            Assert.Equal(4, updatedSourceStock.Quantity);
+            Assert.Equal(4, updatedSourceStock.ReservedQuantity);
+
+            Assert.Equal(6, updatedDestinationStock.Quantity);
+            Assert.Equal(0, updatedDestinationStock.ReservedQuantity);
+
+            Assert.Equal(2, movements.Count);
+            Assert.Equal(MovementType.TransferOut, movements[0].MovementType);
+            Assert.Equal(-6, movements[0].Quantity);
+            Assert.Equal(MovementType.TransferIn, movements[1].MovementType);
+            Assert.Equal(6, movements[1].Quantity);
+        }
+
+        [Fact]
+        public async Task TransferAsync_RollsBack_WhenSecondMovementRegistrationFails()
+        {
+            using var factory = new TestDbContextFactory();
+            await using var context = factory.CreateContext();
+
+            var category = new Category
+            {
+                Name = "Categoría de prueba",
+                IsActive = true
+            };
+
+            var item = new Item
+            {
+                Code = "TRANSFER-014",
+                Name = "Item para probar rollback",
+                Category = category,
+                IsActive = true
+            };
+
+            var sourceWarehouse = new Warehouse
+            {
+                Code = "DEP-ORIGEN-14",
+                Name = "Depósito origen 14",
+                IsActive = true
+            };
+
+            var destinationWarehouse = new Warehouse
+            {
+                Code = "DEP-DESTINO-14",
+                Name = "Depósito destino 14",
+                IsActive = true
+            };
+
+            context.Categories.Add(category);
+            context.Items.Add(item);
+            context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
+
+            await context.SaveChangesAsync();
+
+            context.ItemStocks.Add(new ItemStock
+            {
+                ItemId = item.Id,
+                WarehouseId = sourceWarehouse.Id,
+                Quantity = 10,
+                ReservedQuantity = 2
+            });
+
+            await context.SaveChangesAsync();
+
+            var movementService = new FailingSecondMovementService(context);
+            var transferService = new StockTransferService(context, movementService);
+
+            await Assert.ThrowsAsync<InvalidOperationException>( () => transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 5));
+
+            await using var verificationContext = factory.CreateContext();
+
+            var sourceStock = await verificationContext.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id);
+
+            var destinationStock = await verificationContext.ItemStocks.SingleOrDefaultAsync(s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id);
+
+            var movements = await verificationContext.StockMovements.ToListAsync();
+
+            Assert.Equal(10, sourceStock.Quantity);
+            Assert.Equal(2, sourceStock.ReservedQuantity);
+
+            Assert.Null(destinationStock);
+            Assert.Empty(movements);
+        }
+    }
+
+    internal sealed class FailingSecondMovementService : IStockMovementService
+    {
+        private readonly StockMovementService _innerService;
+        private int _registrationCount;
+
+        public FailingSecondMovementService(ApplicationDbContext context)
+        {
+            _innerService = new StockMovementService(context);
+        }
+
+        public async Task RegisterMovementAsync(int itemId, int warehouseId, MovementType movementType, decimal quantity, string? notes = null)
+        {
+            _registrationCount++;
+
+            if (_registrationCount == 2) throw new InvalidOperationException("Fallo simulado al registrar el segundo movimiento.");
+
+            await _innerService.RegisterMovementAsync(itemId, warehouseId, movementType, quantity, notes);
         }
     }
 }
