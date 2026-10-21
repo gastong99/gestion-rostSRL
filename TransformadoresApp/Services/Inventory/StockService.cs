@@ -10,9 +10,7 @@ namespace TransformadoresApp.Services.Inventory
         private readonly ApplicationDbContext _context;
         private readonly IStockMovementService _stockMovementService;
 
-        public StockService(
-            ApplicationDbContext context,
-            IStockMovementService stockMovementService)
+        public StockService(ApplicationDbContext context, IStockMovementService stockMovementService)
         {
             _context = context;
             _stockMovementService = stockMovementService;
@@ -26,10 +24,10 @@ namespace TransformadoresApp.Services.Inventory
                 throw new InvalidOperationException("La cantidad a ingresar debe ser mayor que cero.");
             }
 
-            await ValidateItemAsync(itemId);
-            await ValidateWarehouseAsync(warehouseId);
+            await InventoryValidationHelper.ValidateItemAsync(_context, itemId);
+            await InventoryValidationHelper.ValidateWarehouseAsync(_context, warehouseId);
 
-            var stock = await GetStockAsync(itemId, warehouseId);
+            var stock = await InventoryValidationHelper.GetStockAsync(_context, itemId, warehouseId);
 
             if (stock == null) {
                 stock = new ItemStock
@@ -47,7 +45,10 @@ namespace TransformadoresApp.Services.Inventory
             }
         }
 
-        public async Task CreateInitialStockAsync(int itemId, int warehouseId, decimal quantity)
+        public async Task CreateInitialStockAsync(
+            int itemId,
+            int warehouseId,
+            decimal quantity)
         {
             ValidateIds(itemId, warehouseId);
 
@@ -55,8 +56,8 @@ namespace TransformadoresApp.Services.Inventory
                 throw new InvalidOperationException("La cantidad inicial debe ser mayor que cero.");
             }
 
-            await ValidateItemAsync(itemId);
-            await ValidateWarehouseAsync(warehouseId);
+            await InventoryValidationHelper.ValidateItemAsync(_context, itemId);
+            await InventoryValidationHelper.ValidateWarehouseAsync(_context, warehouseId);
 
             var exists = await _context.ItemStocks.AnyAsync(s => s.ItemId == itemId && s.WarehouseId == warehouseId);
 
@@ -74,12 +75,7 @@ namespace TransformadoresApp.Services.Inventory
 
             _context.ItemStocks.Add(stock);
 
-            await _stockMovementService.RegisterMovementAsync(
-                itemId,
-                warehouseId,
-                MovementType.InitialLoad,
-                quantity,
-                "Carga inicial de stock");
+            await _stockMovementService.RegisterMovementAsync(itemId, warehouseId, MovementType.InitialLoad, quantity, "Carga inicial de stock");
         }
 
         public async Task AdjustStockAsync(int stockId, decimal adjustment)
@@ -98,8 +94,8 @@ namespace TransformadoresApp.Services.Inventory
                 throw new InvalidOperationException("El registro de stock no existe.");
             }
 
-            await ValidateItemAsync(stock.ItemId);
-            await ValidateWarehouseAsync(stock.WarehouseId);
+            await InventoryValidationHelper.ValidateItemAsync(_context, stock.ItemId);
+            await InventoryValidationHelper.ValidateWarehouseAsync(_context, stock.WarehouseId);
 
             var newQuantity = stock.Quantity + adjustment;
 
@@ -113,48 +109,15 @@ namespace TransformadoresApp.Services.Inventory
 
             stock.Quantity = newQuantity;
 
-            await _stockMovementService.RegisterMovementAsync(
-                stock.ItemId,
-                stock.WarehouseId,
-                MovementType.InventoryAdjustment,
-                adjustment,
-                "Ajuste manual de inventario");
+            await _stockMovementService.RegisterMovementAsync(stock.ItemId, stock.WarehouseId, MovementType.InventoryAdjustment, adjustment, "Ajuste manual de inventario");
         }
 
-        // VALIDACIONES
+        // VALIDACIONES LOCALES
         private static void ValidateIds(int itemId, int warehouseId)
         {
-            if (itemId <= 0) {
-                throw new InvalidOperationException("El item indicado no es válido.");
-            }
+            if (itemId <= 0) throw new InvalidOperationException("El item indicado no es válido.");
 
-            if (warehouseId <= 0) {
-                throw new InvalidOperationException("El depósito indicado no es válido.");
-            }
-        }
-
-        private async Task ValidateItemAsync(int itemId)
-        {
-            var exists = await _context.Items.AnyAsync(i => i.Id == itemId && i.IsActive);
-
-            if (!exists) {
-                throw new InvalidOperationException("El item seleccionado no existe o está inactivo.");
-            }
-        }
-
-        private async Task ValidateWarehouseAsync(int warehouseId)
-        {
-            var exists = await _context.Warehouses.AnyAsync(w => w.Id == warehouseId && w.IsActive);
-
-            if (!exists) {
-                throw new InvalidOperationException("El depósito seleccionado no existe o está inactivo.");
-            }
-        }
-
-        // HELPERS
-        private async Task<ItemStock?> GetStockAsync(int itemId, int warehouseId)
-        {
-            return await _context.ItemStocks.FirstOrDefaultAsync(s => s.ItemId == itemId && s.WarehouseId == warehouseId);
+            if (warehouseId <= 0) throw new InvalidOperationException("El depósito indicado no es válido.");
         }
     }
 }

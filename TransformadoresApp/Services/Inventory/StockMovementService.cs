@@ -1,6 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using TransformadoresApp.Data;
+﻿using TransformadoresApp.Data;
 using TransformadoresApp.Models.Inventory;
 using TransformadoresApp.Services.Interfaces;
 
@@ -19,16 +17,13 @@ namespace TransformadoresApp.Services.Inventory
         {
             ValidateIds(itemId, warehouseId);
 
-            if (!Enum.IsDefined(movementType)) {
-                throw new InvalidOperationException("El tipo de movimiento indicado no es válido.");
-            }
+            if (!Enum.IsDefined(movementType)) throw new InvalidOperationException("El tipo de movimiento indicado no es válido.");
 
-            if (quantity == 0) {
-                throw new InvalidOperationException("La cantidad del movimiento no puede ser cero.");
-            }
+            if (quantity == 0) throw new InvalidOperationException("La cantidad del movimiento no puede ser cero.");
 
-            await ValidateItemAsync(itemId);
-            await ValidateWarehouseAsync(warehouseId);
+            await InventoryValidationHelper.ValidateItemAsync(_context, itemId);
+
+            await InventoryValidationHelper.ValidateWarehouseAsync(_context, warehouseId);
 
             var movement = new StockMovement
             {
@@ -43,34 +38,11 @@ namespace TransformadoresApp.Services.Inventory
             _context.StockMovements.Add(movement);
         }
 
-        // VALIDACIONES
         private static void ValidateIds(int itemId, int warehouseId)
         {
-            if (itemId <= 0) {
-                throw new InvalidOperationException("Debe seleccionar un item válido.");
-            }
+            if (itemId <= 0) throw new InvalidOperationException("Debe seleccionar un item válido.");
 
-            if (warehouseId <= 0) {
-                throw new InvalidOperationException("Debe seleccionar un depósito válido.");
-            }
-        }
-
-        private async Task ValidateItemAsync(int itemId)
-        {
-            var exists = await _context.Items.AnyAsync(i => i.Id == itemId && i.IsActive);
-
-            if (!exists) {
-                throw new InvalidOperationException("El item seleccionado no existe o está inactivo.");
-            }
-        }
-
-        private async Task ValidateWarehouseAsync(int warehouseId)
-        {
-            var exists = await _context.Warehouses.AnyAsync(w => w.Id == warehouseId && w.IsActive);
-
-            if (!exists) {
-                throw new InvalidOperationException("El depósito seleccionado no existe o está inactivo.");
-            }
+            if (warehouseId <= 0) throw new InvalidOperationException("Debe seleccionar un depósito válido.");
         }
     }
 }
