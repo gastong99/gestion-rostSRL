@@ -506,6 +506,31 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             Assert.Equal("La orden ya se encuentra desactivada.", exception.Message);
         }
 
+        [Theory]
+        [InlineData(PurchaseOrderStatus.Pending)]
+        [InlineData(PurchaseOrderStatus.PartiallyReceived)]
+        [InlineData(PurchaseOrderStatus.Completed)]
+        public async Task DeactivateAsync_Throws_WhenOrderStatusDoesNotAllowDeactivation(PurchaseOrderStatus status)
+        {
+            using var factory = new TestDbContextFactory();
+            using var context = factory.CreateContext();
+
+            var supplier = await CreateSupplierAsync(context);
+
+            var purchaseOrder = await CreatePurchaseOrderAsync(context, supplier.Id, $"OC-{Guid.NewGuid():N}"[..12], status, true);
+
+            var service = new PurchaseOrderService(context);
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.DeactivateAsync(purchaseOrder.Id));
+
+            Assert.Equal("Solo se pueden desactivar órdenes de compra en estado borrador o cancelado.", exception.Message);
+
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+
+            Assert.True(order.IsActive);
+            Assert.Equal(status, order.Status);
+        }
+
         [Fact]
         public async Task RestoreAsync_RestoresInactiveOrder()
         {

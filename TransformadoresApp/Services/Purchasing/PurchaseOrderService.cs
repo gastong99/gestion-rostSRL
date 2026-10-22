@@ -128,6 +128,10 @@ namespace TransformadoresApp.Services.Purchasing
                 throw new InvalidOperationException("La orden ya se encuentra desactivada.");
             }
 
+            if (purchaseOrder.Status != PurchaseOrderStatus.Draft && purchaseOrder.Status != PurchaseOrderStatus.Cancelled) {
+                throw new InvalidOperationException("Solo se pueden desactivar órdenes de compra en estado borrador o cancelado.");
+            }
+
             purchaseOrder.IsActive = false;
 
             await _context.SaveChangesAsync();
