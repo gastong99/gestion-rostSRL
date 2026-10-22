@@ -135,16 +135,17 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         }
 
         // RECEIVE - IDENTIFIERS AND EXISTENCE
-
-        [Fact]
-        public async Task ReceiveAsync_Throws_WhenPurchaseOrderItemIdIsZero()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public async Task ReceiveAsync_Throws_WhenPurchaseOrderItemIdIsInvalid(int purchaseOrderItemId)
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
 
             var service = CreateService(context);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.ReceiveAsync(0, 1, 1));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.ReceiveAsync(purchaseOrderItemId, 1, 1));
 
             Assert.Equal("El item de la orden de compra indicado no es válido.", exception.Message);
         }

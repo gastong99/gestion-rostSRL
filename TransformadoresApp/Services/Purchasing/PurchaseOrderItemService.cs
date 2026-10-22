@@ -80,9 +80,7 @@ namespace TransformadoresApp.Services.Purchasing
                 throw new InvalidOperationException("La orden de compra no existe.");
             }
 
-            var purchaseOrderId = existingItem.PurchaseOrderId;
-
-            if (item.PurchaseOrderId != purchaseOrderId) {
+            if (item.PurchaseOrderId != existingItem.PurchaseOrderId) {
                 throw new InvalidOperationException("La orden de compra indicada no coincide con el item.");
             }
 
@@ -110,8 +108,6 @@ namespace TransformadoresApp.Services.Purchasing
 
             existingItem.Quantity = item.Quantity;
             existingItem.UnitPrice = item.UnitPrice;
-
-            await _purchaseOrderService.UpdateStatusAsync(purchaseOrderId);
 
             await _context.SaveChangesAsync();
         }
@@ -143,8 +139,6 @@ namespace TransformadoresApp.Services.Purchasing
             }
 
             _context.PurchaseOrderItems.Remove(item);
-
-            await _purchaseOrderService.UpdateStatusAsync(purchaseOrderId);
 
             await _context.SaveChangesAsync();
 
