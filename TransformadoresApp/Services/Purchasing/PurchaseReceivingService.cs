@@ -1,8 +1,10 @@
-﻿using TransformadoresApp.Data;
+﻿
+using Microsoft.EntityFrameworkCore;
+using TransformadoresApp.Data;
+using TransformadoresApp.Models.Inventory;
 using TransformadoresApp.Models.Purchasing;
 using TransformadoresApp.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using TransformadoresApp.Models.Inventory;
+using TransformadoresApp.Services.Inventory;
 
 namespace TransformadoresApp.Services.Purchasing
 {
@@ -37,18 +39,13 @@ namespace TransformadoresApp.Services.Purchasing
 
                 ValidatePurchaseOrder(purchaseOrder);
 
-                await ValidateWarehouseAsync(warehouseId);
+                await InventoryValidationHelper.ValidateWarehouseAsync(_context, warehouseId, invalidIdMessage: "Debe seleccionar un depósito.", notFoundMessage: "El depósito seleccionado no es válido.");
 
                 ValidateQuantity(purchaseOrderItem, quantity);
 
                 await _stockService.IncreaseStockAsync(purchaseOrderItem.ItemId, warehouseId, quantity);
 
-                await _stockMovementService.RegisterMovementAsync(
-                    purchaseOrderItem.ItemId,
-                    warehouseId,
-                    MovementType.Purchase,
-                    quantity,
-                    $"Recepción OC {purchaseOrder.Number}");
+                await _stockMovementService.RegisterMovementAsync(purchaseOrderItem.ItemId, warehouseId, MovementType.Purchase, quantity, $"Recepción OC {purchaseOrder.Number}");
 
                 UpdateReceivedQuantity(purchaseOrderItem, quantity);
 
@@ -111,30 +108,13 @@ namespace TransformadoresApp.Services.Purchasing
             purchaseOrderItem.ReceivedQuantity += quantity;
         }
 
-        private async Task ValidateWarehouseAsync(int warehouseId)
-        {
-            if (warehouseId <= 0) {
-                throw new InvalidOperationException("Debe seleccionar un depósito.");
-            }
-
-            var exists = await _context.Warehouses.AnyAsync(w => w.Id == warehouseId && w.IsActive);
-
-            if (!exists) {
-                throw new InvalidOperationException("El depósito seleccionado no es válido.");
-            }
-        }
-
         private async Task<PurchaseOrderItem> GetPurchaseOrderItemAsync(int purchaseOrderItemId)
         {
             var purchaseOrderItem = await _context.PurchaseOrderItems.Include(i => i.PurchaseOrder).FirstOrDefaultAsync(i => i.Id == purchaseOrderItemId);
 
-            if (purchaseOrderItem == null) {
-                throw new InvalidOperationException("El item de la orden de compra no existe.");
-            }
+            if (purchaseOrderItem == null) throw new InvalidOperationException("El item de la orden de compra no existe.");
 
-            if (purchaseOrderItem.PurchaseOrder == null) {
-                throw new InvalidOperationException("La orden de compra asociada no existe.");
-            }
+            if (purchaseOrderItem.PurchaseOrder == null) throw new InvalidOperationException("La orden de compra asociada no existe.");
 
             return purchaseOrderItem;
         }

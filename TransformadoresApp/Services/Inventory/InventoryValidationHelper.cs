@@ -16,12 +16,20 @@ namespace TransformadoresApp.Services.Inventory
             }
         }
 
-        internal static async Task ValidateWarehouseAsync(ApplicationDbContext context, int warehouseId, string? warehouseRole = null)
+        internal static async Task ValidateWarehouseAsync(ApplicationDbContext context, int warehouseId, string? warehouseRole = null, string? invalidIdMessage = null, string? notFoundMessage = null)
         {
+            if (warehouseId <= 0) {
+                throw new InvalidOperationException(invalidIdMessage ?? "El depósito indicado no es válido.");
+            }
+
             var exists = await context.Warehouses.AnyAsync(w => w.Id == warehouseId && w.IsActive);
 
             if (!exists) {
-                var message = string.IsNullOrWhiteSpace(warehouseRole) ? "El depósito seleccionado no existe o está inactivo." : $"El depósito de {warehouseRole} seleccionado no existe o está inactivo.";
+                var message = notFoundMessage;
+
+                if (string.IsNullOrWhiteSpace(message)) {
+                    message = string.IsNullOrWhiteSpace(warehouseRole) ? "El depósito seleccionado no existe o está inactivo." : $"El depósito de {warehouseRole} seleccionado no existe o está inactivo.";
+                }
 
                 throw new InvalidOperationException(message);
             }
