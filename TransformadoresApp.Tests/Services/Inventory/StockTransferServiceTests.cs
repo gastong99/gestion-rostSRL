@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
 using TransformadoresApp.Models.Catalogs;
 using TransformadoresApp.Models.Inventory;
@@ -15,6 +16,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -48,7 +50,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var sourceStock = new ItemStock
             {
@@ -60,16 +62,22 @@ namespace TransformadoresApp.Tests.Services.Inventory
 
             context.ItemStocks.Add(sourceStock);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            await transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10);
+            await transferService.TransferAsync(
+                item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10,
+                cancellationToken);
 
-            var updatedSourceStock = await context.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id);
+            var updatedSourceStock = await context.ItemStocks.SingleAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id,
+                cancellationToken);
 
-            var updatedDestinationStock = await context.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id);
+            var updatedDestinationStock = await context.ItemStocks.SingleAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id,
+                cancellationToken);
 
             Assert.Equal(10, updatedSourceStock.Quantity);
             Assert.Equal(5, updatedSourceStock.ReservedQuantity);
@@ -83,6 +91,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -116,7 +125,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             context.ItemStocks.Add(new ItemStock
             {
@@ -126,14 +135,18 @@ namespace TransformadoresApp.Tests.Services.Inventory
                 ReservedQuantity = 0
             });
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            await transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 7);
+            await transferService.TransferAsync(
+                item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 7,
+                cancellationToken);
 
-            var destinationStock = await context.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id);
+            var destinationStock = await context.ItemStocks.SingleAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id,
+                cancellationToken);
 
             Assert.Equal(7, destinationStock.Quantity);
             Assert.Equal(0, destinationStock.ReservedQuantity);
@@ -144,6 +157,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -177,7 +191,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             context.ItemStocks.AddRange(
                 new ItemStock
@@ -195,14 +209,18 @@ namespace TransformadoresApp.Tests.Services.Inventory
                     ReservedQuantity = 2
                 });
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            await transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 8);
+            await transferService.TransferAsync(
+                item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 8,
+                cancellationToken);
 
-            var destinationStock = await context.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id);
+            var destinationStock = await context.ItemStocks.SingleAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id,
+                cancellationToken);
 
             Assert.Equal(13, destinationStock.Quantity);
             Assert.Equal(2, destinationStock.ReservedQuantity);
@@ -213,6 +231,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -246,7 +265,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             context.ItemStocks.Add(new ItemStock
             {
@@ -256,14 +275,18 @@ namespace TransformadoresApp.Tests.Services.Inventory
                 ReservedQuantity = 0
             });
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            await transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 6);
+            await transferService.TransferAsync(
+                item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 6,
+                cancellationToken);
 
-            var movements = await context.StockMovements.OrderBy(m => m.Id).ToListAsync();
+            var movements = await context.StockMovements
+                .OrderBy(m => m.Id)
+                .ToListAsync(cancellationToken);
 
             Assert.Equal(2, movements.Count);
 
@@ -289,11 +312,13 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(0, 1, 2, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(0, 1, 2, 10, cancellationToken));
 
             Assert.Equal("Debe seleccionar un item válido.", exception.Message);
         }
@@ -303,11 +328,13 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(1, 0, 2, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(1, 0, 2, 10, cancellationToken));
 
             Assert.Equal("Debe seleccionar un depósito de origen válido.", exception.Message);
         }
@@ -317,11 +344,13 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(1, 1, 0, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(1, 1, 0, 10, cancellationToken));
 
             Assert.Equal("Debe seleccionar un depósito de destino válido.", exception.Message);
         }
@@ -331,11 +360,13 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(1, 1, 1, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(1, 1, 1, 10, cancellationToken));
 
             Assert.Equal("El depósito de origen y destino no pueden ser el mismo.", exception.Message);
         }
@@ -345,11 +376,13 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(1, 2, 3, 0));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(1, 2, 3, 0, cancellationToken));
 
             Assert.Equal("La cantidad a transferir debe ser mayor que cero.", exception.Message);
         }
@@ -359,11 +392,13 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(1, 2, 3, -5));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(1, 2, 3, -5, cancellationToken));
 
             Assert.Equal("La cantidad a transferir debe ser mayor que cero.", exception.Message);
         }
@@ -373,6 +408,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var sourceWarehouse = new Warehouse
             {
@@ -390,12 +426,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
 
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(999, sourceWarehouse.Id, destinationWarehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    999, sourceWarehouse.Id, destinationWarehouse.Id, 10, cancellationToken));
 
             Assert.Equal("El item seleccionado no existe o está inactivo.", exception.Message);
         }
@@ -405,6 +443,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -438,12 +477,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10, cancellationToken));
 
             Assert.Equal("El item seleccionado no existe o está inactivo.", exception.Message);
         }
@@ -453,6 +494,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -479,12 +521,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(item.Id, 999, destinationWarehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    item.Id, 999, destinationWarehouse.Id, 10, cancellationToken));
 
             Assert.Equal("El depósito de origen seleccionado no existe o está inactivo.", exception.Message);
         }
@@ -494,6 +538,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -527,12 +572,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10, cancellationToken));
 
             Assert.Equal("El depósito de origen seleccionado no existe o está inactivo.", exception.Message);
         }
@@ -542,6 +589,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -568,12 +616,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(sourceWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(item.Id, sourceWarehouse.Id, 999, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    item.Id, sourceWarehouse.Id, 999, 10, cancellationToken));
 
             Assert.Equal("El depósito de destino seleccionado no existe o está inactivo.", exception.Message);
         }
@@ -583,6 +633,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -616,12 +667,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10, cancellationToken));
 
             Assert.Equal("El depósito de destino seleccionado no existe o está inactivo.", exception.Message);
         }
@@ -631,6 +684,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -664,12 +718,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 10, cancellationToken));
 
             Assert.Equal("No existe stock del item seleccionado en el depósito de origen.", exception.Message);
         }
@@ -679,6 +735,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -712,7 +769,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             context.ItemStocks.Add(new ItemStock
             {
@@ -722,16 +779,20 @@ namespace TransformadoresApp.Tests.Services.Inventory
                 ReservedQuantity = 4
             });
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 7));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 7, cancellationToken));
 
             Assert.Equal("La cantidad a transferir supera el stock disponible en el depósito de origen.", exception.Message);
 
-            var sourceStock = await context.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id);
+            var sourceStock = await context.ItemStocks.SingleAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id,
+                cancellationToken);
 
             Assert.Equal(10, sourceStock.Quantity);
             Assert.Equal(4, sourceStock.ReservedQuantity);
@@ -744,6 +805,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             await using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -777,7 +839,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             context.ItemStocks.Add(new ItemStock
             {
@@ -787,20 +849,28 @@ namespace TransformadoresApp.Tests.Services.Inventory
                 ReservedQuantity = 4
             });
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new StockMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            await transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 6);
+            await transferService.TransferAsync(
+                item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 6,
+                cancellationToken);
 
             await using var verificationContext = factory.CreateContext();
 
-            var updatedSourceStock = await verificationContext.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id);
+            var updatedSourceStock = await verificationContext.ItemStocks.SingleAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id,
+                cancellationToken);
 
-            var updatedDestinationStock = await verificationContext.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id);
+            var updatedDestinationStock = await verificationContext.ItemStocks.SingleAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id,
+                cancellationToken);
 
-            var movements = await verificationContext.StockMovements.OrderBy(m => m.Id).ToListAsync();
+            var movements = await verificationContext.StockMovements
+                .OrderBy(m => m.Id)
+                .ToListAsync(cancellationToken);
 
             Assert.Equal(4, updatedSourceStock.Quantity);
             Assert.Equal(4, updatedSourceStock.ReservedQuantity);
@@ -820,6 +890,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
         {
             using var factory = new TestDbContextFactory();
             await using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var category = new Category
             {
@@ -853,7 +924,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.AddRange(sourceWarehouse, destinationWarehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             context.ItemStocks.Add(new ItemStock
             {
@@ -863,20 +934,28 @@ namespace TransformadoresApp.Tests.Services.Inventory
                 ReservedQuantity = 2
             });
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var movementService = new FailingSecondMovementService(context);
             var transferService = new StockTransferService(context, movementService);
 
-            await Assert.ThrowsAsync<InvalidOperationException>( () => transferService.TransferAsync(item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 5));
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => transferService.TransferAsync(
+                    item.Id, sourceWarehouse.Id, destinationWarehouse.Id, 5,
+                    cancellationToken));
 
             await using var verificationContext = factory.CreateContext();
 
-            var sourceStock = await verificationContext.ItemStocks.SingleAsync(s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id);
+            var sourceStock = await verificationContext.ItemStocks.SingleAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == sourceWarehouse.Id,
+                cancellationToken);
 
-            var destinationStock = await verificationContext.ItemStocks.SingleOrDefaultAsync(s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id);
+            var destinationStock = await verificationContext.ItemStocks.SingleOrDefaultAsync(
+                s => s.ItemId == item.Id && s.WarehouseId == destinationWarehouse.Id,
+                cancellationToken);
 
-            var movements = await verificationContext.StockMovements.ToListAsync();
+            var movements = await verificationContext.StockMovements
+                .ToListAsync(cancellationToken);
 
             Assert.Equal(10, sourceStock.Quantity);
             Assert.Equal(2, sourceStock.ReservedQuantity);
@@ -896,13 +975,29 @@ namespace TransformadoresApp.Tests.Services.Inventory
             _innerService = new StockMovementService(context);
         }
 
-        public async Task RegisterMovementAsync(int itemId, int warehouseId, MovementType movementType, decimal quantity, string? notes = null)
+        public async Task RegisterMovementAsync(
+            int itemId,
+            int warehouseId,
+            MovementType movementType,
+            decimal quantity,
+            string? notes = null,
+            CancellationToken cancellationToken = default)
         {
             _registrationCount++;
 
-            if (_registrationCount == 2) throw new InvalidOperationException("Fallo simulado al registrar el segundo movimiento.");
+            if (_registrationCount == 2)
+            {
+                throw new InvalidOperationException(
+                    "Fallo simulado al registrar el segundo movimiento.");
+            }
 
-            await _innerService.RegisterMovementAsync(itemId, warehouseId, movementType, quantity, notes);
+            await _innerService.RegisterMovementAsync(
+                itemId,
+                warehouseId,
+                movementType,
+                quantity,
+                notes,
+                cancellationToken);
         }
     }
 }

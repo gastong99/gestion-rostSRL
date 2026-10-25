@@ -72,7 +72,7 @@ namespace TransformadoresApp.Services
             if (bom != null) {
                 foreach (var item in bom) {
                     table.AddCell(NormalCell(item.MaterialName));
-                    table.AddCell(NormalCell(item.TotalQty?.ToString("0.00")).SetTextAlignment(TextAlignment.CENTER));
+                    table.AddCell(NormalCell(item.TotalQty?.ToString("0.00") ?? "-").SetTextAlignment(TextAlignment.CENTER));
                     table.AddCell(NormalCell(item.Unit));
                 }
             }

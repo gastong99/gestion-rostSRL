@@ -2,8 +2,21 @@
 {
     public interface IStockService
     {
-        Task IncreaseStockAsync(int itemId, int warehouseId, decimal quantity);
-        Task AdjustStockAsync(int stockId, decimal adjustment);
-        Task CreateInitialStockAsync(int itemId, int warehouseId, decimal quantity);
+        Task IncreaseStockAsync(
+            int itemId,
+            int warehouseId,
+            decimal quantity,
+            CancellationToken cancellationToken = default);
+
+        Task AdjustStockAsync(
+            int stockId,
+            decimal adjustment,
+            CancellationToken cancellationToken = default);
+
+        Task CreateInitialStockAsync(
+            int itemId,
+            int warehouseId,
+            decimal quantity,
+            CancellationToken cancellationToken = default);
     }
 }

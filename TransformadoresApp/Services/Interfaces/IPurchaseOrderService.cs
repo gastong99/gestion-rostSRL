@@ -10,6 +10,6 @@ namespace TransformadoresApp.Services.Interfaces
         Task CancelAsync(int purchaseOrderId);
         Task DeactivateAsync(int purchaseOrderId);
         Task RestoreAsync(int purchaseOrderId);
-        Task UpdateStatusAsync(int purchaseOrderId);
+        Task UpdateStatusAsync(int purchaseOrderId, CancellationToken cancellationToken = default);
     }
 }

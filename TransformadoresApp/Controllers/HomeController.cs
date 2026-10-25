@@ -20,12 +20,19 @@ namespace TransformadoresApp.Controllers
             _signInManager = signInManager;
         }
 
+
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             if (!_signInManager.IsSignedIn(User)) return View("Landing");
 
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null) {
+                await _signInManager.SignOutAsync();
+                return View("Landing");
+            }
+
             var roles = await _userManager.GetRolesAsync(user);
 
             if (roles.Contains("Administrador")) return View("DashboardAdmin");

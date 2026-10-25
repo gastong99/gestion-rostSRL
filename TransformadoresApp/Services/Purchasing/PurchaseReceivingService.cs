@@ -23,66 +23,100 @@ namespace TransformadoresApp.Services.Purchasing
             _purchaseOrderService = purchaseOrderService;
         }
 
-        public async Task<int> ReceiveAsync(int purchaseOrderItemId, int warehouseId, decimal quantity)
+        public async Task<int> ReceiveAsync(int purchaseOrderItemId, int warehouseId, decimal quantity, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (purchaseOrderItemId <= 0) {
                 throw new InvalidOperationException("El item de la orden de compra indicado no es válido.");
             }
 
-            await using var transaction = await _context.Database.BeginTransactionAsync();
+            await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             try
             {
-                var purchaseOrderItem = await GetPurchaseOrderItemAsync(purchaseOrderItemId);
+                var purchaseOrderItem =
+                    await GetPurchaseOrderItemAsync(
+                        purchaseOrderItemId,
+                        cancellationToken);
 
                 var purchaseOrder = purchaseOrderItem.PurchaseOrder!;
 
                 ValidatePurchaseOrder(purchaseOrder);
 
-                await InventoryValidationHelper.ValidateWarehouseAsync(_context, warehouseId, invalidIdMessage: "Debe seleccionar un depósito.", notFoundMessage: "El depósito seleccionado no es válido.");
+                await InventoryValidationHelper.ValidateWarehouseAsync(
+                    _context,
+                    warehouseId,
+                    invalidIdMessage: "Debe seleccionar un depósito.",
+                    notFoundMessage: "El depósito seleccionado no es válido.",
+                    cancellationToken: cancellationToken);
 
                 ValidateQuantity(purchaseOrderItem, quantity);
 
-                await _stockService.IncreaseStockAsync(purchaseOrderItem.ItemId, warehouseId, quantity);
+                await _stockService.IncreaseStockAsync(
+                    purchaseOrderItem.ItemId,
+                    warehouseId,
+                    quantity,
+                    cancellationToken);
 
-                await _stockMovementService.RegisterMovementAsync(purchaseOrderItem.ItemId, warehouseId, MovementType.Purchase, quantity, $"Recepción OC {purchaseOrder.Number}");
+                await _stockMovementService.RegisterMovementAsync(
+                    purchaseOrderItem.ItemId,
+                    warehouseId,
+                    MovementType.Purchase,
+                    quantity,
+                    $"Recepción OC {purchaseOrder.Number}",
+                    cancellationToken);
 
                 UpdateReceivedQuantity(purchaseOrderItem, quantity);
 
-                await _purchaseOrderService.UpdateStatusAsync(purchaseOrder.Id);
+                await _purchaseOrderService.UpdateStatusAsync(
+                    purchaseOrder.Id,
+                    cancellationToken);
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
-                await transaction.CommitAsync();
+                await transaction.CommitAsync(cancellationToken);
 
                 return purchaseOrder.Id;
             }
-            catch {
-                await transaction.RollbackAsync();
+            catch
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
                 throw;
             }
         }
 
         private static void ValidatePurchaseOrder(PurchaseOrder purchaseOrder)
         {
-            if (!purchaseOrder.IsActive) {
-                throw new InvalidOperationException("No es posible recibir mercadería de una orden de compra desactivada.");
+            if (!purchaseOrder.IsActive)
+            {
+                throw new InvalidOperationException(
+                    "No es posible recibir mercadería de una orden de compra desactivada.");
             }
 
-            if (purchaseOrder.Status == PurchaseOrderStatus.Draft) {
-                throw new InvalidOperationException("Debe confirmar la orden antes de recibir mercadería.");
+            if (purchaseOrder.Status == PurchaseOrderStatus.Draft)
+            {
+                throw new InvalidOperationException(
+                    "Debe confirmar la orden antes de recibir mercadería.");
             }
 
-            if (purchaseOrder.Status == PurchaseOrderStatus.Completed) {
-                throw new InvalidOperationException("La orden ya fue recibida completamente.");
+            if (purchaseOrder.Status == PurchaseOrderStatus.Completed)
+            {
+                throw new InvalidOperationException(
+                    "La orden ya fue recibida completamente.");
             }
 
-            if (purchaseOrder.Status == PurchaseOrderStatus.Cancelled) {
-                throw new InvalidOperationException("No es posible recibir mercadería de una orden cancelada.");
+            if (purchaseOrder.Status == PurchaseOrderStatus.Cancelled)
+            {
+                throw new InvalidOperationException(
+                    "No es posible recibir mercadería de una orden cancelada.");
             }
 
-            if (purchaseOrder.Status != PurchaseOrderStatus.Pending && purchaseOrder.Status != PurchaseOrderStatus.PartiallyReceived) {
-                throw new InvalidOperationException("La orden de compra no se encuentra en un estado válido para recibir mercadería.");
+            if (purchaseOrder.Status != PurchaseOrderStatus.Pending &&
+                purchaseOrder.Status != PurchaseOrderStatus.PartiallyReceived)
+            {
+                throw new InvalidOperationException(
+                    "La orden de compra no se encuentra en un estado válido para recibir mercadería.");
             }
         }
 
@@ -108,13 +142,17 @@ namespace TransformadoresApp.Services.Purchasing
             purchaseOrderItem.ReceivedQuantity += quantity;
         }
 
-        private async Task<PurchaseOrderItem> GetPurchaseOrderItemAsync(int purchaseOrderItemId)
+        private async Task<PurchaseOrderItem> GetPurchaseOrderItemAsync(int purchaseOrderItemId, CancellationToken cancellationToken)
         {
-            var purchaseOrderItem = await _context.PurchaseOrderItems.Include(i => i.PurchaseOrder).FirstOrDefaultAsync(i => i.Id == purchaseOrderItemId);
+            var purchaseOrderItem = await _context.PurchaseOrderItems.Include(i => i.PurchaseOrder).FirstOrDefaultAsync(i => i.Id == purchaseOrderItemId, cancellationToken);
 
-            if (purchaseOrderItem == null) throw new InvalidOperationException("El item de la orden de compra no existe.");
+            if (purchaseOrderItem == null) {
+                throw new InvalidOperationException("El item de la orden de compra no existe.");
+            }
 
-            if (purchaseOrderItem.PurchaseOrder == null) throw new InvalidOperationException("La orden de compra asociada no existe.");
+            if (purchaseOrderItem.PurchaseOrder == null) {
+                throw new InvalidOperationException("La orden de compra asociada no existe.");
+            }
 
             return purchaseOrderItem;
         }

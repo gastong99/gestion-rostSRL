@@ -18,8 +18,7 @@ namespace TransformadoresApp.Controllers
         public async Task<IActionResult> Index(int? itemId, int? warehouseId, MovementType? movementType, DateTime? dateFrom, DateTime? dateTo)
         {
             var query = _context.StockMovements
-                .Include(m => m.Item)
-                    .ThenInclude(i => i.Category)
+                .Include(m => m.Item).ThenInclude(i => i!.Category)
                 .Include(m => m.Warehouse)
                 .AsQueryable();
 

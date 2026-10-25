@@ -39,14 +39,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            await stockService.IncreaseStockAsync(item.Id, warehouse.Id, 10);
+            await stockService.IncreaseStockAsync(item.Id, warehouse.Id, 10, TestContext.Current.CancellationToken);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var stock = context.ItemStocks.Single();
 
@@ -87,7 +87,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var existingStock = new ItemStock
             {
@@ -99,14 +99,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
 
             context.ItemStocks.Add(existingStock);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            await stockService.IncreaseStockAsync(item.Id, warehouse.Id, 5);
+            await stockService.IncreaseStockAsync(item.Id, warehouse.Id, 5, TestContext.Current.CancellationToken);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var stocks = context.ItemStocks.Where(s => s.ItemId == item.Id && s.WarehouseId == warehouse.Id).ToList();
 
@@ -146,14 +146,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            await stockService.CreateInitialStockAsync(item.Id, warehouse.Id, 25);
+            await stockService.CreateInitialStockAsync(item.Id, warehouse.Id, 25, TestContext.Current.CancellationToken);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var stock = context.ItemStocks.Single();
 
@@ -202,7 +202,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var existingStock = new ItemStock
             {
@@ -214,7 +214,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
 
             context.ItemStocks.Add(existingStock);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
@@ -223,7 +223,8 @@ namespace TransformadoresApp.Tests.Services.Inventory
                 () => stockService.CreateInitialStockAsync(
                     item.Id,
                     warehouse.Id,
-                    20));
+                    20,
+                    TestContext.Current.CancellationToken));
 
             Assert.Equal("Ya existe stock para ese item en el depósito seleccionado.", exception.Message);
 
@@ -266,7 +267,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var stock = new ItemStock
             {
@@ -278,16 +279,17 @@ namespace TransformadoresApp.Tests.Services.Inventory
 
             context.ItemStocks.Add(stock);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
             await stockService.AdjustStockAsync(
                 stock.Id,
-                5);
+                5,
+                TestContext.Current.CancellationToken);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var updatedStock = context.ItemStocks.Single(s => s.Id == stock.Id);
 
@@ -334,7 +336,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var stock = new ItemStock
             {
@@ -346,14 +348,14 @@ namespace TransformadoresApp.Tests.Services.Inventory
 
             context.ItemStocks.Add(stock);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            await stockService.AdjustStockAsync(stock.Id, -4);
+            await stockService.AdjustStockAsync(stock.Id, -4, TestContext.Current.CancellationToken);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var updatedStock = context.ItemStocks.Single(s => s.Id == stock.Id);
 
@@ -400,7 +402,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var stock = new ItemStock
             {
@@ -412,12 +414,12 @@ namespace TransformadoresApp.Tests.Services.Inventory
 
             context.ItemStocks.Add(stock);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.AdjustStockAsync( stock.Id, -3));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.AdjustStockAsync( stock.Id, -3, TestContext.Current.CancellationToken));
 
             Assert.Equal("El ajuste no puede dejar el stock por debajo de la cantidad reservada.", exception.Message);
 
@@ -460,12 +462,12 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(item.Id, warehouse.Id, 0));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(item.Id, warehouse.Id, 0, TestContext.Current.CancellationToken));
 
             Assert.Equal("La cantidad a ingresar debe ser mayor que cero.", exception.Message);
 
@@ -481,7 +483,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(0, 1, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(0, 1, 10, TestContext.Current.CancellationToken));
 
             Assert.Equal("El item indicado no es válido.", exception.Message);
         }
@@ -495,7 +497,7 @@ namespace TransformadoresApp.Tests.Services.Inventory
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(1, 0, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(1, 0, 10, TestContext.Current.CancellationToken));
 
             Assert.Equal("El depósito indicado no es válido.", exception.Message);
         }
@@ -515,12 +517,12 @@ namespace TransformadoresApp.Tests.Services.Inventory
 
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(999, warehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(999, warehouse.Id, 10, TestContext.Current.CancellationToken));
 
             Assert.Equal("El item seleccionado no existe o está inactivo.", exception.Message);
 
@@ -558,12 +560,12 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(item.Id, warehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(item.Id, warehouse.Id, 10, TestContext.Current.CancellationToken));
 
             Assert.Equal("El item seleccionado no existe o está inactivo.", exception.Message);
 
@@ -593,12 +595,12 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Categories.Add(category);
             context.Items.Add(item);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(item.Id, 999, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(item.Id, 999, 10, TestContext.Current.CancellationToken));
 
             Assert.Equal("El depósito seleccionado no existe o está inactivo.", exception.Message);
 
@@ -636,12 +638,12 @@ namespace TransformadoresApp.Tests.Services.Inventory
             context.Items.Add(item);
             context.Warehouses.Add(warehouse);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var movementService = new StockMovementService(context);
             var stockService = new StockService(context, movementService);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(item.Id, warehouse.Id, 10));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => stockService.IncreaseStockAsync(item.Id, warehouse.Id, 10, TestContext.Current.CancellationToken));
 
             Assert.Equal("El depósito seleccionado no existe o está inactivo.", exception.Message);
 

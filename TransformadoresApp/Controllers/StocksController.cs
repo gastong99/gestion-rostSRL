@@ -22,9 +22,9 @@ namespace TransformadoresApp.Controllers
         public async Task<IActionResult> Index()
         {
             var stock = await _context.ItemStocks
-                .Include(s => s.Item)
-                    .ThenInclude(i => i.Category)
+                .Include(s => s.Item).ThenInclude(i => i!.Category)
                 .Include(s => s.Warehouse)
+                .Where(s => s.Item != null && s.Warehouse != null)
                 .OrderBy(s => s.Item!.Name)
                 .ThenBy(s => s.Warehouse!.Name)
                 .ToListAsync();

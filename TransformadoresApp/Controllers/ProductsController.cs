@@ -138,7 +138,7 @@ namespace TransformadoresApp.Controllers
             var product = await _db.Products
                 .Include(p => p.BomItems!)
                     .ThenInclude(b => b.Material)
-                        .ThenInclude(m => m.UnitOfMeasure)
+                        .ThenInclude(m => m!.UnitOfMeasure)
                 .FirstOrDefaultAsync(m => m.ProductId == id);
 
             if (product == null) return NotFound();

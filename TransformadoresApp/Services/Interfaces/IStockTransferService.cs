@@ -1,7 +1,13 @@
-﻿namespace TransformadoresApp.Services.Interfaces
+﻿
+namespace TransformadoresApp.Services.Interfaces
 {
     public interface IStockTransferService
     {
-        Task TransferAsync(int itemId, int sourceWarehouseId, int destinationWarehouseId, decimal quantity);
+        Task TransferAsync(
+            int itemId,
+            int sourceWarehouseId,
+            int destinationWarehouseId,
+            decimal quantity,
+            CancellationToken cancellationToken = default);
     }
 }

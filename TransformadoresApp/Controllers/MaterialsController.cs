@@ -194,9 +194,8 @@ namespace TransformadoresApp.Controllers
             if (material == null) return NotFound();
 
             var usedIn = await _db.BomItems
-                .Include(b => b.Product)
-                .Where(b => b.MaterialId == id)
-                .Select(b => b.Product.Name)
+                .Where(b => b.MaterialId == id && b.Product != null)
+                .Select(b => b.Product!.Name)
                 .Distinct()
                 .ToListAsync();
 
@@ -210,9 +209,8 @@ namespace TransformadoresApp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var usedIn = await _db.BomItems
-                .Include(b => b.Product)
-                .Where(b => b.MaterialId == id)
-                .Select(b => b.Product.Name)
+                .Where(b => b.MaterialId == id && b.Product != null)
+                .Select(b => b.Product!.Name)
                 .Distinct()
                 .ToListAsync();
 
@@ -252,9 +250,8 @@ namespace TransformadoresApp.Controllers
         public async Task<IActionResult> CheckMaterialUsage(int materialId)
         {
             var usedIn = await _db.BomItems
-                .Include(b => b.Product)
-                .Where(b => b.MaterialId == materialId)
-                .Select(b => b.Product.Name)
+                .Where(b => b.MaterialId == materialId && b.Product != null)
+                .Select(b => b.Product!.Name)
                 .Distinct()
                 .ToListAsync();
 

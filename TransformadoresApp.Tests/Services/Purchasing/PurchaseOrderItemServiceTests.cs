@@ -1,5 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Models.Catalogs;
 using TransformadoresApp.Models.Purchasing;
 using TransformadoresApp.Services.Purchasing;
@@ -16,9 +15,10 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
             var service = CreateService(context);
 
             var item = new PurchaseOrderItem
@@ -30,9 +30,10 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                 UnitPrice = 100
             };
 
-            await service.CreateAsync(item);
+            await service.CreateAsync(item, cancellationToken);
 
-            var savedItem = await context.PurchaseOrderItems.SingleAsync(i => i.Id == item.Id);
+            var savedItem = await context.PurchaseOrderItems
+                .SingleAsync(i => i.Id == item.Id, cancellationToken);
 
             Assert.Equal(0, savedItem.ReceivedQuantity);
             Assert.Equal(10, savedItem.Quantity);
@@ -44,6 +45,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var service = CreateService(context);
 
@@ -55,7 +57,8 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                 UnitPrice = 100
             };
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
 
             Assert.Equal("La cantidad debe ser mayor que cero.", exception.Message);
         }
@@ -65,6 +68,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var service = CreateService(context);
 
@@ -76,7 +80,8 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                 UnitPrice = 100
             };
 
-            await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
         }
 
         [Fact]
@@ -84,6 +89,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var service = CreateService(context);
 
@@ -95,7 +101,8 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                 UnitPrice = -1
             };
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
 
             Assert.Equal("El precio unitario no puede ser negativo.", exception.Message);
         }
@@ -105,8 +112,9 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var catalogItem = await CreateItemAsync(context);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
             var service = CreateService(context);
 
             var item = new PurchaseOrderItem
@@ -117,7 +125,8 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                 UnitPrice = 100
             };
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
 
             Assert.Equal("La orden de compra no existe.", exception.Message);
         }
@@ -127,17 +136,21 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context, isActive: false);
+            var order = await CreatePurchaseOrderAsync(
+                context, cancellationToken, isActive: false);
 
-            var catalogItem = await CreateItemAsync(context);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
             var service = CreateService(context);
-
             var item = NewOrderItem(order.Id, catalogItem.Id);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
 
-            Assert.Equal("No es posible agregar items a una orden de compra desactivada.", exception.Message);
+            Assert.Equal(
+                "No es posible agregar items a una orden de compra desactivada.",
+                exception.Message);
         }
 
         [Fact]
@@ -145,17 +158,21 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context, status: PurchaseOrderStatus.Pending);
+            var order = await CreatePurchaseOrderAsync(
+                context, cancellationToken, status: PurchaseOrderStatus.Pending);
 
-            var catalogItem = await CreateItemAsync(context);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
             var service = CreateService(context);
-
             var item = NewOrderItem(order.Id, catalogItem.Id);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
 
-            Assert.Equal("Solo es posible agregar items a una orden en estado borrador.", exception.Message);
+            Assert.Equal(
+                "Solo es posible agregar items a una orden en estado borrador.",
+                exception.Message);
         }
 
         [Fact]
@@ -163,15 +180,18 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
             var service = CreateService(context);
-
             var item = NewOrderItem(order.Id, 999);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
 
-            Assert.Equal("El item seleccionado no existe o está inactivo.", exception.Message);
+            Assert.Equal(
+                "El item seleccionado no existe o está inactivo.",
+                exception.Message);
         }
 
         [Fact]
@@ -179,14 +199,17 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context, isActive: false);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(
+                context, cancellationToken, isActive: false);
+
             var service = CreateService(context);
-
             var item = NewOrderItem(order.Id, catalogItem.Id);
 
-            await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
         }
 
         [Fact]
@@ -194,16 +217,19 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id);
+            await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken);
 
             var service = CreateService(context);
             var item = NewOrderItem(order.Id, catalogItem.Id);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.CreateAsync(item));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CreateAsync(item, cancellationToken));
 
             Assert.Equal("Ese item ya existe en la orden.", exception.Message);
         }
@@ -214,11 +240,14 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id, quantity: 10, receivedQuantity: 0);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken,
+                quantity: 10, receivedQuantity: 0);
 
             var service = CreateService(context);
 
@@ -229,9 +258,10 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                 ItemId = catalogItem.Id,
                 Quantity = 20,
                 UnitPrice = 150
-            });
+            }, cancellationToken);
 
-            var updatedItem = await context.PurchaseOrderItems.SingleAsync(i => i.Id == existingItem.Id);
+            var updatedItem = await context.PurchaseOrderItems
+                .SingleAsync(i => i.Id == existingItem.Id, cancellationToken);
 
             Assert.Equal(20, updatedItem.Quantity);
             Assert.Equal(150, updatedItem.UnitPrice);
@@ -242,6 +272,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var service = CreateService(context);
 
@@ -251,7 +282,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     Id = 999,
                     Quantity = 0,
                     UnitPrice = 100
-                }));
+                }, cancellationToken));
 
             Assert.Equal("La cantidad debe ser mayor que cero.", exception.Message);
         }
@@ -261,6 +292,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var service = CreateService(context);
 
@@ -270,7 +302,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     Id = 999,
                     Quantity = 1,
                     UnitPrice = -1
-                }));
+                }, cancellationToken));
 
             Assert.Equal("El precio unitario no puede ser negativo.", exception.Message);
         }
@@ -280,6 +312,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var service = CreateService(context);
 
@@ -291,7 +324,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     ItemId = 1,
                     Quantity = 1,
                     UnitPrice = 100
-                }));
+                }, cancellationToken));
 
             Assert.Equal("El item de la orden no existe.", exception.Message);
         }
@@ -301,12 +334,13 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
             var existingItem = await CreatePurchaseOrderItemAsync(
-                context, order.Id, catalogItem.Id);
+                context, order.Id, catalogItem.Id, cancellationToken);
 
             var service = CreateService(context);
 
@@ -318,9 +352,11 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     ItemId = catalogItem.Id,
                     Quantity = 2,
                     UnitPrice = 100
-                }));
+                }, cancellationToken));
 
-            Assert.Equal("La orden de compra indicada no coincide con el item.", exception.Message);
+            Assert.Equal(
+                "La orden de compra indicada no coincide con el item.",
+                exception.Message);
         }
 
         [Fact]
@@ -328,12 +364,15 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context, isActive: false);
+            var order = await CreatePurchaseOrderAsync(
+                context, cancellationToken, isActive: false);
 
-            var catalogItem = await CreateItemAsync(context);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken);
 
             var service = CreateService(context);
 
@@ -345,9 +384,11 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     ItemId = catalogItem.Id,
                     Quantity = 2,
                     UnitPrice = 100
-                }));
+                }, cancellationToken));
 
-            Assert.Equal("No es posible modificar items de una orden de compra desactivada.", exception.Message);
+            Assert.Equal(
+                "No es posible modificar items de una orden de compra desactivada.",
+                exception.Message);
         }
 
         [Fact]
@@ -355,12 +396,15 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context, status: PurchaseOrderStatus.Pending);
+            var order = await CreatePurchaseOrderAsync(
+                context, cancellationToken, status: PurchaseOrderStatus.Pending);
 
-            var catalogItem = await CreateItemAsync(context);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken);
 
             var service = CreateService(context);
 
@@ -372,9 +416,11 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     ItemId = catalogItem.Id,
                     Quantity = 2,
                     UnitPrice = 100
-                }));
+                }, cancellationToken));
 
-            Assert.Equal("Solo es posible modificar items de una orden en estado borrador.", exception.Message);
+            Assert.Equal(
+                "Solo es posible modificar items de una orden en estado borrador.",
+                exception.Message);
         }
 
         [Fact]
@@ -382,14 +428,16 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken);
 
             catalogItem.IsActive = false;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var service = CreateService(context);
 
@@ -401,9 +449,11 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     ItemId = catalogItem.Id,
                     Quantity = 2,
                     UnitPrice = 100
-                }));
+                }, cancellationToken));
 
-            Assert.Equal("El item seleccionado no existe o está inactivo.", exception.Message);
+            Assert.Equal(
+                "El item seleccionado no existe o está inactivo.",
+                exception.Message);
         }
 
         [Fact]
@@ -411,12 +461,14 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var originalItem = await CreateItemAsync(context);
-            var otherItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var originalItem = await CreateItemAsync(context, cancellationToken);
+            var otherItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, originalItem.Id);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, originalItem.Id, cancellationToken);
 
             var service = CreateService(context);
 
@@ -428,9 +480,11 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     ItemId = otherItem.Id,
                     Quantity = 2,
                     UnitPrice = 100
-                }));
+                }, cancellationToken));
 
-            Assert.Equal("No es posible cambiar el item de una línea existente.", exception.Message);
+            Assert.Equal(
+                "No es posible cambiar el item de una línea existente.",
+                exception.Message);
         }
 
         [Fact]
@@ -438,11 +492,14 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id, quantity: 10, receivedQuantity: 5);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken,
+                quantity: 10, receivedQuantity: 5);
 
             var service = CreateService(context);
 
@@ -454,7 +511,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
                     ItemId = catalogItem.Id,
                     Quantity = 4,
                     UnitPrice = 100
-                }));
+                }, cancellationToken));
 
             Assert.Contains("La cantidad no puede ser menor", exception.Message);
         }
@@ -465,19 +522,23 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken);
 
             var service = CreateService(context);
 
-            var returnedOrderId = await service.DeleteAsync(existingItem.Id);
+            var returnedOrderId = await service.DeleteAsync(
+                existingItem.Id, cancellationToken);
 
             Assert.Equal(order.Id, returnedOrderId);
 
-            Assert.False(await context.PurchaseOrderItems.AnyAsync(i => i.Id == existingItem.Id));
+            Assert.False(await context.PurchaseOrderItems
+                .AnyAsync(i => i.Id == existingItem.Id, cancellationToken));
         }
 
         [Fact]
@@ -485,10 +546,12 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
             var service = CreateService(context);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.DeleteAsync(999));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.DeleteAsync(999, cancellationToken));
 
             Assert.Equal("El item de la orden no existe.", exception.Message);
         }
@@ -498,18 +561,24 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context, isActive: false);
+            var order = await CreatePurchaseOrderAsync(
+                context, cancellationToken, isActive: false);
 
-            var catalogItem = await CreateItemAsync(context);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken);
 
             var service = CreateService(context);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.DeleteAsync(existingItem.Id));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.DeleteAsync(existingItem.Id, cancellationToken));
 
-            Assert.Equal("No es posible eliminar items de una orden de compra desactivada.", exception.Message);
+            Assert.Equal(
+                "No es posible eliminar items de una orden de compra desactivada.",
+                exception.Message);
         }
 
         [Fact]
@@ -517,18 +586,24 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context, status: PurchaseOrderStatus.Pending);
+            var order = await CreatePurchaseOrderAsync(
+                context, cancellationToken, status: PurchaseOrderStatus.Pending);
 
-            var catalogItem = await CreateItemAsync(context);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken);
 
             var service = CreateService(context);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.DeleteAsync(existingItem.Id));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.DeleteAsync(existingItem.Id, cancellationToken));
 
-            Assert.Equal("Solo es posible eliminar items de una orden en estado borrador.", exception.Message);
+            Assert.Equal(
+                "Solo es posible eliminar items de una orden en estado borrador.",
+                exception.Message);
         }
 
         [Fact]
@@ -536,23 +611,30 @@ namespace TransformadoresApp.Tests.Services.Purchasing
         {
             using var factory = new TestDbContextFactory();
             using var context = factory.CreateContext();
+            var cancellationToken = TestContext.Current.CancellationToken;
 
-            var order = await CreatePurchaseOrderAsync(context);
-            var catalogItem = await CreateItemAsync(context);
+            var order = await CreatePurchaseOrderAsync(context, cancellationToken);
+            var catalogItem = await CreateItemAsync(context, cancellationToken);
 
-            var existingItem = await CreatePurchaseOrderItemAsync(context, order.Id, catalogItem.Id, quantity: 10, receivedQuantity: 1);
+            var existingItem = await CreatePurchaseOrderItemAsync(
+                context, order.Id, catalogItem.Id, cancellationToken,
+                quantity: 10, receivedQuantity: 1);
+
             var service = CreateService(context);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.DeleteAsync(existingItem.Id));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.DeleteAsync(existingItem.Id, cancellationToken));
 
-            Assert.Equal("No es posible eliminar un item que ya tiene mercadería recibida.", exception.Message);
+            Assert.Equal(
+                "No es posible eliminar un item que ya tiene mercadería recibida.",
+                exception.Message);
         }
 
         // HELPERS
-        private static PurchaseOrderItemService CreateService(TransformadoresApp.Data.ApplicationDbContext context)
+        private static PurchaseOrderItemService CreateService(
+            TransformadoresApp.Data.ApplicationDbContext context)
         {
             var purchaseOrderService = new PurchaseOrderService(context);
-
             return new PurchaseOrderItemService(context, purchaseOrderService);
         }
 
@@ -567,7 +649,9 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
         }
 
-        private static async Task<Supplier> CreateSupplierAsync(TransformadoresApp.Data.ApplicationDbContext context)
+        private static async Task<Supplier> CreateSupplierAsync(
+            TransformadoresApp.Data.ApplicationDbContext context,
+            CancellationToken cancellationToken)
         {
             var supplier = new Supplier
             {
@@ -576,14 +660,18 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.Suppliers.Add(supplier);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             return supplier;
         }
 
-        private static async Task<PurchaseOrder> CreatePurchaseOrderAsync(TransformadoresApp.Data.ApplicationDbContext context, PurchaseOrderStatus status = PurchaseOrderStatus.Draft, bool isActive = true)
+        private static async Task<PurchaseOrder> CreatePurchaseOrderAsync(
+            TransformadoresApp.Data.ApplicationDbContext context,
+            CancellationToken cancellationToken,
+            PurchaseOrderStatus status = PurchaseOrderStatus.Draft,
+            bool isActive = true)
         {
-            var supplier = await CreateSupplierAsync(context);
+            var supplier = await CreateSupplierAsync(context, cancellationToken);
 
             var order = new PurchaseOrder
             {
@@ -595,12 +683,15 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.PurchaseOrders.Add(order);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             return order;
         }
 
-        private static async Task<Item> CreateItemAsync(TransformadoresApp.Data.ApplicationDbContext context, bool isActive = true)
+        private static async Task<Item> CreateItemAsync(
+            TransformadoresApp.Data.ApplicationDbContext context,
+            CancellationToken cancellationToken,
+            bool isActive = true)
         {
             var category = new Category
             {
@@ -610,7 +701,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.Categories.Add(category);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             var item = new Item
             {
@@ -624,12 +715,18 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.Items.Add(item);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             return item;
         }
 
-        private static async Task<PurchaseOrderItem> CreatePurchaseOrderItemAsync(TransformadoresApp.Data.ApplicationDbContext context, int purchaseOrderId, int itemId, decimal quantity = 10, decimal receivedQuantity = 0)
+        private static async Task<PurchaseOrderItem> CreatePurchaseOrderItemAsync(
+            TransformadoresApp.Data.ApplicationDbContext context,
+            int purchaseOrderId,
+            int itemId,
+            CancellationToken cancellationToken,
+            decimal quantity = 10,
+            decimal receivedQuantity = 0)
         {
             var item = new PurchaseOrderItem
             {
@@ -641,7 +738,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.PurchaseOrderItems.Add(item);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             return item;
         }

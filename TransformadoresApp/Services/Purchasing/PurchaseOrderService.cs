@@ -154,9 +154,9 @@ namespace TransformadoresApp.Services.Purchasing
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateStatusAsync(int purchaseOrderId)
+        public async Task UpdateStatusAsync(int purchaseOrderId, CancellationToken cancellationToken = default)
         {
-            var purchaseOrder = await _context.PurchaseOrders.Include(po => po.Items).FirstOrDefaultAsync(po => po.Id == purchaseOrderId);
+            var purchaseOrder = await _context.PurchaseOrders.Include(po => po.Items).FirstOrDefaultAsync(po => po.Id == purchaseOrderId, cancellationToken);
 
             if (purchaseOrder == null) {
                 throw new InvalidOperationException("La orden de compra no existe.");

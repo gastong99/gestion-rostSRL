@@ -16,9 +16,8 @@ namespace TransformadoresApp.Controllers
         {
             var list = await _db.BomItems
                 .Include(b => b.Product)
-                .Include(b => b.Material)
-                .ThenInclude(m => m.UnitOfMeasure)
-                .OrderBy(b => b.Product.Name)
+                .Include(b => b.Material).ThenInclude(m => m!.UnitOfMeasure)
+                .OrderBy(b => b.Product!.Name)
                 .ToListAsync();
 
             return View(list);
@@ -53,7 +52,9 @@ namespace TransformadoresApp.Controllers
 
             if (bomItem == null) return BadRequest();
 
-            if (bomItem.QuantityPerUnit <= 0) ModelState.AddModelError(nameof(BomItem.QuantityPerUnit), "La cantidad debe ser mayor que 0.");
+            if (!bomItem.QuantityPerUnit.HasValue || bomItem.QuantityPerUnit.Value <= 0) {
+                ModelState.AddModelError(nameof(BomItem.QuantityPerUnit), "La cantidad debe ser mayor que 0.");
+            }
 
             // Comprobación previa: evitar duplicados product + material
             bool exists = await _db.BomItems
@@ -96,7 +97,7 @@ namespace TransformadoresApp.Controllers
             var item = await _db.BomItems
                 .Include(b => b.Product)
                 .Include(b => b.Material)
-                .ThenInclude(m => m.UnitOfMeasure)
+                .ThenInclude(m => m!.UnitOfMeasure)
                 .FirstOrDefaultAsync(b => b.BomItemId == id);
 
             if (item == null) return NotFound();
@@ -115,7 +116,9 @@ namespace TransformadoresApp.Controllers
         {
             if (id != bomItem.BomItemId) return NotFound();
 
-            if (bomItem.QuantityPerUnit <= 0) ModelState.AddModelError(nameof(BomItem.QuantityPerUnit), "La cantidad debe ser mayor que 0.");
+            if (!bomItem.QuantityPerUnit.HasValue || bomItem.QuantityPerUnit.Value <= 0) {
+                ModelState.AddModelError(nameof(BomItem.QuantityPerUnit), "La cantidad debe ser mayor que 0.");
+            }
 
             // evitar duplicado distinto (al editar cambiar material a uno que ya exista)
             bool duplicate = await _db.BomItems.AnyAsync(b =>
@@ -152,7 +155,7 @@ namespace TransformadoresApp.Controllers
             var item = await _db.BomItems
                 .Include(b => b.Product)
                 .Include(b => b.Material)
-                .ThenInclude(m => m.UnitOfMeasure)
+                .ThenInclude(m => m!.UnitOfMeasure)
                 .FirstOrDefaultAsync(b => b.BomItemId == id);
 
             if (item == null) return NotFound();

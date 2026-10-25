@@ -2,6 +2,6 @@
 {
     public interface IPurchaseReceivingService
     {
-        Task<int> ReceiveAsync(int purchaseOrderItemId, int warehouseId, decimal quantity);
+        Task<int> ReceiveAsync(int purchaseOrderItemId, int warehouseId, decimal quantity, CancellationToken cancellationToken = default);
     }
 }

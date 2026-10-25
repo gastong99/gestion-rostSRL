@@ -28,7 +28,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             await service.CreateAsync(purchaseOrder);
 
-            var createdOrder = await context.PurchaseOrders.SingleAsync();
+            var createdOrder = await context.PurchaseOrders.SingleAsync(TestContext.Current.CancellationToken);
 
             Assert.Equal("OC-001", createdOrder.Number);
             Assert.Equal(supplier.Id, createdOrder.SupplierId);
@@ -55,7 +55,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.PurchaseOrders.Add(existingOrder);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var service = new PurchaseOrderService(context);
 
@@ -100,7 +100,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.PurchaseOrders.Add(existingOrder);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var service = new PurchaseOrderService(context);
 
@@ -116,7 +116,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             await service.UpdateAsync(existingOrder.Id, updatedOrder);
 
-            var order = await context.PurchaseOrders.SingleAsync();
+            var order = await context.PurchaseOrders.SingleAsync(TestContext.Current.CancellationToken);
 
             Assert.Equal("OC-003-MOD", order.Number);
             Assert.Equal(secondSupplier.Id, order.SupplierId);
@@ -186,7 +186,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.PurchaseOrders.Add(existingOrder);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var service = new PurchaseOrderService(context);
 
@@ -221,7 +221,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.PurchaseOrders.Add(existingOrder);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var service = new PurchaseOrderService(context);
 
@@ -265,7 +265,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
             };
 
             context.PurchaseOrders.AddRange(firstOrder, secondOrder);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var service = new PurchaseOrderService(context);
 
@@ -281,7 +281,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             Assert.Equal("Ya existe una orden de compra con ese número.", exception.Message);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == secondOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == secondOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal("OC-009", order.Number);
         }
@@ -303,7 +303,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             await service.ConfirmAsync(purchaseOrder.Id);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.Pending, order.Status);
         }
@@ -386,7 +386,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             await service.CancelAsync(purchaseOrder.Id);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
         }
@@ -405,7 +405,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             await service.CancelAsync(purchaseOrder.Id);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
         }
@@ -471,7 +471,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             await service.DeactivateAsync(purchaseOrder.Id);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.False(order.IsActive);
         }
@@ -525,7 +525,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             Assert.Equal("Solo se pueden desactivar órdenes de compra en estado borrador o cancelado.", exception.Message);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.True(order.IsActive);
             Assert.Equal(status, order.Status);
@@ -545,7 +545,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             await service.RestoreAsync(purchaseOrder.Id);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.True(order.IsActive);
         }
@@ -592,9 +592,9 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             var service = new PurchaseOrderService(context);
 
-            await service.UpdateStatusAsync(purchaseOrder.Id);
+            await service.UpdateStatusAsync(purchaseOrder.Id, TestContext.Current.CancellationToken);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.Draft, order.Status);
         }
@@ -611,9 +611,9 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             var service = new PurchaseOrderService(context);
 
-            await service.UpdateStatusAsync(purchaseOrder.Id);
+            await service.UpdateStatusAsync(purchaseOrder.Id, TestContext.Current.CancellationToken);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
         }
@@ -626,7 +626,7 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             var service = new PurchaseOrderService(context);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.UpdateStatusAsync(999));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>( () => service.UpdateStatusAsync(999, TestContext.Current.CancellationToken));
 
             Assert.Equal("La orden de compra no existe.", exception.Message);
         }
@@ -643,9 +643,9 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             var service = new PurchaseOrderService(context);
 
-            await service.UpdateStatusAsync(purchaseOrder.Id);
+            await service.UpdateStatusAsync(purchaseOrder.Id, TestContext.Current.CancellationToken);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.Draft, order.Status);
         }
@@ -665,9 +665,9 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             var service = new PurchaseOrderService(context);
 
-            await service.UpdateStatusAsync(purchaseOrder.Id);
+            await service.UpdateStatusAsync(purchaseOrder.Id, TestContext.Current.CancellationToken);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.Completed, order.Status);
         }
@@ -687,9 +687,9 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             var service = new PurchaseOrderService(context);
 
-            await service.UpdateStatusAsync(purchaseOrder.Id);
+            await service.UpdateStatusAsync(purchaseOrder.Id, TestContext.Current.CancellationToken);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.Pending, order.Status);
         }
@@ -709,9 +709,9 @@ namespace TransformadoresApp.Tests.Services.Purchasing
 
             var service = new PurchaseOrderService(context);
 
-            await service.UpdateStatusAsync(purchaseOrder.Id);
+            await service.UpdateStatusAsync(purchaseOrder.Id, TestContext.Current.CancellationToken);
 
-            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id);
+            var order = await context.PurchaseOrders.SingleAsync(po => po.Id == purchaseOrder.Id, TestContext.Current.CancellationToken);
 
             Assert.Equal(PurchaseOrderStatus.PartiallyReceived, order.Status);
         }

@@ -23,48 +23,50 @@ namespace TransformadoresApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PurchaseOrderItem item)
+        public async Task<IActionResult> Create(PurchaseOrderItem model)
         {
             if (!ModelState.IsValid) {
                 TempData["Error"] = "Los datos ingresados no son válidos.";
 
-                return RedirectToAction("Details", "PurchaseOrders", new { id = item.PurchaseOrderId });
+                return RedirectToAction("Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
             }
 
             try
             {
-                await _purchaseOrderItemService.CreateAsync(item);
+                await _purchaseOrderItemService.CreateAsync(model);
 
                 TempData["Success"] = "Item agregado correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
-            return RedirectToAction("Details", "PurchaseOrders", new { id = item.PurchaseOrderId });
+            return RedirectToAction("Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(PurchaseOrderItem item)
+        public async Task<IActionResult> Edit(PurchaseOrderItem model)
         {
             if (!ModelState.IsValid) {
                 TempData["Error"] = "Los datos ingresados no son válidos.";
 
-                return RedirectToAction("Details", "PurchaseOrders", new { id = item.PurchaseOrderId });
+                return RedirectToAction( "Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
             }
 
             try
             {
-                await _purchaseOrderItemService.UpdateAsync(item);
+                await _purchaseOrderItemService.UpdateAsync(model);
 
                 TempData["Success"] = "Item actualizado correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
-            return RedirectToAction("Details", "PurchaseOrders", new { id = item.PurchaseOrderId });
+            return RedirectToAction("Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
         }
 
         [HttpPost]
@@ -79,7 +81,8 @@ namespace TransformadoresApp.Controllers
 
                 return RedirectToAction("Details", "PurchaseOrders", new { id = purchaseOrderId });
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
 
                 return await RedirectToPurchaseOrderAsync(id);
@@ -98,12 +101,14 @@ namespace TransformadoresApp.Controllers
 
                 return RedirectToAction("Details", "PurchaseOrders", new { id = purchaseOrderId });
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
 
                 return await RedirectToPurchaseOrderAsync(id);
             }
-            catch {
+            catch
+            {
                 TempData["Error"] = "Ocurrió un error al registrar la recepción de la mercadería.";
 
                 return await RedirectToPurchaseOrderAsync(id);
@@ -112,11 +117,7 @@ namespace TransformadoresApp.Controllers
 
         private async Task<IActionResult> RedirectToPurchaseOrderAsync(int itemId)
         {
-            var purchaseOrderId =
-                await _context.PurchaseOrderItems
-                    .Where(i => i.Id == itemId)
-                    .Select(i => i.PurchaseOrderId)
-                    .FirstOrDefaultAsync();
+            var purchaseOrderId = await _context.PurchaseOrderItems.Where(i => i.Id == itemId).Select(i => i.PurchaseOrderId).FirstOrDefaultAsync();
 
             if (purchaseOrderId == 0) {
                 return RedirectToAction("Index", "PurchaseOrders");
