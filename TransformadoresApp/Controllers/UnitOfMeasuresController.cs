@@ -16,6 +16,10 @@ namespace TransformadoresApp.Controllers
             _db = db;
         }
 
+        // =====================
+        // INDEX
+        // =====================
+
         // GET: /UnitOfMeasures
         public async Task<IActionResult> Index()
         {
@@ -23,16 +27,23 @@ namespace TransformadoresApp.Controllers
             {
                 ("Inicio", "Index", "Home"),
                 ("Panel de Administración", "Index", "Admin"),
-                ("Unidades de Medidas", null, null)
+                ("Unidades de Medida", null, null)
             };
 
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
             ViewBag.Info = TempData["Info"];
 
-            var units = await _db.UnitOfMeasures.ToListAsync();
+            var units = await _db.UnitOfMeasures
+                .OrderBy(u => u.Name)
+                .ToListAsync();
+
             return View(units);
         }
+
+        // =====================
+        // CREATE
+        // =====================
 
         // GET: /UnitOfMeasures/Create
         public IActionResult Create()
@@ -41,109 +52,237 @@ namespace TransformadoresApp.Controllers
         }
 
         // POST: /UnitOfMeasures/Create
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Abbreviation")] UnitOfMeasure unit)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(
+            [Bind("Name,Abbreviation")] UnitOfMeasure unit)
         {
-            if (ModelState.IsValid) {
-                if (await _db.UnitOfMeasures.AnyAsync(u => u.Name == unit.Name)) {
-                    TempData["Error"] = "Ya existe una unidad con ese nombre.";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                _db.UnitOfMeasures.Add(unit);
-                await _db.SaveChangesAsync();
-                TempData["Success"] = $"Unidad '{unit.Name}' ({unit.Abbreviation}) creada correctamente.";
-
-                return RedirectToAction(nameof(Index));
+            if (!ModelState.IsValid)
+            {
+                return View(unit);
             }
 
-            return View(unit);
+            var name = unit.Name.Trim();
+            var abbreviation = unit.Abbreviation.Trim();
+
+            var alreadyExists = await _db.UnitOfMeasures.AnyAsync(u =>
+                u.Name.ToLower() == name.ToLower() ||
+                u.Abbreviation.ToLower() == abbreviation.ToLower());
+
+            if (alreadyExists)
+            {
+                ModelState.AddModelError(
+                    nameof(unit.Name),
+                    "Ya existe una unidad con ese nombre o abreviatura.");
+
+                return View(unit);
+            }
+
+            unit.Name = name;
+            unit.Abbreviation = abbreviation;
+
+            _db.UnitOfMeasures.Add(unit);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] =
+                $"Unidad '{unit.Name}' ({unit.Abbreviation}) creada correctamente.";
+
+            return RedirectToAction(nameof(Index));
         }
+
+        // =====================
+        // EDIT
+        // =====================
 
         // GET: /UnitOfMeasures/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var unit = await _db.UnitOfMeasures.FindAsync(id);
-            if (unit == null) return NotFound();
+
+            if (unit == null)
+            {
+                return NotFound();
+            }
 
             return View(unit);
         }
 
         // POST: /UnitOfMeasures/Edit/5
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UnitOfMeasureId,Name,Abbreviation")] UnitOfMeasure unit)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("UnitOfMeasureId,Name,Abbreviation")] UnitOfMeasure unit)
         {
-            if (id != unit.UnitOfMeasureId) return NotFound();
-
-            if (ModelState.IsValid) {
-                try
-                {
-                    _db.Update(unit);
-                    await _db.SaveChangesAsync();
-                    TempData["Info"] = $"Unidad '{unit.Name}' actualizada correctamente.";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_db.UnitOfMeasures.Any(e => e.UnitOfMeasureId == id)) return NotFound();
-                    else throw;
-                }
+            if (id != unit.UnitOfMeasureId)
+            {
+                return NotFound();
             }
 
-            return View(unit);
+            if (!ModelState.IsValid)
+            {
+                return View(unit);
+            }
+
+            var name = unit.Name.Trim();
+            var abbreviation = unit.Abbreviation.Trim();
+
+            var alreadyExists = await _db.UnitOfMeasures.AnyAsync(u =>
+                u.UnitOfMeasureId != id &&
+                (u.Name.ToLower() == name.ToLower() ||
+                 u.Abbreviation.ToLower() == abbreviation.ToLower()));
+
+            if (alreadyExists)
+            {
+                ModelState.AddModelError(
+                    nameof(unit.Name),
+                    "Ya existe otra unidad con ese nombre o abreviatura.");
+
+                return View(unit);
+            }
+
+            var existingUnit = await _db.UnitOfMeasures.FindAsync(id);
+
+            if (existingUnit == null)
+            {
+                return NotFound();
+            }
+
+            existingUnit.Name = name;
+            existingUnit.Abbreviation = abbreviation;
+
+            await _db.SaveChangesAsync();
+
+            TempData["Info"] =
+                $"Unidad '{existingUnit.Name}' actualizada correctamente.";
+
+            return RedirectToAction(nameof(Index));
         }
+
+        // =====================
+        // DELETE
+        // =====================
 
         // GET: /UnitOfMeasures/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-            var unit = await _db.UnitOfMeasures.FirstOrDefaultAsync(u => u.UnitOfMeasureId == id);
+            var unit = await _db.UnitOfMeasures
+                .FirstOrDefaultAsync(u => u.UnitOfMeasureId == id);
 
-            if (unit == null) return NotFound();
+            if (unit == null)
+            {
+                return NotFound();
+            }
 
-            bool isUsed = await _db.Materials.AnyAsync(m => m.UnitOfMeasureId == id);
-            ViewBag.IsUsed = isUsed;
+            var usage = await GetUnitUsageAsync(id.Value);
+
+            ViewBag.IsUsed = usage.IsUsed;
+            ViewBag.ItemsUsingUnit = usage.Items;
+            ViewBag.MaterialsUsingUnit = usage.Materials;
 
             return View(unit);
         }
 
         // POST: /UnitOfMeasures/Delete/5
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var unit = await _db.UnitOfMeasures.FindAsync(id);
-            if (unit == null) return NotFound();
 
-            bool isUsed = await _db.Materials.AnyAsync(m => m.UnitOfMeasureId == id);
-            if (isUsed) {
-                TempData["Error"] = $"No se puede eliminar la unidad '{unit.Name}' porque está en uso por materiales.";
+            if (unit == null)
+            {
+                return NotFound();
+            }
+
+            var usage = await GetUnitUsageAsync(id);
+
+            if (usage.IsUsed)
+            {
+                TempData["Error"] =
+                    $"No se puede eliminar la unidad '{unit.Name}' porque está en uso por artículos o materiales.";
+
                 return RedirectToAction(nameof(Index));
             }
 
             _db.UnitOfMeasures.Remove(unit);
             await _db.SaveChangesAsync();
-            TempData["Success"] = $"Unidad '{unit.Name}' eliminada correctamente.";
+
+            TempData["Success"] =
+                $"Unidad '{unit.Name}' eliminada correctamente.";
+
             return RedirectToAction(nameof(Index));
         }
 
-        // Método para verificar si una unidad está en uso vía AJAX
+        // =====================
+        // UNIT USAGE
+        // =====================
+
+        // GET: /UnitOfMeasures/CheckUnitUsage?unitId=5
         [HttpGet]
         public async Task<IActionResult> CheckUnitUsage(int unitId)
         {
-            var materialsUsingUnit = await _db.Materials
-                .Where(m => m.UnitOfMeasureId == unitId)
-                .Select(m => m.Name)
-                .ToListAsync();
+            if (unitId <= 0)
+            {
+                return BadRequest();
+            }
+
+            var usage = await GetUnitUsageAsync(unitId);
 
             return Json(new
             {
-                isUsed = materialsUsingUnit.Any(),
-                materialsCount = materialsUsingUnit.Count,
-                materials = materialsUsingUnit
+                isUsed = usage.IsUsed,
+                itemsCount = usage.Items.Count,
+                items = usage.Items,
+                materialsCount = usage.Materials.Count,
+                materials = usage.Materials
             });
+        }
+
+        // =====================
+        // PRIVATE HELPERS
+        // =====================
+
+        private async Task<UnitUsageResult> GetUnitUsageAsync(int unitId)
+        {
+            var items = await _db.Items
+                .AsNoTracking()
+                .Where(item => item.UnitOfMeasureId == unitId)
+                .OrderBy(item => item.Name)
+                .Select(item => item.Name)
+                .ToListAsync();
+
+            var materials = await _db.Materials
+                .AsNoTracking()
+                .Where(material => material.UnitOfMeasureId == unitId)
+                .OrderBy(material => material.Name)
+                .Select(material => material.Name)
+                .ToListAsync();
+
+            return new UnitUsageResult
+            {
+                Items = items,
+                Materials = materials
+            };
+        }
+
+        private sealed class UnitUsageResult
+        {
+            public List<string> Items { get; init; } = new();
+
+            public List<string> Materials { get; init; } = new();
+
+            public bool IsUsed => Items.Count > 0 || Materials.Count > 0;
         }
     }
 }

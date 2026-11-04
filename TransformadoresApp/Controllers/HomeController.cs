@@ -2,50 +2,87 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using TransformadoresApp.Data;
 using TransformadoresApp.Models;
 
 namespace TransformadoresApp.Controllers
 {
     public class HomeController : Controller
     {
+        // =====================
+        // DEPENDENCIES
+        // =====================
+
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        // =====================
+        // CONSTRUCTOR
+        // =====================
+
+        public HomeController(
+            ILogger<HomeController> logger,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
         }
 
+        // =====================
+        // INDEX
+        // =====================
 
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            if (!_signInManager.IsSignedIn(User)) return View("Landing");
+            if (!_signInManager.IsSignedIn(User))
+            {
+                return View("Landing");
+            }
 
             var user = await _userManager.GetUserAsync(User);
 
-            if (user == null) {
+            if (user == null)
+            {
                 await _signInManager.SignOutAsync();
                 return View("Landing");
             }
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            if (roles.Contains("Administrador")) return View("DashboardAdmin");
+            if (roles.Contains("Administrador"))
+            {
+                return View("DashboardAdmin");
+            }
 
-            if (roles.Contains("Operario")) return View("DashboardOperario");
+            if (roles.Contains("Operador"))
+            {
+                return View("DashboardOperario");
+            }
 
             return View("Landing");
         }
 
-        [AllowAnonymous]
-        public IActionResult Privacy() => View();
+        // =====================
+        // PRIVACY
+        // =====================
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [AllowAnonymous]
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        // =====================
+        // ERROR
+        // =====================
+
+        [ResponseCache(
+            Duration = 0,
+            Location = ResponseCacheLocation.None,
+            NoStore = true)]
         [AllowAnonymous]
         public IActionResult Error()
         {
