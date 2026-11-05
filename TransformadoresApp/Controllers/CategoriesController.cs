@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
@@ -7,6 +8,7 @@ using TransformadoresApp.Helpers;
 
 namespace TransformadoresApp.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -16,7 +18,10 @@ namespace TransformadoresApp.Controllers
             _db = db;
         }
 
-        [Authorize(Roles = "Administrador")]
+        // =====================
+        // INDEX
+        // =====================
+
         public async Task<IActionResult> Index(bool showInactive = false)
         {
             ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
@@ -28,7 +33,8 @@ namespace TransformadoresApp.Controllers
             IQueryable<Category> query = _db.Categories
                 .Include(c => c.Parent);
 
-            if (!showInactive) {
+            if (!showInactive)
+            {
                 query = query.Where(c => c.IsActive);
             }
 
@@ -45,8 +51,11 @@ namespace TransformadoresApp.Controllers
             return View(categories);
         }
 
+        // =====================
+        // CREATE
+        // =====================
+
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category category)
         {
@@ -59,10 +68,12 @@ namespace TransformadoresApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            if (ModelState.IsValid) {
+            if (ModelState.IsValid)
+            {
                 _db.Categories.Add(category);
 
-                if (category.ItemType == null) {
+                if (category.ItemType == null)
+                {
                     ModelState.AddModelError(nameof(category.ItemType), "Debe seleccionar un tipo.");
 
                     return RedirectToAction(nameof(Index));
@@ -76,8 +87,11 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // EDIT
+        // =====================
+
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Category category)
         {
@@ -90,10 +104,12 @@ namespace TransformadoresApp.Controllers
             existing.Name = category.Name;
             existing.ParentId = category.ParentId;
 
-            if (category.ItemType == null) {
+            if (category.ItemType == null)
+            {
                 ModelState.AddModelError(nameof(category.ItemType), "Debe seleccionar un tipo.");
 
-                if (category.ParentId == category.Id) {
+                if (category.ParentId == category.Id)
+                {
                     TempData["Error"] = "Una categoría no puede ser su propia categoría padre.";
 
                     return RedirectToAction(nameof(Index));
@@ -109,8 +125,11 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // DELETE
+        // =====================
+
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -127,8 +146,11 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // REACTIVATE
+        // =====================
+
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
@@ -146,13 +168,18 @@ namespace TransformadoresApp.Controllers
                 new { showInactive = true });
         }
 
+        // =====================
+        // GET CATEGORIES LIST
+        // =====================
+
         [HttpGet]
         public async Task<IActionResult> GetCategoriesList(int? excludeId)
         {
             var query = _db.Categories
-                 .Where(c => c.IsActive);
+                .Where(c => c.IsActive);
 
-            if (excludeId.HasValue) {
+            if (excludeId.HasValue)
+            {
                 query = query.Where(c => c.Id != excludeId.Value);
             }
 
@@ -167,6 +194,10 @@ namespace TransformadoresApp.Controllers
 
             return Json(categories);
         }
+
+        // =====================
+        // GET ITEM TYPES LIST
+        // =====================
 
         [HttpGet]
         public IActionResult GetItemTypesList()

@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
 using TransformadoresApp.Models.Catalogs;
 
 namespace TransformadoresApp.Controllers
 {
+    [Authorize(Roles = "Administrador,Operador")]
     public class ItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -14,8 +17,21 @@ namespace TransformadoresApp.Controllers
             _context = context;
         }
 
+        // =====================
+        // INDEX
+        // ADMINISTRADOR Y OPERADOR
+        // =====================
+
         public async Task<IActionResult> Index(bool showInactive = false)
         {
+            var isAdmin = User.IsInRole("Administrador");
+
+            // El Operador solamente puede consultar artículos activos.
+            if (!isAdmin)
+            {
+                showInactive = false;
+            }
+
             ViewBag.ShowInactive = showInactive;
 
             var query = _context.Items
@@ -23,7 +39,8 @@ namespace TransformadoresApp.Controllers
                 .Include(i => i.UnitOfMeasure)
                 .AsQueryable();
 
-            if (!showInactive) {
+            if (!showInactive)
+            {
                 query = query.Where(i => i.IsActive);
             }
 
@@ -34,6 +51,12 @@ namespace TransformadoresApp.Controllers
             return View(items);
         }
 
+        // =====================
+        // CREATE
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Item item)
@@ -57,6 +80,12 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // EDIT
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Item item)
@@ -90,6 +119,12 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // DEACTIVATE
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Deactivate(int id)
@@ -105,6 +140,12 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // RESTORE
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(int id)
@@ -120,6 +161,12 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // GET CATEGORIES LIST
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<IActionResult> GetCategoriesList()
         {
@@ -136,6 +183,12 @@ namespace TransformadoresApp.Controllers
             return Json(categories);
         }
 
+        // =====================
+        // GET UNITS OF MEASURE LIST
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<IActionResult> GetUnitOfMeasuresList()
         {
@@ -152,6 +205,12 @@ namespace TransformadoresApp.Controllers
             return Json(units);
         }
 
+        // =====================
+        // GET ITEM TYPES LIST
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IActionResult GetItemTypesList()
         {

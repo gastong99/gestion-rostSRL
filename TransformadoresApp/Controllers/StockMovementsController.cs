@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
@@ -6,6 +8,7 @@ using TransformadoresApp.Models.Inventory;
 
 namespace TransformadoresApp.Controllers
 {
+    [Authorize(Roles = "Administrador,Operador")]
     public class StockMovementsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,31 +18,41 @@ namespace TransformadoresApp.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? itemId, int? warehouseId, MovementType? movementType, DateTime? dateFrom, DateTime? dateTo)
+        public async Task<IActionResult> Index(
+            int? itemId,
+            int? warehouseId,
+            MovementType? movementType,
+            DateTime? dateFrom,
+            DateTime? dateTo)
         {
             var query = _context.StockMovements
                 .Include(m => m.Item).ThenInclude(i => i!.Category)
                 .Include(m => m.Warehouse)
                 .AsQueryable();
 
-            if (itemId.HasValue) {
+            if (itemId.HasValue)
+            {
                 query = query.Where(m => m.ItemId == itemId.Value);
             }
 
-            if (warehouseId.HasValue) {
+            if (warehouseId.HasValue)
+            {
                 query = query.Where(m => m.WarehouseId == warehouseId.Value);
             }
 
-            if (movementType.HasValue) {
+            if (movementType.HasValue)
+            {
                 query = query.Where(m => m.MovementType == movementType.Value);
             }
 
-            if (dateFrom.HasValue) {
+            if (dateFrom.HasValue)
+            {
                 var from = dateFrom.Value.Date;
                 query = query.Where(m => m.MovementDate >= from);
             }
 
-            if (dateTo.HasValue) {
+            if (dateTo.HasValue)
+            {
                 var to = dateTo.Value.Date.AddDays(1);
                 query = query.Where(m => m.MovementDate < to);
             }

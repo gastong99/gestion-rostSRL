@@ -1,8 +1,11 @@
-﻿@model IEnumerable<TransformadoresApp.Models.Catalogs.Item>
+﻿
+@model IEnumerable<TransformadoresApp.Models.Catalogs.Item>
 @using TransformadoresApp.Models.Catalogs
 
 @{
     ViewData["Title"] = "Items";
+
+    var isAdmin = User.IsInRole("Administrador");
 }
 
 <a asp-controller="Home" asp-action="Index" class="page-back">
@@ -11,56 +14,73 @@
 </a>
 
 <div class="page-card">
+
     <h2 class="page-card-title">
         <i class="bi bi-box-seam"></i>
         Items
     </h2>
 
     <div class="view-actions">
-        <button class="btn-create" onclick="openCreateModal()">
-            <i class="bi bi-plus-circle"></i>
-            Nuevo Item
-        </button>
 
-        <a asp-action="Index" asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))" class="btn btn-outline-secondary">
-            <i class="bi bi-eye"></i>
-            @(ViewBag.ShowInactive == true
-                ? "Ocultar inactivos"
-                : "Mostrar inactivos")
-        </a>
+        @if (isAdmin)
+        {
+            <button class="btn-create" onclick="openCreateModal()">
+                <i class="bi bi-plus-circle"></i>
+                Nuevo Item
+            </button>
+        }
+        else
+        {
+            <button class="btn-create disabled" disabled title="Solo Administrador" aria-disabled="true" style="opacity: .55; cursor: not-allowed;">
+                <i class="bi bi-lock"></i>
+                Nuevo Item
+            </button>
+        }
+
+        @if (isAdmin)
+        {
+            <a asp-action="Index"
+               asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))"
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-eye"></i>
+
+                @(ViewBag.ShowInactive == true
+                    ? "Ocultar inactivos"
+                    : "Mostrar inactivos")
+
+            </a>
+        }
+        else
+        {
+            <button class="btn btn-outline-secondary" disabled title="Solo Administrador" aria-disabled="true" style="opacity: .55; cursor: not-allowed;">
+
+                <i class="bi bi-lock"></i>
+                Mostrar inactivos
+
+            </button>
+        }
 
     </div>
 
     <table class="table table-hover mt-3">
+
         <thead>
             <tr>
-                <th style="width:12%">
-                    Código
-                </th>
-                <th style="width:24%">
-                    Nombre
-                </th>
-                <th style="width:18%">
-                    Categoría
-                </th>
-                <th style="width:16%">
-                    Tipo
-                </th>
-                <th style="width:10%">
-                    Unidad
-                </th>
-                <th style="width:10%" class="text-center">
-                    Estado
-                </th>
-                <th style="width:10%" class="text-center">
-                    Acciones
-                </th>
+                <th style="width:12%">Código</th>
+                <th style="width:24%">Nombre</th>
+                <th style="width:18%">Categoría</th>
+                <th style="width:16%">Tipo</th>
+                <th style="width:10%">Unidad</th>
+                <th style="width:10%" class="text-center">Estado</th>
+                <th style="width:10%" class="text-center">Acciones</th>
             </tr>
         </thead>
 
         <tbody>
 
-            @foreach (var item in Model) {
+            @foreach (var item in Model)
+            {
                 var itemData = new
                 {
                     id = item.Id,
@@ -75,59 +95,54 @@
                 };
 
                 <tr>
+
                     <td style="vertical-align:middle">
                         @item.Code
                     </td>
+
                     <td style="vertical-align:middle">
                         @item.Name
                     </td>
+
                     <td style="vertical-align:middle">
                         @(item.Category?.Name ?? "-")
                     </td>
+
                     <td style="vertical-align:middle">
 
                         @switch (item.ItemType)
                         {
                             case ItemType.RawMaterial:
-
                                 <span class="badge bg-success">
                                     Materia Prima
                                 </span>
-
                                 break;
 
                             case ItemType.FinishedProduct:
-
                                 <span class="badge bg-primary">
                                     Producto Terminado
                                 </span>
-
                                 break;
 
                             case ItemType.CommercialProduct:
-
                                 <span class="badge bg-info text-dark">
                                     Producto Comercial
                                 </span>
-
                                 break;
 
                             case ItemType.Service:
-
                                 <span class="badge bg-warning text-dark">
                                     Servicio
                                 </span>
-
                                 break;
 
                             default:
-
                                 <span class="badge bg-secondary">
                                     Sin definir
                                 </span>
-
                                 break;
                         }
+
                     </td>
 
                     <td style="vertical-align:middle">
@@ -136,70 +151,118 @@
 
                     <td class="text-center" style="vertical-align:middle">
 
-                        @if (item.IsActive) {
+                        @if (item.IsActive)
+                        {
                             <span class="badge bg-success">
                                 Activo
                             </span>
                         }
-                        else {
+                        else
+                        {
                             <span class="badge bg-secondary">
                                 Inactivo
                             </span>
                         }
+
                     </td>
 
                     <td>
-                        <div class="action-btn-group">
-                            @if (item.IsActive) {
-                                <button class="action-btn action-btn-edit" onclick='openEditModal(@Html.Raw(Json.Serialize(itemData)))'>
-                                    <i class="bi bi-pencil"></i>
-                                    <span class="action-tooltip">
-                                        Modificar
-                                    </span>
-                                </button>
 
-                                <button class="action-btn action-btn-delete"
-                                        onclick='openDeactivateModal(@Html.Raw(Json.Serialize(new
-                                        {
-                                            id = item.Id,
-                                            code = item.Code,
-                                            name = item.Name
-                                        })))'>
-                                    <i class="bi bi-pause-circle"></i>
+                        <div class="action-btn-group">
+
+                            @if (isAdmin)
+                            {
+                                @if (item.IsActive)
+                                {
+                                    <button class="action-btn action-btn-edit"
+                                            onclick='openEditModal(@Html.Raw(Json.Serialize(itemData)))'>
+
+                                        <i class="bi bi-pencil"></i>
+
+                                        <span class="action-tooltip">
+                                            Modificar
+                                        </span>
+
+                                    </button>
+
+                                    <button class="action-btn action-btn-delete"
+                                            onclick='openDeactivateModal(@Html.Raw(Json.Serialize(new
+                                            {
+                                                id = item.Id,
+                                                code = item.Code,
+                                                name = item.Name
+                                            })))'>
+
+                                        <i class="bi bi-pause-circle"></i>
+
+                                        <span class="action-tooltip">
+                                            Desactivar
+                                        </span>
+
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="action-btn action-btn-restore"
+                                            onclick='openRestoreModal(@Html.Raw(Json.Serialize(new
+                                            {
+                                                id = item.Id,
+                                                code = item.Code,
+                                                name = item.Name
+                                            })))'>
+
+                                        <i class="bi bi-arrow-clockwise"></i>
+
+                                        <span class="action-tooltip">
+                                            Restaurar
+                                        </span>
+
+                                    </button>
+                                }
+                            }
+                            else
+                            {
+                                <button class="action-btn action-btn-edit"
+                                        disabled
+                                        title="Solo Administrador"
+                                aria-disabled="true" style="opacity: .55; cursor: not-allowed;">
+
+                                    <i class="bi bi-lock"></i>
+
                                     <span class="action-tooltip">
-                                        Desactivar
+                                        Solo Administrador
                                     </span>
+
                                 </button>
                             }
-                            else {
-                                <button class="action-btn action-btn-restore"
-                                        onclick='openRestoreModal(@Html.Raw(Json.Serialize(new
-                                        {
-                                            id = item.Id,
-                                            code = item.Code,
-                                            name = item.Name
-                                        })))'>
-                                    <i class="bi bi-arrow-clockwise"></i>
-                                    <span class="action-tooltip">
-                                        Restaurar
-                                    </span>
-                                </button>
-                            }
+
                         </div>
+
                     </td>
+
                 </tr>
             }
+
         </tbody>
+
     </table>
+
 </div>
 
-<partial name="_Modals/_CreateItemModal" />
-<partial name="_Modals/_EditItemModal" />
-<partial name="_Modals/_DeactivateItemModal" />
-<partial name="_Modals/_RestoreItemModal" />
+@if (isAdmin)
+{
+    <partial name="_Modals/_CreateItemModal" />
+    <partial name="_Modals/_EditItemModal" />
+    <partial name="_Modals/_DeactivateItemModal" />
+    <partial name="_Modals/_RestoreItemModal" />
+}
 
-@section Scripts{
-    <script src="~/js/items.modals.js" asp-append-version="true"></script>
+@section Scripts
+{
+    @if (isAdmin)
+    {
+        <script src="~/js/items.modals.js" asp-append-version="true"></script>
 
-    <partial name="_ValidationScriptsPartial" />
+        <partial name="_ValidationScriptsPartial" />
+    }
 }

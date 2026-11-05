@@ -14,6 +14,7 @@
     <div class="section-title">Inventario</div>
 
     <div class="dashboard-grid-section grid-one-col">
+
         <a asp-controller="Stocks"
            asp-action="Index"
            class="dashboard-card dashboard-card-featured text-decoration-none">
@@ -33,6 +34,43 @@
 
             <i class="bi bi-chevron-right dashboard-card-arrow dashboard-card-arrow-featured"></i>
         </a>
+
+        <a asp-controller="Items"
+           asp-action="Index"
+           class="dashboard-card text-decoration-none">
+
+            <div class="dashboard-card-icon-wrap">
+                <i class="bi bi-box-seam dashboard-card-icon"></i>
+            </div>
+
+            <div class="dashboard-card-body">
+                <h4 class="dashboard-card-title">Artículos</h4>
+                <p class="dashboard-card-desc">
+                    Consultar el catálogo de artículos, sus categorías y unidades de medida
+                </p>
+            </div>
+
+            <i class="bi bi-chevron-right dashboard-card-arrow"></i>
+        </a>
+
+        <a asp-controller="StockMovements"
+           asp-action="Index"
+           class="dashboard-card text-decoration-none">
+
+            <div class="dashboard-card-icon-wrap">
+                <i class="bi bi-arrow-left-right dashboard-card-icon"></i>
+            </div>
+
+            <div class="dashboard-card-body">
+                <h4 class="dashboard-card-title">Movimientos de Stock</h4>
+                <p class="dashboard-card-desc">
+                    Consultar el historial de movimientos y filtrar por artículo, depósito, tipo y fecha
+                </p>
+            </div>
+
+            <i class="bi bi-chevron-right dashboard-card-arrow"></i>
+        </a>
+
     </div>
 </div>
 
