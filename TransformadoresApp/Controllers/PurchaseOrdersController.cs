@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +9,23 @@ using TransformadoresApp.Services.Interfaces;
 
 namespace TransformadoresApp.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador,Operador")]
     public class PurchaseOrdersController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IPurchaseOrderService _purchaseOrderService;
 
-        public PurchaseOrdersController(ApplicationDbContext context, IPurchaseOrderService purchaseOrderService)
+        public PurchaseOrdersController(
+            ApplicationDbContext context,
+            IPurchaseOrderService purchaseOrderService)
         {
             _context = context;
             _purchaseOrderService = purchaseOrderService;
         }
+
+        // =====================
+        // INDEX
+        // =====================
 
         public async Task<IActionResult> Index(bool showInactive = false)
         {
@@ -28,7 +35,8 @@ namespace TransformadoresApp.Controllers
                 .Include(p => p.Supplier)
                 .AsQueryable();
 
-            if (!showInactive) {
+            if (!showInactive)
+            {
                 query = query.Where(p => p.IsActive);
             }
 
@@ -47,6 +55,10 @@ namespace TransformadoresApp.Controllers
 
             return View(purchaseOrders);
         }
+
+        // =====================
+        // DETAILS
+        // =====================
 
         public async Task<IActionResult> Details(int id)
         {
@@ -77,11 +89,17 @@ namespace TransformadoresApp.Controllers
             return View(purchaseOrder);
         }
 
+        // =====================
+        // CREATE
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PurchaseOrder purchaseOrder)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 TempData["Error"] = "Los datos ingresados no son válidos.";
 
                 return RedirectToAction(nameof(Index));
@@ -93,18 +111,25 @@ namespace TransformadoresApp.Controllers
 
                 TempData["Success"] = "Orden de compra creada correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // EDIT
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PurchaseOrder purchaseOrder)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 TempData["Error"] = "Los datos ingresados no son válidos.";
 
                 return RedirectToAction(nameof(Index));
@@ -116,13 +141,19 @@ namespace TransformadoresApp.Controllers
 
                 TempData["Success"] = "Orden de compra actualizada correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // CONFIRM
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Confirm(int id)
@@ -130,15 +161,22 @@ namespace TransformadoresApp.Controllers
             try
             {
                 await _purchaseOrderService.ConfirmAsync(id);
+
                 TempData["Success"] = "Orden de compra confirmada correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        // =====================
+        // CANCEL
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(int id)
@@ -149,13 +187,19 @@ namespace TransformadoresApp.Controllers
 
                 TempData["Success"] = "Orden de compra cancelada correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        // =====================
+        // DEACTIVATE
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Deactivate(int id)
@@ -166,13 +210,19 @@ namespace TransformadoresApp.Controllers
 
                 TempData["Success"] = "Orden de compra desactivada correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // RESTORE
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(int id)
@@ -183,7 +233,8 @@ namespace TransformadoresApp.Controllers
 
                 TempData["Success"] = "Orden de compra restaurada correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 

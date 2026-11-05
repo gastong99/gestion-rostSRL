@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
@@ -7,7 +8,7 @@ using TransformadoresApp.Services.Interfaces;
 
 namespace TransformadoresApp.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador,Operador")]
     public class StocksController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,6 +19,10 @@ namespace TransformadoresApp.Controllers
             _context = context;
             _stockService = stockService;
         }
+
+        // =====================
+        // INDEX
+        // =====================
 
         public async Task<IActionResult> Index()
         {
@@ -54,11 +59,18 @@ namespace TransformadoresApp.Controllers
             return View(stock);
         }
 
+        // =====================
+        // CREATE - STOCK INICIAL
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ItemStock stock)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 TempData["Error"] = "Los datos ingresados no son válidos.";
 
                 return RedirectToAction(nameof(Index));
@@ -72,13 +84,20 @@ namespace TransformadoresApp.Controllers
 
                 TempData["Success"] = "Stock inicial cargado correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================
+        // EDIT - AJUSTE MANUAL
+        // ADMINISTRADOR
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, int itemId, int warehouseId, decimal adjustment)
@@ -89,7 +108,8 @@ namespace TransformadoresApp.Controllers
 
                 if (stock == null) return NotFound();
 
-                if (stock.ItemId != itemId || stock.WarehouseId != warehouseId) {
+                if (stock.ItemId != itemId || stock.WarehouseId != warehouseId)
+                {
                     TempData["Error"] = "No es posible modificar el Item o el Depósito desde un ajuste de stock.";
 
                     return RedirectToAction(nameof(Index));
@@ -101,12 +121,18 @@ namespace TransformadoresApp.Controllers
 
                 TempData["Success"] = "Ajuste de stock registrado correctamente.";
             }
-            catch (InvalidOperationException ex) {
+            catch (InvalidOperationException ex)
+            {
                 TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction(nameof(Index));
         }
+
+        // =====================
+        // GET - LISTAS PARA TRANSFERENCIAS
+        // ADMINISTRADOR Y OPERADOR
+        // =====================
 
         [HttpGet]
         public async Task<IActionResult> GetItemsList()
@@ -145,7 +171,8 @@ namespace TransformadoresApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAvailableStock(int itemId, int warehouseId)
         {
-            if (itemId <= 0 || warehouseId <= 0) {
+            if (itemId <= 0 || warehouseId <= 0)
+            {
                 return Json(new
                 {
                     success = false,
@@ -153,9 +180,11 @@ namespace TransformadoresApp.Controllers
                 });
             }
 
-            var stock = await _context.ItemStocks.FirstOrDefaultAsync(s => s.ItemId == itemId && s.WarehouseId == warehouseId);
+            var stock = await _context.ItemStocks
+                .FirstOrDefaultAsync(s => s.ItemId == itemId && s.WarehouseId == warehouseId);
 
-            if (stock == null) {
+            if (stock == null)
+            {
                 return Json(new
                 {
                     success = true,

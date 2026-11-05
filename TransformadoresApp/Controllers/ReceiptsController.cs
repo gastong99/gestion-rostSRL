@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
@@ -6,7 +7,7 @@ using TransformadoresApp.Models.Inventory;
 
 namespace TransformadoresApp.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador,Operador")]
     public class ReceiptsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,6 +16,10 @@ namespace TransformadoresApp.Controllers
         {
             _context = context;
         }
+
+        // =====================
+        // INDEX
+        // =====================
 
         [HttpGet]
         public async Task<IActionResult> Index()

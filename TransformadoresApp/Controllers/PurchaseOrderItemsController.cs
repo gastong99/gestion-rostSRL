@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
@@ -7,25 +8,34 @@ using TransformadoresApp.Services.Interfaces;
 
 namespace TransformadoresApp.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador,Operador")]
     public class PurchaseOrderItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IPurchaseReceivingService _purchaseReceivingService;
         private readonly IPurchaseOrderItemService _purchaseOrderItemService;
 
-        public PurchaseOrderItemsController(ApplicationDbContext context, IPurchaseReceivingService purchaseReceivingService, IPurchaseOrderItemService purchaseOrderItemService)
+        public PurchaseOrderItemsController(
+            ApplicationDbContext context,
+            IPurchaseReceivingService purchaseReceivingService,
+            IPurchaseOrderItemService purchaseOrderItemService)
         {
             _context = context;
             _purchaseReceivingService = purchaseReceivingService;
             _purchaseOrderItemService = purchaseOrderItemService;
         }
 
+        // =====================
+        // CREATE
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PurchaseOrderItem model)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 TempData["Error"] = "Los datos ingresados no son válidos.";
 
                 return RedirectToAction("Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
@@ -45,14 +55,20 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction("Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
         }
 
+        // =====================
+        // EDIT
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(PurchaseOrderItem model)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 TempData["Error"] = "Los datos ingresados no son válidos.";
 
-                return RedirectToAction( "Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
+                return RedirectToAction("Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
             }
 
             try
@@ -69,6 +85,11 @@ namespace TransformadoresApp.Controllers
             return RedirectToAction("Details", "PurchaseOrders", new { id = model.PurchaseOrderId });
         }
 
+        // =====================
+        // DELETE
+        // =====================
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -88,6 +109,10 @@ namespace TransformadoresApp.Controllers
                 return await RedirectToPurchaseOrderAsync(id);
             }
         }
+
+        // =====================
+        // RECEIVE
+        // =====================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -115,11 +140,19 @@ namespace TransformadoresApp.Controllers
             }
         }
 
+        // =====================
+        // HELPERS
+        // =====================
+
         private async Task<IActionResult> RedirectToPurchaseOrderAsync(int itemId)
         {
-            var purchaseOrderId = await _context.PurchaseOrderItems.Where(i => i.Id == itemId).Select(i => i.PurchaseOrderId).FirstOrDefaultAsync();
+            var purchaseOrderId = await _context.PurchaseOrderItems
+                .Where(i => i.Id == itemId)
+                .Select(i => i.PurchaseOrderId)
+                .FirstOrDefaultAsync();
 
-            if (purchaseOrderId == 0) {
+            if (purchaseOrderId == 0)
+            {
                 return RedirectToAction("Index", "PurchaseOrders");
             }
 

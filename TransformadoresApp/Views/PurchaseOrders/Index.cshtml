@@ -1,8 +1,11 @@
-﻿@model IEnumerable<TransformadoresApp.Models.Purchasing.PurchaseOrder>
+﻿
+@model IEnumerable<TransformadoresApp.Models.Purchasing.PurchaseOrder>
 @using TransformadoresApp.Helpers
 
 @{
     ViewData["Title"] = "Órdenes de Compra";
+
+    var isAdmin = User.IsInRole("Administrador");
 }
 
 <a asp-controller="Home" asp-action="Index" class="page-back">
@@ -17,13 +20,20 @@
     </h2>
 
     <div class="view-actions">
-        <button class="btn-create" onclick="openCreateModal()">
-            <i class="bi bi-plus-circle"></i>
-            Nueva Orden
-        </button>
 
-        <a asp-action="Index" asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))" class="btn btn-outline-secondary">
+        @if (isAdmin) {
+            <button class="btn-create" onclick="openCreateModal()">
+                <i class="bi bi-plus-circle"></i>
+                Nueva Orden
+            </button>
+        }
+
+        <a asp-action="Index"
+           asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))"
+           class="btn btn-outline-secondary">
+
             <i class="bi bi-eye"></i>
+
             @(ViewBag.ShowInactive == true
                 ? "Ocultar inactivas"
                 : "Mostrar inactivas")
@@ -61,97 +71,127 @@
 
         <tbody>
 
-            @foreach (var item in Model) {
-                var orderData = new
-                {
-                    id = item.Id,
-                    number = item.Number,
-                    supplierId = item.SupplierId,
-                    supplierName = item.Supplier?.BusinessName,
-                    orderDate = item.OrderDate.ToString("yyyy-MM-dd"),
-                    expectedDate = item.ExpectedDate?.ToString("yyyy-MM-dd"),
-                    status = (int)item.Status,
-                    notes = item.Notes
-                };
-
+            @if (!Model.Any()) {
                 <tr>
-                    <td style="vertical-align:middle">
-                        @item.Number
-                    </td>
-
-                    <td style="vertical-align:middle">
-                        @item.OrderDate.ToString("dd/MM/yyyy")
-                    </td>
-
-                    <td style="vertical-align:middle">
-                        @item.Supplier?.BusinessName
-                    </td>
-
-                    <td style="vertical-align:middle">
-                        <span class="badge bg-primary">
-                            @item.Status.GetDisplayName()
-                        </span>
-                    </td>
-
-                    <td class="text-center" style="vertical-align:middle">
-                        @if (item.IsActive) {
-                            <span class="badge bg-success">
-                                Activa
-                            </span>
-                        }
-                        else {
-                            <span class="badge bg-secondary">
-                                Inactiva
-                            </span>
-                        }
-                    </td>
-
-                    <td>
-                        <div class="action-btn-group">
-                            <a asp-action="Details" asp-route-id="@item.Id" class="action-btn action-btn-view">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                                <span class="action-tooltip">
-                                    Abrir
-                                </span>
-                            </a>
-
-                            @if (item.IsActive) {
-                                <button class="action-btn action-btn-edit" onclick='openEditModal(@Html.Raw(Json.Serialize(orderData)))'>
-                                    <i class="bi bi-pencil"></i>
-                                    <span class="action-tooltip">
-                                        Modificar
-                                    </span>
-                                </button>
-
-                                <button class="action-btn action-btn-delete" onclick='openDeactivateModal(@Html.Raw(Json.Serialize(orderData)))'>
-                                    <i class="bi bi-pause-circle"></i>
-                                    <span class="action-tooltip">
-                                        Desactivar
-                                    </span>
-                                </button>
-                            }
-                            else {
-                                <button class="action-btn action-btn-restore" onclick='openRestoreModal(@Html.Raw(Json.Serialize(orderData)))'>
-                                    <i class="bi bi-arrow-clockwise"></i>
-                                    <span class="action-tooltip">
-                                        Restaurar
-                                    </span>
-                                </button>
-                            }
-                        </div>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        No existen órdenes de compra para mostrar.
                     </td>
                 </tr>
+            }
+            else {
+                @foreach (var item in Model) {
+                    var orderData = new
+                    {
+                        id = item.Id,
+                        number = item.Number,
+                        supplierId = item.SupplierId,
+                        supplierName = item.Supplier?.BusinessName,
+                        orderDate = item.OrderDate.ToString("yyyy-MM-dd"),
+                        expectedDate = item.ExpectedDate?.ToString("yyyy-MM-dd"),
+                        status = (int)item.Status,
+                        notes = item.Notes
+                    };
+
+                    <tr>
+                        <td style="vertical-align:middle">
+                            @item.Number
+                        </td>
+
+                        <td style="vertical-align:middle">
+                            @item.OrderDate.ToString("dd/MM/yyyy")
+                        </td>
+
+                        <td style="vertical-align:middle">
+                            @item.Supplier?.BusinessName
+                        </td>
+
+                        <td style="vertical-align:middle">
+                            <span class="badge bg-primary">
+                                @item.Status.GetDisplayName()
+                            </span>
+                        </td>
+
+                        <td class="text-center" style="vertical-align:middle">
+                            @if (item.IsActive) {
+                                <span class="badge bg-success">
+                                    Activa
+                                </span>
+                            }
+                            else {
+                                <span class="badge bg-secondary">
+                                    Inactiva
+                                </span>
+                            }
+                        </td>
+
+                        <td>
+                            <div class="action-btn-group">
+
+                                <a asp-action="Details"
+                                   asp-route-id="@item.Id"
+                                   class="action-btn action-btn-view">
+
+                                    <i class="bi bi-box-arrow-up-right"></i>
+
+                                    <span class="action-tooltip">
+                                        Abrir
+                                    </span>
+                                </a>
+
+                                @if (isAdmin) {
+                                    @if (item.IsActive) {
+                                        <button class="action-btn action-btn-edit"
+                                                onclick='openEditModal(@Html.Raw(Json.Serialize(orderData)))'>
+
+                                            <i class="bi bi-pencil"></i>
+
+                                            <span class="action-tooltip">
+                                                Modificar
+                                            </span>
+                                        </button>
+
+                                        <button class="action-btn action-btn-delete"
+                                                onclick='openDeactivateModal(@Html.Raw(Json.Serialize(orderData)))'>
+
+                                            <i class="bi bi-pause-circle"></i>
+
+                                            <span class="action-tooltip">
+                                                Desactivar
+                                            </span>
+                                        </button>
+                                    }
+                                    else {
+                                        <button class="action-btn action-btn-restore"
+                                                onclick='openRestoreModal(@Html.Raw(Json.Serialize(orderData)))'>
+
+                                            <i class="bi bi-arrow-clockwise"></i>
+
+                                            <span class="action-tooltip">
+                                                Restaurar
+                                            </span>
+                                        </button>
+                                    }
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 </div>
 
-<partial name="_Modals/_CreatePurchaseOrderModal" />
-<partial name="_Modals/_EditPurchaseOrderModal" />
-<partial name="_Modals/_DeactivatePurchaseOrderModal" />
-<partial name="_Modals/_RestorePurchaseOrderModal" />
+@if (isAdmin) {
+    <partial name="_Modals/_CreatePurchaseOrderModal" />
+    <partial name="_Modals/_EditPurchaseOrderModal" />
+    <partial name="_Modals/_DeactivatePurchaseOrderModal" />
+    <partial name="_Modals/_RestorePurchaseOrderModal" />
+}
 
 @section Scripts{
-    <script src="~/js/purchaseorders.modals.js" asp-append-version="true"></script>
-    <partial name="_ValidationScriptsPartial" />
+
+    @if (isAdmin) {
+        <script src="~/js/purchaseorders.modals.js" asp-append-version="true"></script>
+        <partial name="_ValidationScriptsPartial" />
+    }
 }

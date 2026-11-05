@@ -1,11 +1,13 @@
-﻿@model TransformadoresApp.Models.Purchasing.PurchaseOrder
+﻿
+@model TransformadoresApp.Models.Purchasing.PurchaseOrder
 
 @{
     ViewData["Title"] = $"Orden de Compra {Model.Number}";
-}
 
-@{
-    var isDraft = Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Draft;
+    var isAdmin = User.IsInRole("Administrador");
+
+    var isDraft =
+        Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Draft;
 
     var isPending =
         Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Pending;
@@ -13,17 +15,11 @@
     var isPartiallyReceived =
         Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.PartiallyReceived;
 
-    var isCompleted =
-        Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Completed;
-
-    var isCancelled =
-        Model.Status == TransformadoresApp.Models.Purchasing.PurchaseOrderStatus.Cancelled;
-
     var canEditOrder =
-        isDraft;
+        isAdmin && isDraft;
 
     var canReceive =
-        isPending || isPartiallyReceived;
+        Model.IsActive && (isPending || isPartiallyReceived);
 }
 
 <a asp-action="Index" class="page-back">
@@ -71,30 +67,34 @@
                     break;
             }
 
-            @if (isDraft) {
-                <button type="button" class="btn btn-success" onclick='openConfirmPurchaseOrderModal(
-                    @Html.Raw(Json.Serialize(new
-                        {
-                            id = Model.Id,
-                            number = Model.Number,
-                            supplierName = Model.Supplier?.BusinessName
-                        }))
-                    )'>
+            @if (isAdmin && isDraft) {
+                <button type="button"
+                        class="btn btn-success"
+                        onclick='openConfirmPurchaseOrderModal(
+                            @Html.Raw(Json.Serialize(new
+                            {
+                                id = Model.Id,
+                                number = Model.Number,
+                                supplierName = Model.Supplier?.BusinessName
+                            }))
+                        )'>
 
                     <i class="bi bi-check-circle"></i>
                     Confirmar Orden
                 </button>
             }
 
-            @if (isDraft || isPending) {
-                <button type="button" class="btn btn-danger" onclick='openCancelPurchaseOrderModal(
-                    @Html.Raw(Json.Serialize(new
-                        {
-                            id = Model.Id,
-                            number = Model.Number,
-                            supplierName = Model.Supplier?.BusinessName
-                        }))
-                    )'>
+            @if (isAdmin && (isDraft || isPending)) {
+                <button type="button"
+                        class="btn btn-danger"
+                        onclick='openCancelPurchaseOrderModal(
+                            @Html.Raw(Json.Serialize(new
+                            {
+                                id = Model.Id,
+                                number = Model.Number,
+                                supplierName = Model.Supplier?.BusinessName
+                            }))
+                        )'>
 
                     <i class="bi bi-x-circle"></i>
                     Cancelar Orden
@@ -151,7 +151,8 @@
 <div class="page-card mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0">
-            <i class="bi bi-list-ul"></i> Detalle de la Orden
+            <i class="bi bi-list-ul"></i>
+            Detalle de la Orden
         </h3>
 
         <span class="badge bg-primary">
@@ -159,8 +160,11 @@
         </span>
 
         @if (canEditOrder) {
-            <button class="btn-create" onclick="openCreateItemModal(@Model.Id)">             
-                <i class="bi bi-plus-circle"></i> Agregar Item
+            <button class="btn-create"
+                    onclick="openCreateItemModal(@Model.Id)">
+
+                <i class="bi bi-plus-circle"></i>
+                Agregar Item
             </button>
         }
     </div>
@@ -207,17 +211,17 @@
                 foreach (var item in Model.Items) {
 
                     var itemData = new
-                        {
-                            id = item.Id,
-                            purchaseOrderId = item.PurchaseOrderId,
-                            itemId = item.ItemId,
-                            itemCode = item.Item?.Code,
-                            itemName = item.Item?.Name,
-                            quantity = item.Quantity,
-                            receivedQuantity = item.ReceivedQuantity,
-                            pendingQuantity = item.Quantity - item.ReceivedQuantity,
-                            unitPrice = item.UnitPrice
-                        };
+                    {
+                        id = item.Id,
+                        purchaseOrderId = item.PurchaseOrderId,
+                        itemId = item.ItemId,
+                        itemCode = item.Item?.Code,
+                        itemName = item.Item?.Name,
+                        quantity = item.Quantity,
+                        receivedQuantity = item.ReceivedQuantity,
+                        pendingQuantity = item.Quantity - item.ReceivedQuantity,
+                        unitPrice = item.UnitPrice
+                    };
 
                     <tr>
                         <td>
@@ -250,19 +254,38 @@
 
                         <td>
                             <div class="action-btn-group">
+
                                 @if (canReceive && item.PendingQuantity > 0) {
-                                    <button class="action-btn action-btn-success" onclick='openReceiveItemModal(@Html.Raw(Json.Serialize(itemData)))'>
-                                        <i class="bi bi-box-seam"></i><span class="action-tooltip"> Recibir</span>
+                                    <button class="action-btn action-btn-success"
+                                            onclick='openReceiveItemModal(@Html.Raw(Json.Serialize(itemData)))'>
+
+                                        <i class="bi bi-box-seam"></i>
+
+                                        <span class="action-tooltip">
+                                            Recibir
+                                        </span>
                                     </button>
                                 }
 
                                 @if (canEditOrder) {
-                                    <button class="action-btn action-btn-edit" onclick='openEditItemModal(@Html.Raw(Json.Serialize(itemData)))'>
-                                        <i class="bi bi-pencil"></i><span class="action-tooltip"> Modificar</span>
+                                    <button class="action-btn action-btn-edit"
+                                            onclick='openEditItemModal(@Html.Raw(Json.Serialize(itemData)))'>
+
+                                        <i class="bi bi-pencil"></i>
+
+                                        <span class="action-tooltip">
+                                            Modificar
+                                        </span>
                                     </button>
 
-                                    <button class="action-btn action-btn-delete" onclick='openDeleteItemModal(@Html.Raw(Json.Serialize(itemData)))'>
-                                        <i class="bi bi-trash"></i><span class="action-tooltip"> Eliminar</span>
+                                    <button class="action-btn action-btn-delete"
+                                            onclick='openDeleteItemModal(@Html.Raw(Json.Serialize(itemData)))'>
+
+                                        <i class="bi bi-trash"></i>
+
+                                        <span class="action-tooltip">
+                                            Eliminar
+                                        </span>
                                     </button>
                                 }
                             </div>
@@ -291,16 +314,30 @@
     </div>
 </div>
 
-<partial name="_Modals/_ConfirmPurchaseOrderModal" />
-<partial name="_Modals/_CancelPurchaseOrderModal" />
-<partial name="_Modals/_CreatePurchaseOrderItemModal" />
-<partial name="_Modals/_EditPurchaseOrderItemModal" />
-<partial name="_Modals/_ReceivePurchaseOrderItemModal" />
-<partial name="_Modals/_DeletePurchaseOrderItemModal" />
+@if (isAdmin && isDraft) {
+    <partial name="_Modals/_ConfirmPurchaseOrderModal" />
+    <partial name="_Modals/_CreatePurchaseOrderItemModal" />
+    <partial name="_Modals/_EditPurchaseOrderItemModal" />
+    <partial name="_Modals/_DeletePurchaseOrderItemModal" />
+}
+
+@if (isAdmin && (isDraft || isPending)) {
+    <partial name="_Modals/_CancelPurchaseOrderModal" />
+}
+
+@if (canReceive) {
+    <partial name="_Modals/_ReceivePurchaseOrderItemModal" />
+}
 
 @section Scripts{
-    <script src="~/js/purchaseorders.modals.js" asp-append-version="true"></script>
-    <script src="~/js/purchaseorderitems.modals.js" asp-append-version="true"></script>
+
+    @if (isAdmin) {
+        <script src="~/js/purchaseorders.modals.js" asp-append-version="true"></script>
+    }
+
+    @if (canEditOrder || canReceive) {
+        <script src="~/js/purchaseorderitems.modals.js" asp-append-version="true"></script>
+    }
 
     <partial name="_ValidationScriptsPartial" />
 }
