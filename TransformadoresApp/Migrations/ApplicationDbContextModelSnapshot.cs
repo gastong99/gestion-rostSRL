@@ -17,7 +17,7 @@ namespace TransformadoresApp.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -218,34 +218,6 @@ namespace TransformadoresApp.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("TransformadoresApp.Models.BomItem", b =>
-                {
-                    b.Property<int>("BomItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BomItemId"));
-
-                    b.Property<int>("MaterialId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("QuantityPerUnit")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("BomItemId");
-
-                    b.HasIndex("MaterialId");
-
-                    b.HasIndex("ProductId", "MaterialId")
-                        .IsUnique();
-
-                    b.ToTable("BomItems");
                 });
 
             modelBuilder.Entity("TransformadoresApp.Models.Catalogs.Category", b =>
@@ -467,115 +439,6 @@ namespace TransformadoresApp.Migrations
                     b.ToTable("Warehouses");
                 });
 
-            modelBuilder.Entity("TransformadoresApp.Models.Material", b =>
-                {
-                    b.Property<int>("MaterialId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaterialId"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("UnitOfMeasureId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MaterialId");
-
-                    b.HasIndex("UnitOfMeasureId");
-
-                    b.ToTable("Materials");
-                });
-
-            modelBuilder.Entity("TransformadoresApp.Models.Product", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
-
-                    b.Property<int>("Alto")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Ancho")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Diametro")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Largo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("PerdidasPcc")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PerdidasPo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Peso")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PotenciaKVA")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Ucc")
-                        .HasColumnType("float");
-
-                    b.HasKey("ProductId");
-
-                    b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("TransformadoresApp.Models.ProductionOrder", b =>
-                {
-                    b.Property<int>("ProductionOrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductionOrderId"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductionOrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductionOrders");
-                });
-
             modelBuilder.Entity("TransformadoresApp.Models.Purchasing.PurchaseOrder", b =>
                 {
                     b.Property<int>("Id")
@@ -795,25 +658,6 @@ namespace TransformadoresApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TransformadoresApp.Models.BomItem", b =>
-                {
-                    b.HasOne("TransformadoresApp.Models.Material", "Material")
-                        .WithMany()
-                        .HasForeignKey("MaterialId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TransformadoresApp.Models.Product", "Product")
-                        .WithMany("BomItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Material");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("TransformadoresApp.Models.Catalogs.Category", b =>
                 {
                     b.HasOne("TransformadoresApp.Models.Catalogs.Category", "Parent")
@@ -891,28 +735,6 @@ namespace TransformadoresApp.Migrations
                     b.Navigation("Warehouse");
                 });
 
-            modelBuilder.Entity("TransformadoresApp.Models.Material", b =>
-                {
-                    b.HasOne("TransformadoresApp.Models.UnitOfMeasure", "UnitOfMeasure")
-                        .WithMany()
-                        .HasForeignKey("UnitOfMeasureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("UnitOfMeasure");
-                });
-
-            modelBuilder.Entity("TransformadoresApp.Models.ProductionOrder", b =>
-                {
-                    b.HasOne("TransformadoresApp.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("TransformadoresApp.Models.Purchasing.PurchaseOrder", b =>
                 {
                     b.HasOne("TransformadoresApp.Models.Purchasing.Supplier", "Supplier")
@@ -966,11 +788,6 @@ namespace TransformadoresApp.Migrations
                     b.Navigation("StockMovements");
 
                     b.Navigation("Stocks");
-                });
-
-            modelBuilder.Entity("TransformadoresApp.Models.Product", b =>
-                {
-                    b.Navigation("BomItems");
                 });
 
             modelBuilder.Entity("TransformadoresApp.Models.Purchasing.PurchaseOrder", b =>

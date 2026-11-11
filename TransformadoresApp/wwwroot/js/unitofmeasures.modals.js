@@ -1,4 +1,8 @@
-﻿// MODAL CREATE
+﻿
+// =====================
+// MODAL CREATE
+// =====================
+
 function openCreateModal() {
     resetCreateForm();
 
@@ -6,11 +10,16 @@ function openCreateModal() {
     modal.show();
 }
 
+// =====================
 // MODAL EDIT
+// =====================
+
 function openEditModal(unit) {
     resetEditForm();
 
-    document.getElementById('editUnitModalTitle').textContent = `Editando unidad '${unit.name}'`;
+    document.getElementById('editUnitModalTitle').textContent =
+        `Editando unidad '${unit.name}'`;
+
     document.getElementById('edit_UnitOfMeasureId').value = unit.unitOfMeasureId;
     document.getElementById('edit_Name').value = unit.name || '';
     document.getElementById('edit_Abbreviation').value = unit.abbreviation || '';
@@ -30,66 +39,105 @@ function openEditModal(unit) {
     }, 100);
 }
 
+// =====================
 // MODAL DELETE
+// =====================
+
 async function openDeleteModal(unitId, name) {
 
+    const errorDiv = document.getElementById('deleteUnitError');
+    const confirmDiv = document.getElementById('deleteUnitConfirm');
+    const submitBtn = document.getElementById('deleteUnitSubmit');
+    const cancelText = document.getElementById('deleteUnitCancelText');
+    const itemsCount = document.getElementById('deleteUnitItemsCount');
+    const itemsList = document.getElementById('deleteUnitItemsList');
+
+    // Restablecer estado del modal
+    errorDiv.classList.add('d-none');
+    confirmDiv.classList.remove('d-none');
+    submitBtn.classList.remove('d-none');
+    submitBtn.disabled = true;
+    cancelText.textContent = 'Cancelar';
+
+    itemsCount.textContent = '';
+    itemsList.innerHTML = '';
+
     document.getElementById('deleteUnitName').textContent = name;
+    document.getElementById('deleteUnitForm').action =
+        `/UnitOfMeasures/DeleteConfirmed/${unitId}`;
 
-    document.getElementById('deleteUnitForm').action = `/UnitOfMeasures/DeleteConfirmed/${unitId}`;
+    try {
+        const response = await fetch(
+            `/UnitOfMeasures/CheckUnitUsage?unitId=${unitId}`
+        );
 
-    // Verificar si la unidad está en uso
-    try
-    {
-        const response = await fetch(`/UnitOfMeasures/CheckUnitUsage?unitId=${unitId}`);
-        if (response.ok) {
-            const data = await response.json();
+        if (!response.ok) {
+            throw new Error('No se pudo verificar el uso de la unidad.');
+        }
 
-            const errorDiv = document.getElementById('deleteUnitError');
-            const confirmDiv = document.getElementById('deleteUnitConfirm');
-            const submitBtn = document.getElementById('deleteUnitSubmit');
-            const cancelText = document.getElementById('deleteUnitCancelText');
-            const materialsCount = document.getElementById('deleteUnitMaterialsCount');
-            const materialsList = document.getElementById('deleteUnitMaterialsList');
+        const data = await response.json();
 
-            if (data.isUsed && data.materials && data.materials.length > 0) {
-                // Unidad está en uso - mostrar error
-                errorDiv.classList.remove('d-none');
-                confirmDiv.classList.add('d-none');
-                submitBtn.classList.add('d-none');
-                cancelText.textContent = 'Cerrar';
+        if (data.isUsed && data.items && data.items.length > 0) {
 
-                // Mostrar cantidad
-                materialsCount.textContent = data.materialsCount;
+            // La unidad está en uso: impedir eliminación
+            errorDiv.classList.remove('d-none');
+            confirmDiv.classList.add('d-none');
+            submitBtn.classList.add('d-none');
+            cancelText.textContent = 'Cerrar';
 
-                // Llenar lista de materiales
-                materialsList.innerHTML = '';
-                data.materials.forEach(materialName => {
-                    const li = document.createElement('li');
-                    li.textContent = materialName;
-                    materialsList.appendChild(li);
-                });
-            }
-            else {
-                // Unidad NO está en uso - permitir eliminar
-                errorDiv.classList.add('d-none');
-                confirmDiv.classList.remove('d-none');
-                submitBtn.classList.remove('d-none');
-                cancelText.textContent = 'Cancelar';
-            }
+            itemsCount.textContent = data.itemsCount;
+
+            data.items.forEach(itemName => {
+                const li = document.createElement('li');
+                li.textContent = itemName;
+                itemsList.appendChild(li);
+            });
+        }
+        else {
+            // La unidad no está en uso: permitir eliminación
+            errorDiv.classList.add('d-none');
+            confirmDiv.classList.remove('d-none');
+            submitBtn.classList.remove('d-none');
+            submitBtn.disabled = false;
+            cancelText.textContent = 'Cancelar';
         }
     }
     catch (error) {
         console.error('Error verificando uso de la unidad:', error);
+
+        // Ante un error de verificación, no permitir eliminar
+        errorDiv.classList.remove('d-none');
+        confirmDiv.classList.add('d-none');
+        submitBtn.classList.add('d-none');
+        cancelText.textContent = 'Cerrar';
+
+        errorDiv.querySelector('strong').textContent =
+            'No se pudo verificar el uso de la unidad.';
+
+        const message = document.createElement('p');
+        message.className = 'mb-0 mt-2';
+        message.textContent =
+            'Intente nuevamente. No se habilitó la eliminación por seguridad.';
+
+        itemsList.innerHTML = '';
+        itemsList.appendChild(message);
     }
 
     // Mostrar modal
-    const modal = new bootstrap.Modal(document.getElementById('deleteUnitModal'));
+    const modal = new bootstrap.Modal(
+        document.getElementById('deleteUnitModal')
+    );
+
     modal.show();
 }
 
-// FUNCIONES DE LIMPIEZA
+// =====================
+// FORM RESET
+// =====================
+
 function resetCreateForm() {
     const form = document.querySelector('#createUnitModal form');
+
     if (form) {
         form.reset();
 
@@ -98,50 +146,54 @@ function resetCreateForm() {
             if (validator) validator.resetForm();
         }
 
-        // Limpiar mensajes de error
-        form.querySelectorAll('.text-danger, .field-validation-error').forEach(span => {
-            span.textContent = '';
-            span.classList.remove('field-validation-error');
-            span.classList.add('field-validation-valid');
-        });
+        form.querySelectorAll('.text-danger, .field-validation-error')
+            .forEach(span => {
+                span.textContent = '';
+                span.classList.remove('field-validation-error');
+                span.classList.add('field-validation-valid');
+            });
 
-        // Limpiar clases de validación
-        form.querySelectorAll('.is-invalid, .input-validation-error').forEach(input => {
-            input.classList.remove('is-invalid', 'input-validation-error');
-        });
+        form.querySelectorAll('.is-invalid, .input-validation-error')
+            .forEach(input => {
+                input.classList.remove('is-invalid', 'input-validation-error');
+            });
     }
 }
 
 function resetEditForm() {
     const form = document.getElementById('editUnitForm');
+
     if (form) {
         form.reset();
 
-        // Restaurar título por defecto
-        document.getElementById('editUnitModalTitle').textContent = 'Editar Unidad de Medida';
+        document.getElementById('editUnitModalTitle').textContent =
+            'Editar Unidad de Medida';
 
-        // Limpiar validación jQuery
         if (typeof $.validator !== 'undefined') {
             const validator = $(form).validate();
             if (validator) validator.resetForm();
         }
 
-        // Limpiar mensajes de error
-        form.querySelectorAll('.text-danger, .field-validation-error').forEach(span => {
-            span.textContent = '';
-            span.classList.remove('field-validation-error');
-            span.classList.add('field-validation-valid');
-        });
+        form.querySelectorAll('.text-danger, .field-validation-error')
+            .forEach(span => {
+                span.textContent = '';
+                span.classList.remove('field-validation-error');
+                span.classList.add('field-validation-valid');
+            });
 
-        // Limpiar clases de validación
-        form.querySelectorAll('.is-invalid, .input-validation-error').forEach(input => {
-            input.classList.remove('is-invalid', 'input-validation-error');
-        });
+        form.querySelectorAll('.is-invalid, .input-validation-error')
+            .forEach(input => {
+                input.classList.remove('is-invalid', 'input-validation-error');
+            });
     }
 }
 
-// LIMPIAR AL CERRAR MODALES
+// =====================
+// CLEANUP ON MODAL CLOSE
+// =====================
+
 document.addEventListener('DOMContentLoaded', function () {
+
     const createModal = document.getElementById('createUnitModal');
     const editModal = document.getElementById('editUnitModal');
 

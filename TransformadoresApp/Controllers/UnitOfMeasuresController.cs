@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Data;
@@ -188,7 +189,6 @@ namespace TransformadoresApp.Controllers
 
             ViewBag.IsUsed = usage.IsUsed;
             ViewBag.ItemsUsingUnit = usage.Items;
-            ViewBag.MaterialsUsingUnit = usage.Materials;
 
             return View(unit);
         }
@@ -210,7 +210,7 @@ namespace TransformadoresApp.Controllers
             if (usage.IsUsed)
             {
                 TempData["Error"] =
-                    $"No se puede eliminar la unidad '{unit.Name}' porque está en uso por artículos o materiales.";
+                    $"No se puede eliminar la unidad '{unit.Name}' porque está en uso por artículos.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -243,9 +243,7 @@ namespace TransformadoresApp.Controllers
             {
                 isUsed = usage.IsUsed,
                 itemsCount = usage.Items.Count,
-                items = usage.Items,
-                materialsCount = usage.Materials.Count,
-                materials = usage.Materials
+                items = usage.Items
             });
         }
 
@@ -262,17 +260,9 @@ namespace TransformadoresApp.Controllers
                 .Select(item => item.Name)
                 .ToListAsync();
 
-            var materials = await _db.Materials
-                .AsNoTracking()
-                .Where(material => material.UnitOfMeasureId == unitId)
-                .OrderBy(material => material.Name)
-                .Select(material => material.Name)
-                .ToListAsync();
-
             return new UnitUsageResult
             {
-                Items = items,
-                Materials = materials
+                Items = items
             };
         }
 
@@ -280,9 +270,7 @@ namespace TransformadoresApp.Controllers
         {
             public List<string> Items { get; init; } = new();
 
-            public List<string> Materials { get; init; } = new();
-
-            public bool IsUsed => Items.Count > 0 || Materials.Count > 0;
+            public bool IsUsed => Items.Count > 0;
         }
     }
 }

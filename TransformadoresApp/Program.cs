@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using System.Globalization;
 using TransformadoresApp.Data;
 using TransformadoresApp.Models;
-using TransformadoresApp.Services;
 using TransformadoresApp.Services.Interfaces;
 using TransformadoresApp.Services.Purchasing;
 using TransformadoresApp.Services.Inventory;
@@ -57,9 +56,6 @@ builder.Services.AddScoped<IStockMovementService, StockMovementService>();
 builder.Services.AddScoped<IStockTransferService, StockTransferService>();
 builder.Services.AddScoped<IPurchaseReceivingService, PurchaseReceivingService>();
 builder.Services.AddScoped<IPurchaseOrderItemService, PurchaseOrderItemService>();
-
-builder.Services.AddScoped<BomService>();
-builder.Services.AddScoped<PdfService>();
 
 var app = builder.Build();
 
