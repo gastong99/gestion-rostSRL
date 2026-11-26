@@ -1,55 +1,59 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using TransformadoresApp.Models;
 
-namespace TransformadoresApp.Data
+namespace TransformadoresApp.Data;
+
+public static class IdentitySeeder
 {
-    public static class IdentitySeeder
+    public static async Task SeedRolesAndAdminAsync(
+        IServiceProvider serviceProvider,
+        IConfiguration configuration,
+        ILogger logger)
     {
-        // =====================
-        // ROLES Y USUARIO ADMINISTRADOR
-        // =====================
+        using var scope = serviceProvider.CreateScope();
 
-        public static async Task SeedRolesAndAdminAsync(
-            IServiceProvider serviceProvider)
+        var roleManager = scope.ServiceProvider
+            .GetRequiredService<RoleManager<IdentityRole>>();
+
+        var userManager = scope.ServiceProvider
+            .GetRequiredService<UserManager<ApplicationUser>>();
+
+        string[] roles = { "Administrador", "Operador" };
+
+        foreach (var role in roles)
         {
-            using var scope = serviceProvider.CreateScope();
-
-            var roleManager = scope.ServiceProvider
-                .GetRequiredService<RoleManager<IdentityRole>>();
-
-            var userManager = scope.ServiceProvider
-                .GetRequiredService<UserManager<ApplicationUser>>();
-
-            // =====================
-            // CREAR ROLES VIGENTES
-            // =====================
-
-            string[] roles = { "Administrador", "Operador" };
-
-            foreach (var role in roles)
+            if (await roleManager.RoleExistsAsync(role))
             {
-                if (!await roleManager.RoleExistsAsync(role))
-                {
-                    var result = await roleManager.CreateAsync(
-                        new IdentityRole(role));
-
-                    if (!result.Succeeded)
-                    {
-                        throw new InvalidOperationException(
-                            $"No se pudo crear el rol '{role}': " +
-                            string.Join(", ",
-                                result.Errors.Select(error => error.Description)));
-                    }
-                }
+                continue;
             }
 
-            // =====================
-            // USUARIO ADMINISTRADOR PRINCIPAL
-            // =====================
+            var result = await roleManager.CreateAsync(new IdentityRole(role));
 
-            const string adminEmail = "admin@rostagno.com";
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    $"No se pudo crear el rol '{role}': " +
+                    string.Join(", ", result.Errors.Select(error => error.Description)));
+            }
+        }
 
+        // El administrador inicial se provisiona mediante configuración secreta.
+        // No se incluye una contraseña conocida en el código fuente.
+        var adminEmail = configuration["BootstrapAdmin:Email"]?.Trim();
+        var adminPassword = configuration["BootstrapAdmin:Password"];
+
+        if (string.IsNullOrWhiteSpace(adminEmail) ||
+            string.IsNullOrWhiteSpace(adminPassword))
+        {
+            logger.LogWarning(
+                "No se configuró BootstrapAdmin:Email/Password. " +
+                "Se omitió la creación automática del administrador inicial.");
+        }
+        else
+        {
             var adminUser = await userManager.Users
                 .FirstOrDefaultAsync(user => user.Email == adminEmail);
 
@@ -62,73 +66,59 @@ namespace TransformadoresApp.Data
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(
-                    adminUser, "Admin123!");
+                var createResult = await userManager.CreateAsync(
+                    adminUser,
+                    adminPassword);
 
-                if (!result.Succeeded)
+                if (!createResult.Succeeded)
                 {
                     throw new InvalidOperationException(
-                        "No se pudo crear el usuario administrador: " +
-                        string.Join(", ",
-                            result.Errors.Select(error => error.Description)));
+                        "No se pudo crear el administrador inicial: " +
+                        string.Join(", ", createResult.Errors.Select(error => error.Description)));
                 }
             }
 
-            if (!await userManager.IsInRoleAsync(
-                    adminUser, "Administrador"))
+            if (!await userManager.IsInRoleAsync(adminUser, "Administrador"))
             {
-                var result = await userManager.AddToRoleAsync(
-                    adminUser, "Administrador");
+                var roleResult = await userManager.AddToRoleAsync(
+                    adminUser,
+                    "Administrador");
 
-                if (!result.Succeeded)
+                if (!roleResult.Succeeded)
                 {
                     throw new InvalidOperationException(
-                        "No se pudo asignar el rol Administrador: " +
-                        string.Join(", ",
-                            result.Errors.Select(error => error.Description)));
+                        "No se pudo asignar el rol Administrador al usuario inicial: " +
+                        string.Join(", ", roleResult.Errors.Select(error => error.Description)));
                 }
             }
+        }
 
-            // =====================
-            // MIGRAR OPERARIO A OPERADOR
-            // =====================
+        // Migrar usuarios del rol legado Operario a Operador.
+        if (await roleManager.RoleExistsAsync("Operario"))
+        {
+            var oldRoleUsers = await userManager.GetUsersInRoleAsync("Operario");
 
-            if (await roleManager.RoleExistsAsync("Operario"))
+            foreach (var user in oldRoleUsers)
             {
-                var oldRoleUsers = await userManager
-                    .GetUsersInRoleAsync("Operario");
-
-                foreach (var user in oldRoleUsers)
+                if (!await userManager.IsInRoleAsync(user, "Operador"))
                 {
-                    // Primero garantizamos la nueva asignación.
-                    if (!await userManager.IsInRoleAsync(user, "Operador"))
-                    {
-                        var addResult = await userManager.AddToRoleAsync(
-                            user, "Operador");
+                    var addResult = await userManager.AddToRoleAsync(user, "Operador");
 
-                        if (!addResult.Succeeded)
-                        {
-                            throw new InvalidOperationException(
-                                $"No se pudo asignar el rol Operador al usuario " +
-                                $"'{user.Email}': " +
-                                string.Join(", ",
-                                    addResult.Errors.Select(error => error.Description)));
-                        }
-                    }
-
-                    // Quitamos el rol anterior únicamente después
-                    // de confirmar la nueva asignación.
-                    var removeResult = await userManager.RemoveFromRoleAsync(
-                        user, "Operario");
-
-                    if (!removeResult.Succeeded)
+                    if (!addResult.Succeeded)
                     {
                         throw new InvalidOperationException(
-                            $"No se pudo retirar el rol Operario al usuario " +
-                            $"'{user.Email}': " +
-                            string.Join(", ",
-                                removeResult.Errors.Select(error => error.Description)));
+                            $"No se pudo asignar el rol Operador al usuario '{user.Email}': " +
+                            string.Join(", ", addResult.Errors.Select(error => error.Description)));
                     }
+                }
+
+                var removeResult = await userManager.RemoveFromRoleAsync(user, "Operario");
+
+                if (!removeResult.Succeeded)
+                {
+                    throw new InvalidOperationException(
+                        $"No se pudo retirar el rol Operario al usuario '{user.Email}': " +
+                        string.Join(", ", removeResult.Errors.Select(error => error.Description)));
                 }
             }
         }

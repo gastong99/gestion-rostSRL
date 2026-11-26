@@ -1,4 +1,11 @@
-﻿<div class="modal fade" id="editSupplierModal" tabindex="-1" aria-hidden="true">
+﻿@{
+    var supplierFormModel =
+        ViewData["SupplierEditModel"]
+        as TransformadoresApp.Models.Purchasing.Supplier
+        ?? new TransformadoresApp.Models.Purchasing.Supplier();
+}
+
+<div class="modal fade" id="editSupplierModal" tabindex="-1" aria-hidden="true">
 
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -17,9 +24,13 @@
             <form id="editSupplierForm"  asp-controller="Suppliers" asp-action="Edit" method="post">
 
                 @Html.AntiForgeryToken()
+                <input type="hidden"
+                   name="showInactive"
+                   value="@(ViewBag.ShowInactive == true)" />
 
                 <div class="modal-body">
-                    <partial name="~/Views/Shared/Forms/Suppliers/_EditForm.cshtml" />
+                    <partial name="~/Views/Shared/Forms/Suppliers/_EditForm.cshtml"
+                                model="supplierFormModel" />
                 </div>
 
                 <div class="modal-footer">

@@ -1,131 +1,113 @@
-# Sistema de Gestión Rostagno SRL
+# ERP V2 — Sistema de gestión Rostagno SRL
 
-Sistema web de gestión interna para una empresa fabricante de transformadores eléctricos. Permite administrar productos, materiales, estructuras de producto (BOM) y órdenes de producción, con control de acceso por roles.
+Aplicación web de gestión interna para una empresa industrial. El proyecto se desarrolla con ASP.NET Core MVC, Razor Views, Entity Framework Core y SQL Server. Incluye catálogos, clientes, proveedores, inventario por depósito y órdenes de compra con recepción de mercadería.
 
-Desarrollado por **Gastón Galotto**
+> Estado del proyecto: desarrollo activo. Antes de utilizarlo en producción deben completarse las tareas de seguridad, concurrencia, despliegue y aceptación documentadas en `docs/ERP-V2-AUDITORIA-TECNICA.md` (si se distribuye ese informe junto al proyecto).
 
----
-
-## Capturas de pantalla
-
-### Dashboard — Administrador
-![Dashboard Administrador](TransformadoresApp/docs/screenshots/dashboard-admin.png)
-
-### Transformadores — Listado
-![Listado de Transformadores](TransformadoresApp/docs/screenshots/transformadores-index.png)
-
-### Modal de edición
-![Modal de formulario](TransformadoresApp/docs/screenshots/modal-formulario.png)
-
-### Órdenes de Producción
-![Órdenes de Producción](TransformadoresApp/docs/screenshots/ordenes-index.png)
-
-### Filtros avanzados
-![Filtros avanzados](TransformadoresApp/docs/screenshots/ordenes-detalles.png)
-
-### Detalle de Transformador con BOM
-![Detalle con BOM](TransformadoresApp/docs/screenshots/transformador-detalle-bom.png)
-
----
-
-## Tecnologías utilizadas
+## Tecnologías
 
 | Capa | Tecnología |
 |---|---|
-| Backend | ASP.NET Core MVC 8, C# |
-| ORM | Entity Framework Core + LINQ |
-| Base de datos | SQL Server LocalDB |
-| Frontend | Razor Views, Bootstrap 5, Bootstrap Icons |
-| Autenticación | ASP.NET Core Identity + Roles |
-| Librerías | ClosedXML, iTextSharp.LGPLv2.Core |
+| Backend | ASP.NET Core MVC / .NET 10 |
+| Lenguaje | C# |
+| ORM | Entity Framework Core 10 |
+| Base de datos | SQL Server (LocalDB para desarrollo local) |
+| Autenticación | ASP.NET Core Identity |
+| Autorización | Roles `Administrador` y `Operador` |
+| Frontend | Razor Views, Bootstrap 5, JavaScript |
+| Pruebas | xUnit v3, EF Core SQLite en memoria |
 
----
+## Módulos actuales
 
-## Funcionalidades principales
+- Administración de usuarios y roles.
+- Catálogos: categorías, artículos y unidades de medida.
+- Inventario: depósitos, stock, movimientos y transferencias.
+- Compras: proveedores, órdenes de compra, líneas y recepción.
+- Clientes.
+- Paneles de inicio según permisos.
 
-### 🔐 Roles de usuario
-- **Administrador** — acceso completo a todos los módulos
-- **Operario** — acceso restringido al módulo de Órdenes de Producción
+## Requisitos de desarrollo
 
-### 📦 Transformadores (Productos)
-- CRUD completo con modales
-- Importación masiva desde archivos Excel
-- Vista de detalle con BOM (lista de materiales) asociada
-- Búsqueda por código o nombre con paginación
+- SDK de .NET 10.
+- Visual Studio 2022 actualizado o editor compatible.
+- SQL Server LocalDB (incluido en las instalaciones habituales de Visual Studio en Windows).
+- Git.
 
-### 🔩 Materiales
-- CRUD completo con modales
-- Importación masiva desde Excel
-- Asociación con unidades de medida
+## Configuración local
 
-### 📋 BOM — Estructura de producto
-- Asociación de materiales a transformadores con cantidad requerida
+1. Clonar el repositorio y abrir `TransformadoresApp.sln`.
+2. Restaurar paquetes:
 
-### 🏭 Órdenes de Producción
-- CRUD completo con modales
-- Flujo de estados: `Pendiente → En Proceso → Completada / Cancelada`
-- Cambio de estado con confirmación por modal
-- Papelera con restauración o eliminación definitiva
-- Filtros avanzados por estado, producto y rango de fechas
-- Exportación individual a PDF
-- Preview de BOM al crear o editar una orden
+   ```powershell
+   dotnet restore TransformadoresApp.sln
+   ```
 
-### ⚙️ Panel de Administración
-- Gestión de usuarios y asignación de roles
-- Administración de unidades de medida
+3. Configurar la conexión en `TransformadoresApp/appsettings.json` o, preferentemente, mediante la variable de entorno `ConnectionStrings__DefaultConnection`.
 
----
+   Valor de desarrollo LocalDB:
 
-## Requisitos previos
+   ```text
+   Server=(localdb)\MSSQLLocalDB;Database=TransformadoresDb;Trusted_Connection=True;MultipleActiveResultSets=true
+   ```
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8)
-- SQL Server LocalDB (incluido con Visual Studio)
-- Visual Studio 2022 o superior
+4. Configurar las credenciales del administrador inicial mediante variables de entorno **antes del primer arranque**. No hay una contraseña predeterminada en el código:
 
----
+   ```powershell
+   $env:BootstrapAdmin__Email = "admin@tu-dominio.local"
+   $env:BootstrapAdmin__Password = "Usa-Una-Frase-Larga-2026!"
+   ```
 
-## Instalación y ejecución
+   La contraseña debe cumplir la política de Identity (12 caracteres como mínimo, mayúscula, minúscula, número y carácter no alfanumérico). Elegí una contraseña única y no uses el ejemplo. Si tu LocalDB ya fue inicializada con la versión anterior, la cuenta antigua no se elimina ni cambia automáticamente: actualizá su contraseña y revisá las cuentas existentes antes de exponer la aplicación.
 
-```bash
-# 1. Clonar el repositorio
-git clone https://github.com/gastong99/gestion-rostSRL.git
-cd gestion-rostSRL/TransformadoresApp
+5. Ejecutar:
 
-# 2. Restaurar dependencias
-dotnet restore
+   ```powershell
+   dotnet run --project TransformadoresApp
+   ```
 
-# 3. Aplicar migraciones (crea la base de datos automáticamente)
-dotnet ef database update
+   En Development, la aplicación aplica las migraciones y carga las unidades de medida iniciales. El administrador se crea si se configuraron ambas variables `BootstrapAdmin__Email` y `BootstrapAdmin__Password` y ese email aún no existe.
 
-# 4. Ejecutar la aplicación
-dotnet run
+6. Después de confirmar que el administrador inicial fue creado, eliminá las variables de entorno del proceso/sesión. La cuenta y su rol permanecen en la base de datos.
+
+## Pruebas
+
+Desde la raíz de la solución:
+
+```powershell
+dotnet test TransformadoresApp.sln
 ```
 
-La aplicación estará disponible en `https://localhost:5001` (o el puerto configurado).
+La suite actual cubre principalmente reglas de servicios de inventario y compras. Se está ampliando para incluir controladores, Identity, seguridad, concurrencia y flujos completos.
 
-> **Nota:** Al iniciar por primera vez, el sistema crea automáticamente los roles y el usuario administrador por defecto mediante un seed inicial.
+## Dependencias frontend
 
----
+Las dependencias estáticas utilizadas por las vistas se encuentran en `TransformadoresApp/wwwroot/lib`. Esa carpeta debe conservarse/versionarse o restaurarse mediante un manifiesto reproducible; no debe excluirse de una distribución limpia, ya que las vistas referencian sus rutas directamente.
 
-## Estructura del proyecto
+## Estructura
 
+```text
+TransformadoresApp/
+├── Areas/Identity/       # Páginas de autenticación
+├── Controllers/          # Endpoints MVC
+├── Data/                # DbContext, seeders y configuración de datos
+├── Migrations/           # Migraciones EF Core
+├── Models/              # Entidades de dominio
+├── Services/             # Servicios de Inventario y Compras
+├── Views/                # Vistas y formularios Razor
+└── wwwroot/               # CSS, JavaScript, imágenes y librerías
+TransformadoresApp.Tests/  # Pruebas automatizadas
+TransformadoresApp.sln
 ```
-├── Controllers/
-├── Models/
-├── Views/
-│   ├── Home/          # Dashboards por rol
-│   ├── Products/      # Transformadores
-│   ├── Materials/
-│   ├── BomItems/
-│   ├── ProductionOrders/
-│   ├── Admin/
-│   ├── UnitOfMeasures/
-│   └── Shared/        # Layout, breadcrumbs, modales compartidos
-├── Forms/             # Formularios parciales (Create/Edit por módulo)
-├── docs/
-│   └── screenshots/   # Capturas de pantalla
-├── wwwroot/
-│   ├── css/site.css
-│   └── js/            # Scripts de modales por módulo
-└── appsettings.json
-```
+
+## Seguridad y despliegue
+
+- El registro público está deshabilitado; las cuentas deben provisionarse por administración.
+- No almacenar contraseñas, claves ni connection strings sensibles en el repositorio.
+- LocalDB es solo para desarrollo local. Para producción, configurar una instancia de SQL Server adecuada y permisos mínimos.
+- En producción, las migraciones no se ejecutan automáticamente al iniciar la web. Aplicarlas desde el proceso de despliegue (por ejemplo, con `dotnet ef database update --project TransformadoresApp` después de instalar `dotnet-ef` 10.x) y verificar el resultado en staging.
+- Antes de desplegar, configurar secretos, backups y restauración, y ejecutar build/tests y pruebas de aceptación.
+- La aplicación aún requiere una revisión final de concurrencia de stock/recepciones y pruebas de integración antes de considerarse apta para comercialización.
+
+## Autor
+
+Desarrollado por Gastón Galotto.

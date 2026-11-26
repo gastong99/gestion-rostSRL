@@ -1,97 +1,119 @@
-﻿<div class="row">
+@model TransformadoresApp.Models.Purchasing.Supplier
 
-    <div class="col-md-4 mb-3">
-        <label for="Code" class="form-label">Código *</label>
-        <input name="Code"
+<div class="row g-3">
+
+    <div class="col-md-4">
+        <label asp-for="Code" class="form-label">Código *</label>
+        <input asp-for="Code"
                id="Code"
                class="form-control"
                maxlength="20"
                required />
+        <span asp-validation-for="Code" class="text-danger"></span>
     </div>
 
-    <div class="col-md-8 mb-3">
-        <label for="BusinessName" class="form-label">Razón Social *</label>
-        <input name="BusinessName"
+    <div class="col-md-8">
+        <label asp-for="BusinessName" class="form-label">Razón Social *</label>
+        <input asp-for="BusinessName"
                id="BusinessName"
                class="form-control"
                maxlength="150"
                required />
+        <span asp-validation-for="BusinessName" class="text-danger"></span>
     </div>
 
-    <div class="col-md-6 mb-3">
-        <label for="FantasyName" class="form-label">Nombre Comercial</label>
-        <input name="FantasyName"
+    <div class="col-md-6">
+        <label asp-for="FantasyName" class="form-label">Nombre Comercial</label>
+        <input asp-for="FantasyName"
                id="FantasyName"
                class="form-control"
                maxlength="150" />
+        <span asp-validation-for="FantasyName" class="text-danger"></span>
     </div>
 
-    <div class="col-md-6 mb-3">
-        <label for="TaxId" class="form-label">CUIT / RUT / NIT</label>
-        <input name="TaxId"
+    <div class="col-md-6">
+        <label asp-for="TaxId" class="form-label">CUIT / RUT / NIT</label>
+        <input asp-for="TaxId"
                id="TaxId"
                class="form-control"
-               maxlength="20" />
+               maxlength="20"
+               title="Ingresá un CUIT, RUT o NIT con al menos un número. Se admiten letras, números, puntos, espacios y guiones." />
+        <span asp-validation-for="TaxId" class="text-danger"></span>
     </div>
 
-    <div class="col-md-6 mb-3">
-        <label for="Email" class="form-label">Email</label>
-        <input name="Email"
+    <div class="col-md-6">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email"
                id="Email"
                type="email"
                class="form-control"
                maxlength="150" />
+        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
-    <div class="col-md-6 mb-3">
-        <label for="Phone" class="form-label">Teléfono</label>
-        <input name="Phone"
+    <div class="col-md-6">
+        <label asp-for="Phone" class="form-label">Teléfono</label>
+        <input asp-for="Phone"
                id="Phone"
+               type="tel"
                class="form-control"
-               maxlength="50" />
+               maxlength="50"
+               inputmode="tel"
+               data-phone-input
+               data-initial-country="ar"
+               title="Admite números, +, espacios, guiones y paréntesis." />
+        <span asp-validation-for="Phone" class="text-danger"></span>
     </div>
 
-    <div class="col-md-12 mb-3">
-        <label for="Address" class="form-label">Dirección</label>
-        <input name="Address"
+    <div class="col-md-12">
+        <label asp-for="Address" class="form-label">Dirección</label>
+        <input asp-for="Address"
                id="Address"
                class="form-control"
-               maxlength="200" />
+               maxlength="200"
+               title="Ingresá una dirección con letras. Podés incluir números, espacios y caracteres habituales de un domicilio." />
+        <span asp-validation-for="Address" class="text-danger"></span>
     </div>
 
-    <div class="col-md-4 mb-3">
-        <label for="City" class="form-label">Ciudad</label>
-        <input name="City"
+    <div class="col-md-4">
+        <label asp-for="City" class="form-label">Ciudad</label>
+        <input asp-for="City"
                id="City"
                class="form-control"
-               maxlength="100" />
+               maxlength="100"
+               title="Ingresá un nombre compuesto por letras. No se permiten números." />
+        <span asp-validation-for="City" class="text-danger"></span>
     </div>
 
-    <div class="col-md-4 mb-3">
-        <label for="Province" class="form-label">Provincia</label>
-        <input name="Province"
+    <div class="col-md-4">
+        <label asp-for="Province" class="form-label">Provincia</label>
+        <input asp-for="Province"
                id="Province"
                class="form-control"
-               maxlength="100" />
+               maxlength="100"
+               title="Ingresá un nombre compuesto por letras. No se permiten números." />
+        <span asp-validation-for="Province" class="text-danger"></span>
     </div>
 
-    <div class="col-md-4 mb-3">
-        <label for="Country" class="form-label">País</label>
-        <input name="Country"
+    <div class="col-md-4">
+        <label asp-for="Country" class="form-label">País</label>
+        <input asp-for="Country"
                id="Country"
                class="form-control"
                maxlength="100"
-               value="Argentina" />
+               value="Argentina"
+               title="Ingresá un nombre compuesto por letras. No se permiten números." />
+        <span asp-validation-for="Country" class="text-danger"></span>
     </div>
 
-    <div class="col-md-12 mb-3">
-        <label for="Notes" class="form-label">Observaciones</label>
-
-        <textarea name="Notes"
+    <div class="col-md-12">
+        <label asp-for="Notes" class="form-label">Observaciones</label>
+        <textarea asp-for="Notes"
                   id="Notes"
                   class="form-control"
                   rows="4"
                   maxlength="500"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
     </div>
 
 </div>

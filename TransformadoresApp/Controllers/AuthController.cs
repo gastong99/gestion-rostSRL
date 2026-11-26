@@ -1,4 +1,4 @@
-﻿
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +41,7 @@ namespace TransformadoresApp.Controllers
             var result = await _signInManager.PasswordSignInAsync(
                 email,
                 password,
-                isPersistent: true,
+                isPersistent: false,
                 lockoutOnFailure: true
             );
 

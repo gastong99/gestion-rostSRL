@@ -1,4 +1,11 @@
-﻿<div class="modal fade" id="createSupplierModal" tabindex="-1" aria-hidden="true">
+﻿@{
+    var supplierFormModel =
+        ViewData["SupplierCreateModel"]
+        as TransformadoresApp.Models.Purchasing.Supplier
+        ?? new TransformadoresApp.Models.Purchasing.Supplier();
+}
+
+<div class="modal fade" id="createSupplierModal" tabindex="-1" aria-hidden="true">
 
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -12,12 +19,17 @@
                 </button>
             </div>
 
-            <form asp-action="Create" method="post">
+            <form id="createSupplierForm" asp-action="Create" method="post">
 
                 @Html.AntiForgeryToken()
 
+                <input type="hidden"
+                   name="showInactive"
+                   value="@(ViewBag.ShowInactive == true)" />
+
                 <div class="modal-body">
-                    <partial name="~/Views/Shared/Forms/Suppliers/_CreateForm.cshtml"  model="new TransformadoresApp.Models.Purchasing.Supplier()" />
+                    <partial name="~/Views/Shared/Forms/Suppliers/_CreateForm.cshtml"
+                            model="supplierFormModel" />
                 </div>
 
                 <div class="modal-footer">

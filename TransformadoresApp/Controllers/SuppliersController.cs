@@ -35,9 +35,15 @@ namespace TransformadoresApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Supplier supplier)
+        public async Task<IActionResult> Create(Supplier supplier, bool showInactive = false)
         {
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
+            if (!ModelState.IsValid)
+            {
+                return await ReturnToIndexWithValidation(
+                    supplier,
+                    "create",
+                    showInactive);
+            }
 
             supplier.Code = supplier.Code.Trim();
             supplier.BusinessName = supplier.BusinessName.Trim();
@@ -53,10 +59,16 @@ namespace TransformadoresApp.Controllers
 
             var codeExists = await _context.Suppliers.AnyAsync(s => s.Code == supplier.Code);
 
-            if (codeExists) {
-                TempData["Error"] = "Ya existe un proveedor con ese código.";
+            if (codeExists)
+            {
+                ModelState.AddModelError(
+                    nameof(Supplier.Code),
+                    "Ya existe un proveedor con ese código.");
 
-                return RedirectToAction(nameof(Index));
+                return await ReturnToIndexWithValidation(
+                    supplier,
+                    "create",
+                    showInactive);
             }
 
             supplier.IsActive = true;
@@ -72,11 +84,17 @@ namespace TransformadoresApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Supplier supplier)
+        public async Task<IActionResult> Edit(int id, Supplier supplier, bool showInactive = false)
         {
             if (id != supplier.Id) return NotFound();
 
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
+            if (!ModelState.IsValid)
+            {
+                return await ReturnToIndexWithValidation(
+                    supplier,
+                    "edit",
+                    showInactive);
+            }
 
             supplier.Code = supplier.Code.Trim();
             supplier.BusinessName = supplier.BusinessName.Trim();
@@ -96,10 +114,16 @@ namespace TransformadoresApp.Controllers
 
             var codeExists = await _context.Suppliers.AnyAsync(s => s.Code == supplier.Code && s.Id != supplier.Id);
 
-            if (codeExists) {
-                TempData["Error"] = "Ya existe un proveedor con ese código.";
+            if (codeExists)
+            {
+                ModelState.AddModelError(
+                    nameof(Supplier.Code),
+                    "Ya existe un proveedor con ese código.");
 
-                return RedirectToAction(nameof(Index));
+                return await ReturnToIndexWithValidation(
+                    supplier,
+                    "edit",
+                    showInactive);
             }
 
             existingSupplier.Code = supplier.Code;
@@ -182,6 +206,34 @@ namespace TransformadoresApp.Controllers
                 .ToListAsync();
 
             return Json(suppliers);
+        }
+
+        private async Task<IActionResult> ReturnToIndexWithValidation(Supplier supplier, string modal, bool showInactive)
+        {
+            ViewBag.ShowInactive = showInactive;
+            ViewBag.ValidationModal = modal;
+
+            if (modal == "create")
+            {
+                ViewData["SupplierCreateModel"] = supplier;
+            }
+            else
+            {
+                ViewData["SupplierEditModel"] = supplier;
+            }
+
+            var query = _context.Suppliers.AsQueryable();
+
+            if (!showInactive)
+            {
+                query = query.Where(s => s.IsActive);
+            }
+
+            var suppliers = await query
+                .OrderBy(s => s.BusinessName)
+                .ToListAsync();
+
+            return View("Index", suppliers);
         }
     }
 }

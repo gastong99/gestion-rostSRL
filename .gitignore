@@ -41,7 +41,6 @@
 appsettings.Development.json
 **/publish/
 *.log
-wwwroot/lib/
 
 
 # ─── NuGet ───────────────────────────────────────────────────

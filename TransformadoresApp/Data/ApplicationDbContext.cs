@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TransformadoresApp.Models;
 using TransformadoresApp.Models.Catalogs;
+using TransformadoresApp.Models.Customers;
 using TransformadoresApp.Models.Inventory;
 using TransformadoresApp.Models.Purchasing;
 
@@ -22,6 +24,7 @@ namespace TransformadoresApp.Data
         public DbSet<ItemStock> ItemStocks => Set<ItemStock>();
         public DbSet<StockMovement> StockMovements => Set<StockMovement>();
         public DbSet<Supplier> Suppliers => Set<Supplier>();
+        public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
         public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
 
@@ -135,6 +138,71 @@ namespace TransformadoresApp.Data
                 .WithMany(w => w.StockMovements)
                 .HasForeignKey(sm => sm.WarehouseId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================
+            // CLIENTES
+            // =====================
+
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                // Código único
+                entity.HasIndex(c => c.Code)
+                    .IsUnique();
+
+                entity.Property(c => c.Code)
+                    .HasMaxLength(20);
+
+                // Tipo de cliente
+                entity.Property(c => c.CustomerType)
+                    .HasConversion<int>();
+
+                // Datos personales y empresariales
+                entity.Property(c => c.FirstName)
+                    .HasMaxLength(100);
+
+                entity.Property(c => c.LastName)
+                    .HasMaxLength(100);
+
+                entity.Property(c => c.BusinessName)
+                    .HasMaxLength(150);
+
+                entity.Property(c => c.FantasyName)
+                    .HasMaxLength(150);
+
+                // Identificación fiscal
+                entity.Property(c => c.TaxId)
+                    .HasMaxLength(20);
+
+                entity.Property(c => c.DocumentNumber)
+                    .HasMaxLength(20);
+
+                // Contacto
+                entity.Property(c => c.Email)
+                    .HasMaxLength(150);
+
+                entity.Property(c => c.Phone)
+                    .HasMaxLength(50);
+
+                entity.Property(c => c.ContactName)
+                    .HasMaxLength(150);
+
+                // Domicilio
+                entity.Property(c => c.Address)
+                    .HasMaxLength(200);
+
+                entity.Property(c => c.City)
+                    .HasMaxLength(100);
+
+                entity.Property(c => c.Province)
+                    .HasMaxLength(100);
+
+                entity.Property(c => c.Country)
+                    .HasMaxLength(100);
+
+                // Otros
+                entity.Property(c => c.Notes)
+                    .HasMaxLength(500);
+            });
 
             // =====================
             // COMPRAS

@@ -1,0 +1,227 @@
+@model TransformadoresApp.Models.Customers.Customer
+
+<input type="hidden" asp-for="Id" id="edit_Id" />
+
+@* =====================
+   IDENTIFICACIÓN
+   ===================== *@
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+        <label asp-for="Code" class="form-label">Código *</label>
+        <input asp-for="Code"
+               id="edit_Code"
+               class="form-control"
+               maxlength="20"
+               title="Solo letras, números, puntos, guiones y barras."
+               required />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="CustomerType" class="form-label">Tipo de cliente *</label>
+        <select asp-for="CustomerType"
+                id="edit_CustomerType"
+                class="form-select"
+                onchange="toggleEditCustomerFields()"
+                required>
+            <option value="">Seleccioná un tipo de cliente</option>
+            <option value="1">Persona física</option>
+            <option value="2">Empresa</option>
+        </select>
+        <span asp-validation-for="CustomerType" class="text-danger"></span>
+    </div>
+
+</div>
+
+@* =====================
+   PERSONA FÍSICA
+   ===================== *@
+
+<div id="edit_personFields" class="row g-3 mt-1">
+
+    <div class="col-md-6">
+        <label asp-for="FirstName" class="form-label">Nombre *</label>
+        <input asp-for="FirstName"
+               id="edit_FirstName"
+               class="form-control"
+               maxlength="100" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="LastName" class="form-label">Apellido *</label>
+        <input asp-for="LastName"
+               id="edit_LastName"
+               class="form-control"
+               maxlength="100" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="DocumentNumber" class="form-label">DNI / Documento</label>
+        <input asp-for="DocumentNumber"
+               id="edit_DocumentNumber"
+               class="form-control"
+               maxlength="20"
+               title="Admite letras, números, espacios, puntos, guiones y barras."
+               autocomplete="off" />
+        <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+        <small class="text-muted">Podés ingresar DNI, pasaporte u otro documento.</small>
+    </div>
+
+</div>
+
+@* =====================
+   EMPRESA
+   ===================== *@
+
+<div id="edit_companyFields" class="row g-3 mt-1" hidden>
+
+    <div class="col-md-6">
+        <label asp-for="BusinessName" class="form-label">Razón social *</label>
+        <input asp-for="BusinessName"
+               id="edit_BusinessName"
+               class="form-control"
+               maxlength="150" />
+        <span asp-validation-for="BusinessName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="FantasyName" class="form-label">Nombre de fantasía</label>
+        <input asp-for="FantasyName"
+               id="edit_FantasyName"
+               class="form-control"
+               maxlength="150" />
+        <span asp-validation-for="FantasyName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="ContactName" class="form-label">Nombre del contacto</label>
+        <input asp-for="ContactName"
+               id="edit_ContactName"
+               class="form-control"
+               maxlength="150" />
+        <span asp-validation-for="ContactName" class="text-danger"></span>
+    </div>
+
+</div>
+
+@* =====================
+   DATOS FISCALES
+   ===================== *@
+
+<div class="row g-3 mt-1">
+
+    <div class="col-md-6">
+        <label asp-for="TaxId" class="form-label">CUIT / CUIL</label>
+        <input asp-for="TaxId"
+               id="edit_TaxId"
+               class="form-control"
+               maxlength="20"
+               inputmode="numeric"
+               data-mask="cuit"
+               title="Ingresá 11 números, con o sin guiones." />
+        <span asp-validation-for="TaxId" class="text-danger"></span>
+    </div>
+
+</div>
+
+@* =====================
+   CONTACTO
+   ===================== *@
+
+<div class="row g-3 mt-1">
+
+    <div class="col-md-6">
+        <label asp-for="Email" class="form-label">Correo electrónico</label>
+        <input asp-for="Email"
+               id="edit_Email"
+               type="email"
+               class="form-control"
+               maxlength="150" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Phone" class="form-label">Teléfono</label>
+        <input asp-for="Phone"
+               id="edit_Phone"
+               type="tel"
+               class="form-control"
+               maxlength="50"
+               inputmode="tel"
+               data-phone-input
+               data-initial-country="ar"
+               title="Admite números, +, espacios, guiones y paréntesis." />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+</div>
+
+@* =====================
+   DOMICILIO
+   ===================== *@
+
+<div class="row g-3 mt-1">
+
+    <div class="col-12">
+        <label asp-for="Address" class="form-label">Dirección</label>
+        <input asp-for="Address"
+               id="edit_Address"
+               class="form-control"
+               maxlength="200"
+               title="Ingresá una dirección con letras. Podés incluir números, espacios y caracteres habituales de un domicilio." />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="City" class="form-label">Ciudad</label>
+        <input asp-for="City"
+               id="edit_City"
+               class="form-control"
+               maxlength="100"
+               title="Ingresá un nombre compuesto por letras. No se permiten números." />
+        <span asp-validation-for="City" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Province" class="form-label">Provincia</label>
+        <input asp-for="Province"
+               id="edit_Province"
+               class="form-control"
+               maxlength="100"
+               title="Ingresá un nombre compuesto por letras. No se permiten números." />
+        <span asp-validation-for="Province" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Country" class="form-label">País</label>
+        <input asp-for="Country"
+               id="edit_Country"
+               class="form-control"
+               maxlength="100"
+               title="Ingresá un nombre compuesto por letras. No se permiten números." />
+        <span asp-validation-for="Country" class="text-danger"></span>
+    </div>
+
+</div>
+
+@* =====================
+   INFORMACIÓN ADICIONAL
+   ===================== *@
+
+<div class="mt-3">
+
+    <label asp-for="Notes" class="form-label">Observaciones</label>
+
+    <textarea asp-for="Notes"
+              id="edit_Notes"
+              class="form-control"
+              rows="3"
+              maxlength="500"></textarea>
+
+    <span asp-validation-for="Notes" class="text-danger"></span>
+
+</div>

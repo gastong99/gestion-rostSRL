@@ -924,3 +924,60 @@ span[class*="-error"] {
         margin-bottom: 20px;
     }
 }
+
+/* ===== MODALES DE CLIENTES ===== */
+
+.customer-modal-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.customer-modal-form .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.customer-modal-form .modal-footer {
+    flex-shrink: 0;
+}
+
+
+/* =====================
+   INTL-TEL-INPUT - SEARCH
+   ===================== */
+
+.iti__search-wrapper {
+    position: relative;
+}
+
+.iti__search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.iti__search-input {
+    width: 100%;
+    padding-left: 38px !important;
+    box-sizing: border-box;
+}
+
+/* =====================
+   PHONE INPUT
+   ===================== */
+
+.iti {
+    display: block;
+    width: 100%;
+}
+
+    .iti input {
+        width: 100%;
+    }

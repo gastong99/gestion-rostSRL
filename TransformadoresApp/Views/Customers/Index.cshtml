@@ -1,0 +1,239 @@
+﻿
+@model IEnumerable<TransformadoresApp.Models.Customers.Customer>
+
+@using TransformadoresApp.Models.Customers
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<a asp-controller="Home" asp-action="Index" class="page-back">
+    <i class="bi bi-arrow-left"></i>
+    Panel Principal
+</a>
+
+<div class="page-card">
+
+    <h2 class="page-card-title">
+        <i class="bi bi-people"></i>
+        Clientes
+    </h2>
+
+    <div class="view-actions">
+
+        <button class="btn-create" onclick="openCreateModal()">
+            <i class="bi bi-plus-circle"></i>
+            Nuevo Cliente
+        </button>
+
+        <a asp-action="Index"
+           asp-route-showInactive="@(!(ViewBag.ShowInactive ?? false))"
+           class="btn btn-outline-secondary">
+
+            <i class="bi bi-eye"></i>
+
+            @(ViewBag.ShowInactive == true
+                ? "Ocultar inactivos"
+                : "Mostrar inactivos")
+        </a>
+
+    </div>
+
+    <table class="table table-hover mt-3">
+
+        <thead>
+            <tr>
+                <th style="width:9%">Código</th>
+                <th style="width:10%">Tipo</th>
+                <th style="width:25%">Cliente</th>
+                <th style="width:14%">CUIT / Documento</th>
+                <th style="width:12%">Teléfono</th>
+                <th style="width:12%">Ciudad</th>
+                <th style="width:8%" class="text-center">Estado</th>
+                <th style="width:10%" class="text-center">Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                var displayName = item.CustomerType == CustomerType.Person
+                    ? $"{item.FirstName} {item.LastName}".Trim()
+                    : item.BusinessName;
+
+                var customerData = new
+                {
+                    id = item.Id,
+                    code = item.Code,
+                    customerType = (int)item.CustomerType,
+                    firstName = item.FirstName,
+                    lastName = item.LastName,
+                    businessName = item.BusinessName,
+                    fantasyName = item.FantasyName,
+                    taxId = item.TaxId,
+                    documentNumber = item.DocumentNumber,
+                    email = item.Email,
+                    phone = item.Phone,
+                    contactName = item.ContactName,
+                    address = item.Address,
+                    city = item.City,
+                    province = item.Province,
+                    country = item.Country,
+                    notes = item.Notes,
+                    displayName = displayName
+                };
+
+                <tr>
+
+                    <td style="vertical-align:middle">
+                        @item.Code
+                    </td>
+
+                    <td style="vertical-align:middle">
+                        @if (item.CustomerType == CustomerType.Person)
+                        {
+                            <span class="badge bg-info text-dark">
+                                Persona
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-primary">
+                                Empresa
+                            </span>
+                        }
+                    </td>
+
+                    <td style="vertical-align:middle">
+
+                        @if (item.CustomerType == CustomerType.Person)
+                        {
+                            @($"{item.FirstName} {item.LastName}")
+                        }
+                        else
+                        {
+                            <div>@item.BusinessName</div>
+
+                            @if (!string.IsNullOrWhiteSpace(item.FantasyName))
+                            {
+                                <small class="text-muted">
+                                    @item.FantasyName
+                                </small>
+                            }
+                        }
+
+                    </td>
+
+                    <td style="vertical-align:middle">
+                        @(item.TaxId ?? item.DocumentNumber)
+                    </td>
+
+                    <td style="vertical-align:middle">
+                        @item.Phone
+                    </td>
+
+                    <td style="vertical-align:middle">
+                        @item.City
+                    </td>
+
+                    <td class="text-center" style="vertical-align:middle">
+
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">
+                                Activo
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">
+                                Inactivo
+                            </span>
+                        }
+
+                    </td>
+
+                    <td>
+
+                        <div class="action-btn-group">
+
+                            @if (item.IsActive)
+                            {
+                                <button class="action-btn action-btn-edit"
+                                        onclick='openEditModal(@Html.Raw(Json.Serialize(customerData)))'>
+
+                                    <i class="bi bi-pencil"></i>
+
+                                    <span class="action-tooltip">
+                                        Modificar
+                                    </span>
+
+                                </button>
+
+                                <button class="action-btn action-btn-delete"
+                                        onclick="openDeactivateModal(
+                                        @customerData.id,
+                                        '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customerData.code ?? string.Empty))',
+                                        '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customerData.displayName ?? string.Empty))'
+                                        )">
+
+                                    <i class="bi bi-pause-circle"></i>
+
+                                    <span class="action-tooltip">
+                                        Desactivar
+                                    </span>
+
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="action-btn action-btn-restore"
+                                        onclick="openRestoreModal(
+                                        @customerData.id,
+                                        '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customerData.code ?? string.Empty))',
+                                        '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customerData.displayName ?? string.Empty))'
+                                        )">
+
+                                    <i class="bi bi-arrow-clockwise"></i>
+
+                                    <span class="action-tooltip">
+                                        Restaurar
+                                    </span>
+
+                                </button>
+                            }
+
+                        </div>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<partial name="_Modals/_CreateCustomerModal" />
+<partial name="_Modals/_EditCustomerModal" />
+<partial name="_Modals/_DeactivateCustomerModal" />
+<partial name="_Modals/_RestoreCustomerModal" />
+
+<div id="customerValidationState"
+     data-modal="@ViewBag.ValidationModal">
+</div>
+
+@section Scripts {
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script src="~/lib/imask/imask.min.js"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/form-masks.js" asp-append-version="true"></script>
+    <script src="~/js/phone-input.js" asp-append-version="true"></script>
+    <script src="~/js/form-validation.js" asp-append-version="true"></script>
+    <script src="~/js/customers.modals.js" asp-append-version="true"></script>
+}

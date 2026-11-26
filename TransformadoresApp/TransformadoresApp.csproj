@@ -28,6 +28,7 @@
 	<ItemGroup>
 		<Folder Include="Models\Administration\" />
 		<Folder Include="Models\Sales\" />
+		<Folder Include="wwwroot\lib\intl-tel-input\img\" />
 	</ItemGroup>
 
 </Project>

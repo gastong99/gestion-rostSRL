@@ -162,7 +162,16 @@
 <partial name="_Modals/_DeactivateSupplierModal" />
 <partial name="_Modals/_RestoreSupplierModal" />
 
+<div id="supplierValidationState"
+     data-modal="@ViewBag.ValidationModal">
+</div>
+
 @section Scripts {
-    <script src="~/js/suppliers.modals.js" asp-append-version="true"></script>
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+
     <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/phone-input.js" asp-append-version="true"></script>
+    <script src="~/js/form-validation.js" asp-append-version="true"></script>
+    <script src="~/js/suppliers.modals.js" asp-append-version="true"></script>
 }

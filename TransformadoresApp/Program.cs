@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,8 @@ CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
 
 // MVC + Localización
 builder.Services.AddLocalization();
-builder.Services.AddControllersWithViews()
+builder.Services.AddControllersWithViews(options =>
+        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
 
@@ -38,16 +40,32 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Identity (usuarios + roles)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
+    // ERP interno: las cuentas se crean por administración o bootstrap seguro.
     options.SignIn.RequireConfirmedAccount = false;
-    options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
+    options.User.RequireUniqueEmail = true;
+
+    options.Password.RequiredLength = 12;
+    options.Password.RequireDigit = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders()
 .AddDefaultUI();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = true;
+});
 
 // Servicios
 builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
@@ -67,10 +85,20 @@ app.UseRequestLocalization(locOptions.Value);
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
 
+    // En producción, las migraciones deben aplicarse como parte del despliegue,
+    // antes de iniciar la aplicación. El arranque automático queda limitado a Development.
+    if (app.Environment.IsDevelopment())
+    {
+        db.Database.Migrate();
+    }
+
+    // Seed idempotente de datos de referencia. La base debe estar migrada previamente.
     DbSeeder.Seed(db);
-    await IdentitySeeder.SeedRolesAndAdminAsync(scope.ServiceProvider);
+    await IdentitySeeder.SeedRolesAndAdminAsync(
+        scope.ServiceProvider,
+        app.Configuration,
+        app.Logger);
 }
 
 // Middleware

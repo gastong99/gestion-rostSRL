@@ -1,0 +1,69 @@
+﻿@using TransformadoresApp.Models.Customers
+
+@{
+    var customerFormModel =
+        ViewData["CustomerCreateModel"] as Customer
+        ?? new Customer();
+}
+
+<div class="modal fade" id="createCustomerModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header" style="background: #1E6B45; color: #fff;">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle"></i>
+                    Nuevo Cliente
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <form id="createCustomerForm" asp-action="Create" method="post" class="customer-modal-form">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="showInactive"
+                       value="@(ViewBag.ShowInactive ?? false)" />
+
+                <div class="modal-body">
+
+                    <partial name="~/Views/Shared/Forms/Customers/_CreateForm.cshtml"
+                                 model="customerFormModel" />
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success"
+                            style="background: #1E6B45; color: #fff;">
+
+                        <i class="bi bi-save"></i>
+                        Guardar Cliente
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

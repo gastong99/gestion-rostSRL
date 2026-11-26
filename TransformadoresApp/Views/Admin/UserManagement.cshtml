@@ -1,4 +1,4 @@
-﻿
+
 @model TransformadoresApp.ViewModels.UserListViewModel
 
 @{
@@ -11,15 +11,22 @@
 
 <div class="page-card">
 
-    <h2 class="page-card-title">
-        <i class="bi bi-people"></i> Gestión de Usuarios
-    </h2>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+        <h2 class="page-card-title mb-0">
+            <i class="bi bi-people"></i> Gestión de Usuarios
+        </h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            <i class="bi bi-person-plus"></i> Nuevo usuario
+        </button>
+    </div>
 
     @if (!Model.Users.Any())
     {
         <div class="alert alert-warning text-center">
             <i class="bi bi-exclamation-triangle-fill"></i>
             No hay usuarios registrados.
+        
+
         </div>
     }
     else
@@ -38,18 +45,11 @@
                 {
                     var isAdmin = user.Roles.Contains("Administrador");
                     var isOperator = user.Roles.Contains("Operador");
-                    var isMainAdmin = user.Email == "admin@rostagno.com";
 
                     <tr>
                         <td>
                             @user.Email
 
-                            @if (isMainAdmin)
-                            {
-                                <span class="badge bg-primary ms-2">
-                                    <i class="bi bi-shield-fill"></i> Principal
-                                </span>
-                            }
                         </td>
 
                         <td class="text-center">
@@ -79,20 +79,10 @@
                         <td class="text-center">
                             @if (isAdmin)
                             {
-                                @if (!isMainAdmin)
-                                {
-                                    <span class="text-muted small">
-                                        <i class="bi bi-lock-fill"></i>
-                                        Administrador completo
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted small">
-                                        <i class="bi bi-shield-fill-check"></i>
-                                        Usuario protegido
-                                    </span>
-                                }
+                                <span class="text-muted small">
+                                    <i class="bi bi-shield-fill-check"></i>
+                                    Administrador completo
+                                </span>
                             }
                             else
                             {
@@ -183,4 +173,40 @@
             </nav>
         }
     }
+</div>
+
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="CreateUser" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">Crear usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newUserEmail" class="form-label">Correo electrónico *</label>
+                        <input id="newUserEmail" name="Email" type="email" class="form-control" maxlength="256" autocomplete="off" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="newUserPassword" class="form-label">Contraseña temporal *</label>
+                        <input id="newUserPassword" name="Password" type="password" class="form-control" minlength="12" maxlength="100" autocomplete="new-password" required />
+                        <div class="form-text">Mínimo 12 caracteres, con mayúscula, minúscula, número y símbolo.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newUserRole" class="form-label">Rol *</label>
+                        <select id="newUserRole" name="Role" class="form-select" required>
+                            <option value="Operador">Operador</option>
+                            <option value="Administrador">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-person-plus"></i> Crear usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

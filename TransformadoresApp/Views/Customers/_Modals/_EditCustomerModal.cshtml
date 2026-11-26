@@ -1,0 +1,74 @@
+﻿@using TransformadoresApp.Models.Customers
+
+@{
+    var customerFormModel =
+        ViewData["CustomerEditModel"] as Customer
+        ?? new Customer();
+}
+
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-warning">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil"></i>
+
+                    <span id="editCustomerModalTitle">
+                        Editar Cliente
+                    </span>
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <form id="editCustomerForm" asp-controller="Customers" asp-action="Edit" asp-route-id="@customerFormModel.Id" method="post" class="customer-modal-form">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="showInactive"
+                       value="@(ViewBag.ShowInactive ?? false)" />
+
+                <div class="modal-body">
+
+                    <div asp-validation-summary="All"
+                         class="text-danger validation-summary">
+                    </div>
+
+                    <partial name="~/Views/Shared/Forms/Customers/_EditForm.cshtml"
+                                 model="customerFormModel" />
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-warning">
+
+                        <i class="bi bi-save"></i>
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
